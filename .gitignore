@@ -1,5 +1,5 @@
-# Created by https://www.toptal.com/developers/gitignore/api/windows,macos,django,python
-# Edit at https://www.toptal.com/developers/gitignore?templates=windows,macos,django,python
+# Created by https://www.toptal.com/developers/gitignore/api/windows,macos,react,django,python
+# Edit at https://www.toptal.com/developers/gitignore?templates=windows,macos,react,django,python
 
 ### Django ###
 *.log
@@ -296,6 +296,21 @@ poetry.toml
 # LSP config files
 pyrightconfig.json
 
+### react ###
+.DS_*
+logs
+**/*.backup.*
+**/*.back.*
+
+node_modules
+bower_components
+
+*.sublime*
+
+psd
+thumb
+sketch
+
 ### Windows ###
 # Windows thumbnail cache files
 Thumbs.db
@@ -322,4 +337,4 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
-# End of https://www.toptal.com/developers/gitignore/api/windows,macos,django,python
+# End of https://www.toptal.com/developers/gitignore/api/windows,macos,react,django,python
