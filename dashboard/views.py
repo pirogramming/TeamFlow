@@ -1,7 +1,18 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from teams.models import Team, TeamMember
+from django.db.models import F
 #from tasks.models import Task 'tasks' 앱의 Task 모델을 임포트했다고 가정
+
+@login_required
+def dashboard_router_view(request):
+    my_team = Team.objects.filter(members=request.user).first()
+
+    if my_team:
+        return redirect('dashboard', team_id=my_team.id)
+    else:
+        return redirect('team_join')
+    
 
 @login_required
 def dashboard_view(request, team_id):
@@ -14,7 +25,10 @@ def dashboard_view(request, team_id):
 
     # 2. 팀 현황 정보 불러오기 (이름, 학과, 역할)
     # User 모델에 'major' 필드가 있다고 가정
-    team_members = TeamMember.objects.filter(team=team).select_related('user')
+    team_members = TeamMember.objects.filter(team=team).annotate(
+        name=F('user__username'),
+        major=F('user__profile__major')
+    ).values('name', 'major', 'role')
 
     # 3. 전체 진행률 및 개인 완료율 계산 
     total_tasks_count = all_team_tasks.count()
