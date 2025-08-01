@@ -21,4 +21,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/teams/', include('teams.urls')),
     path('api/dashboard/', include('dashboard.urls')),
+    path('api/auth/', include('users.urls')),
+
+    # django allauth에서 제공하는 계정 관련 URL 추가
+    path('accounts/', include('allauth.urls')),
 ]
