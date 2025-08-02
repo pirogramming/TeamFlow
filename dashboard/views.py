@@ -4,6 +4,10 @@ from teams.models import Team, TeamMember
 from django.db.models import F
 #from tasks.models import Task 'tasks' 앱의 Task 모델을 임포트했다고 가정
 
+def landing_page_view(request):
+    return render(request, 'landing/index.html')
+
+
 @login_required
 def dashboard_router_view(request):
     my_team = Team.objects.filter(members=request.user).first()

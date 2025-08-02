@@ -19,7 +19,7 @@ def team_create_view(request):
         # return redirect('dashboard') 
         return redirect('/') # 임시로 메인 페이지로 이동
 
-    return render(request, 'teams/team_create.html')
+    return render(request, 'team/create.html')
 
 
 @login_required
