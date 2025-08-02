@@ -18,6 +18,7 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from dashboard import views as dashboard
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -27,6 +28,7 @@ urlpatterns = [
 
     # django allauth에서 제공하는 계정 관련 URL 추가
     path('accounts/', include('allauth.urls')),
+    path('', dashboard.landing_page_view, name='landing_index'),
 ]
 
 # 개발 환경에서 static 파일 서빙
