@@ -183,5 +183,6 @@ import environ
 env = environ.Env(DEBUG=(bool, False))
 environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
+GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID')
 # .env 파일에서 GOOGLE_CLIENT_SECRET 변수 값을 가져와 사용
 GOOGLE_CLIENT_SECRET = env('GOOGLE_CLIENT_SECRET')

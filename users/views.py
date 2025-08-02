@@ -1,3 +1,5 @@
+from django.conf import settings
+from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -51,3 +53,10 @@ class GoogleLoginAPIView(APIView):
 
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        
+
+        
+def login_page(request):
+    return render(request, 'auth/login.html', {
+        'GOOGLE_CLIENT_ID': settings.GOOGLE_CLIENT_ID
+    })

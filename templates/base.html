@@ -144,7 +144,7 @@
       // 백엔드에서 템플릿 컨텍스트로 전달해야 할 설정값들
       window.APP_CONFIG = {
           // Google OAuth 클라이언트 ID (백엔드 settings.py에서 관리)
-          GOOGLE_CLIENT_ID: 'GOOGLE_CLIENT_ID',
+          GOOGLE_CLIENT_ID: '{{ GOOGLE_CLIENT_ID }}',
 
           // API 기본 URL (개발/운영 환경별 다름)
           // API_BASE_URL: '{#% url "api_root" %#}', 
