@@ -337,4 +337,7 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
+# Cursor IDE
+.cursor
+
 # End of https://www.toptal.com/developers/gitignore/api/windows,macos,react,django,python
