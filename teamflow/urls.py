@@ -16,6 +16,8 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -26,3 +28,7 @@ urlpatterns = [
     # django allauth에서 제공하는 계정 관련 URL 추가
     path('accounts/', include('allauth.urls')),
 ]
+
+# 개발 환경에서 static 파일 서빙
+if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
