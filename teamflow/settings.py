@@ -63,7 +63,7 @@ REST_FRAMEWORK = {
     )
 }
 
-SITE_ID = 1
+SITE_ID = 2
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -165,18 +165,18 @@ REST_FRAMEWORK = {
     ]
 }
 
-LOGIN_REDIRECT_URL = '/'
-LOGOUT_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = '/api/dashboard/'  # 로그인 후 이동할 페이지
+LOGOUT_REDIRECT_URL = '/'           # 로그아웃 후 이동할 페이지
 
+# 구글 OAuth 클라이언트 정보
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
-        'APP': {
-            'client_id': os.getenv('GOOGLE_CLIENT_ID'),
-            'secret': os.getenv('GOOGLE_CLIENT_SECRET'),
-            'key': ''
-        }
+        
+        'SCOPE': ['profile', 'email'],
+        'AUTH_PARAMS': {'access_type': 'online'},
     }
 }
+
 import environ
 
 # .env 파일을 읽어오기 위한 설정
