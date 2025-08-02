@@ -340,4 +340,7 @@ $RECYCLE.BIN/
 # Cursor IDE
 .cursor
 
+# TeamFlow 캡쳐본 폴더
+팀플로우 캡쳐본/
+
 # End of https://www.toptal.com/developers/gitignore/api/windows,macos,react,django,python
