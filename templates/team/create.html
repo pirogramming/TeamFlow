@@ -1,9 +1,20 @@
-{% extends "base.html" %} {% load static %} {% block title %}팀 만들기 -
-TeamFlow{% endblock %} {% block extra_css %}
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+팀 만들기 - TeamFlow
+{% endblock %}
+
+{% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/pages/team-setup.css' %}" />
 <link rel="stylesheet" href="{% static 'css/pages/team-create.css' %}" />
-{% endblock %} {% block body_class %}auth-page team-create-page{% endblock %} {%
-block content %}
+{% endblock %}
+
+{% block body_class %}
+auth-page team-create-page
+{% endblock %}
+
+{% block content %}
 <!-- 
     팀 생성 페이지
     
@@ -13,7 +24,6 @@ block content %}
     3. 생성 성공 시 초대 코드를 포함한 결과 화면을 표시
     4. 이미 팀이 있는 사용자는 대시보드로 리다이렉션 처리가 필요
 -->
-
 <div class="team-setup-container">
   <div class="container">
     <div class="team-setup-content">
@@ -24,8 +34,7 @@ block content %}
           <div class="user-avatar">
             <!-- 사용자 이니셜 표시 -->
             <span class="user-initial">
-              {{ user.first_name.0|default:"U" }}{{ user.last_name.0|default:""
-              }}
+              {{ user.first_name.0|default:"U" }}{{ user.last_name.0|default:"" }}
             </span>
           </div>
           <div class="user-details">
@@ -62,7 +71,8 @@ block content %}
 
       <!-- 팀 만들기 폼 -->
       <div class="team-form-section" id="create-form-section">
-        <form id="team-create-form" class="team-form" novalidate>
+        <!-- ✨ 이 부분을 수정했습니다. -->
+        <form id="team-create-form" class="team-form" method="POST" action="{% url 'team_create' %}">
           {% csrf_token %}
 
           <!-- 팀 이름 입력 -->
@@ -234,6 +244,8 @@ block content %}
     }
   }
 </script>
-{% endblock %} {% block extra_js %}
+{% endblock %}
+
+{% block extra_js %}
 <script src="{% static 'js/pages/team-setup/team-create.js' %}"></script>
 {% endblock %}

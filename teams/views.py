@@ -30,13 +30,13 @@ def team_join_view(request):
             team_to_join = Team.objects.get(invite_code=code)
             
             if request.user in team_to_join.members.all():
-                return render(request, 'teams/team_join.html', {'error': '이미 참여한 팀입니다.'})
+                return render(request, 'team/join.html', {'error': '이미 참여한 팀입니다.'})
 
             team_to_join.members.add(request.user)
             # 원래는 대시보드로 리다이렉트 
             return redirect('/') # 임시로 메인 페이지로 이동
             
         except Team.DoesNotExist:
-            return render(request, 'teams/team_join.html', {'error': '유효하지 않은 초대 코드입니다.'})
+            return render(request, 'team/join.html', {'error': '유효하지 않은 초대 코드입니다.'})
             
-    return render(request, 'teams/team_join.html')
+    return render(request, 'team/join.html')

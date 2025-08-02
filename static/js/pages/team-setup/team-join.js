@@ -1,77 +1,50 @@
 /**
- * 팀 참여 페이지 (백엔드 테스트용)
- * 
- * 백엔드 개발자 참고:
- * - POST /api/teams/join/ 엔드포인트로 초대코드 전송
- * - 필드: invite_code
- * - 응답: { "team": { "id": 1, "name": "팀명", "members_count": 3 } }
+ * 팀 참여 페이지 (전통 Django 방식)
+ * * - 폼 제출은 HTML의 action 속성을 통해 서버에서 직접 처리합니다.
+ * - JavaScript는 입력 포맷팅, 페이지 이동과 같은 보조적인 역할만 담당합니다.
  */
 
 document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('team-join-form');
-    const successSection = document.getElementById('join-success-section');
-    const formSection = document.getElementById('join-form-section');
+    // 폼 제출(submit) 이벤트 리스너를 제거합니다.
+    // 이제 폼은 브라우저의 기본 동작에 따라 서버로 제출됩니다.
+    console.log('팀 참여 페이지 스크립트 로드됨.');
     
-    if (form) {
-        form.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const formData = new FormData(form);
-            const data = {
-                invite_code: formData.get('invite_code')
-            };
-            
-            console.log('팀 참여 데이터 전송:', data);
-            
-            try {
-                const result = await apiCall('/api/teams/join/', {
-                    method: 'POST',
-                    data: data
-                });
-                
-                if (result.success) {
-                    // 성공 화면 표시
-                    if (formSection) formSection.style.display = 'none';
-                    if (successSection) successSection.style.display = 'block';
-                    
-                    // 참여한 팀 정보 표시
-                    document.getElementById('joined-team-name').textContent = result.data.team.name;
-                    document.getElementById('joined-team-description').textContent = result.data.team.description || '-';
-                    document.getElementById('joined-team-members').textContent = result.data.team.members_count + '명';
-                    
-                    console.log('팀 참여 성공:', result.data);
-                } else {
-                    alert('팀 참여 실패: ' + result.error);
-                }
-            } catch (error) {
-                alert('오류 발생: ' + error.message);
-            }
-        });
-    }
-    
-    // 초대 코드 입력 포맷팅
+    // 초대 코드 입력 포맷팅 (사용자 경험 향상)
     const inviteCodeInput = document.getElementById('invite-code');
     if (inviteCodeInput) {
         inviteCodeInput.addEventListener('input', function(e) {
-            // 대문자로 변환하고 6자리 제한
+            // 입력값을 대문자로 변환하고 6자리로 제한합니다.
             e.target.value = e.target.value.toUpperCase().slice(0, 6);
         });
     }
 });
 
-// 네비게이션 함수들
+/**
+ * 대시보드 페이지로 이동하는 함수
+ * (HTML의 onclick 속성에서 호출)
+ */
 function navigateToDashboard() {
     window.location.href = '/dashboard/';
 }
 
+/**
+ * 팀 생성 페이지로 이동하는 함수
+ * (HTML의 onclick 속성에서 호출)
+ */
 function navigateToTeamCreate() {
-    window.location.href = '/team/create/';
+    // Django urls.py에 정의된 'team_create' URL 이름으로 이동하는 것이 더 좋습니다.
+    // 여기서는 직접 경로를 지정합니다.
+    window.location.href = '/api/teams/create';
 }
 
+/**
+ * 현재 페이지를 새로고침하여 다른 팀에 참여할 수 있도록 하는 함수
+ */
 function joinAnotherTeam() {
     window.location.reload();
 }
 
+// HTML의 onclick 속성에서 함수를 호출할 수 있도록 전역 스코프에 할당
 window.navigateToDashboard = navigateToDashboard;
 window.navigateToTeamCreate = navigateToTeamCreate;
 window.joinAnotherTeam = joinAnotherTeam;
