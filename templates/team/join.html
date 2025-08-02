@@ -1,10 +1,21 @@
-{% extends "base.html" %} {% load static %} {% block title %}팀 참여하기 -
-TeamFlow{% endblock %} {% block extra_css %}
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+팀 참여하기 - TeamFlow
+{% endblock %}
+
+{% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/pages/team-setup.css' %}" />
 <link rel="stylesheet" href="{% static 'css/pages/team-create.css' %}" />
 <link rel="stylesheet" href="{% static 'css/pages/team-join.css' %}" />
-{% endblock %} {% block body_class %}auth-page team-join-page{% endblock %} {%
-block content %}
+{% endblock %}
+
+{% block body_class %}
+auth-page team-join-page
+{% endblock %}
+
+{% block content %}
 <!-- 
     팀 참여 페이지
     
@@ -14,7 +25,6 @@ block content %}
     3. 성공 시 팀 정보와 함께 대시보드로 리다이렉션
     4. 이미 팀이 있는 사용자도 새로운 팀에 참여할 수 있음
 -->
-
 <div class="team-setup-container">
   <div class="container">
     <div class="team-setup-content">
@@ -25,8 +35,7 @@ block content %}
           <div class="user-avatar">
             <!-- 사용자 이니셜 표시 -->
             <span class="user-initial">
-              {{ user.first_name.0|default:"U" }}{{ user.last_name.0|default:""
-              }}
+              {{ user.first_name.0|default:"U" }}{{ user.last_name.0|default:"" }}
             </span>
           </div>
           <div class="user-details">
@@ -219,6 +228,8 @@ block content %}
     }
   }
 </script>
-{% endblock %} {% block extra_js %}
+{% endblock %}
+
+{% block extra_js %}
 <script src="{% static 'js/pages/team-setup/team-join.js' %}"></script>
 {% endblock %}
