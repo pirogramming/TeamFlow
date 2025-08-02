@@ -1,1 +1,148 @@
-<!-- 프로필 설정 (이름, 전공 입력) -->
+{% extends "base.html" %} {% load static %} {% block title %}프로필 설정 -
+TeamFlow{% endblock %} {% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/auth/profile-setup.css' %}" />
+{% endblock %} {% block body_class %}auth-page profile-setup-page{% endblock %}
+{% block content %}
+<!-- 
+    사용자 정보 입력 페이지
+    
+    백엔드 개발자 참고사항:
+    1. Google 로그인 완료 후 이 페이지로 리다이렉션
+    2. 폼 제출 시 /api/users/me/ 엔드포인트로 PATCH 요청
+    3. 프로필 완성 후 팀 설정 페이지로 이동
+    4. 이미 프로필이 완성된 사용자는 대시보드로 리다이렉션 처리 필요
+-->
+
+<div class="profile-setup-container">
+  <div class="container">
+    <div class="profile-setup-content">
+      <!-- 환영 섹션 -->
+      <div class="welcome-section">
+        <!-- 사용자 아이콘 -->
+        <div class="user-avatar">
+          <svg fill="currentColor" viewBox="0 0 24 24" width="48" height="48">
+            <path
+              d="M12 2c2.21 0 4 1.79 4 4 0 2.21-1.79 4-4 4s-4-1.79-4-4c0-2.21 1.79-4 4-4zm0 14c2.67 0 8 1.34 8 4v2H4v-2c0-2.66 5.33-4 8-4z"
+            />
+          </svg>
+        </div>
+
+        <h1 class="welcome-title">환영합니다!</h1>
+        <p class="welcome-subtitle">
+          TeamFlow 시작을 위해 기본 정보를 입력해주세요
+        </p>
+      </div>
+
+      <!-- 프로필 설정 폼 -->
+      <div class="profile-form-section">
+        <div class="form-card">
+          <div class="form-header">
+            <h2 class="form-title">기본 정보 입력</h2>
+            <p class="form-description">프로필 성정을 입력해주세요</p>
+          </div>
+
+          <!-- 
+                        사용자 정보 입력 폼
+                        백엔드: onsubmit 이벤트에서 API 호출 처리
+                    -->
+          <form id="profile-setup-form" class="profile-form" novalidate>
+            {% csrf_token %}
+
+            <!-- 이름 입력 -->
+            <div class="form-group">
+              <label for="name" class="form-label required">이름</label>
+              <input
+                type="text"
+                id="name"
+                name="name"
+                class="form-input"
+                placeholder="팀 이름을 입력하세요"
+                value="{{ user.first_name|default:'' }} {{ user.last_name|default:'' }}"
+                required
+                autocomplete="name"
+              />
+            </div>
+
+            <!-- 전공 직접 입력 -->
+            <div class="form-group">
+              <label for="major" class="form-label required">전공</label>
+              <input
+                type="text"
+                id="major"
+                name="major"
+                class="form-input"
+                placeholder="전공을 입력해주세요 (예: 컴퓨터공학과, 경영학과)"
+                required
+                maxlength="100"
+                autocomplete="organization-title"
+              />
+              <small class="form-help-text">
+                본인의 전공을 정확히 입력해주세요 (학과명 포함)
+              </small>
+            </div>
+
+            <!-- 세부 전공 (선택사항) -->
+            <div class="form-group">
+              <label for="specialization" class="form-label"
+                >전공 세부사항</label
+              >
+              <input
+                type="text"
+                id="specialization"
+                name="specialization"
+                class="form-input"
+                placeholder="물리학과"
+                maxlength="100"
+              />
+              <small class="form-help-text">
+                세부 전공이나 복수전공이 있다면 입력해주세요 (선택사항)
+              </small>
+            </div>
+
+            <!-- 제출 버튼 -->
+            <div class="form-actions">
+              <button
+                type="submit"
+                class="btn btn-primary btn-full btn-lg"
+                id="profile-submit-btn"
+              >
+                다음 단계로
+                <svg
+                  class="btn-icon"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                  width="20"
+                  height="20"
+                >
+                  <path
+                    d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"
+                  />
+                </svg>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 
+    구조화된 데이터 (SEO)
+    백엔드: 사용자 온보딩 프로세스 추적용
+-->
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "프로필 설정",
+    "description": "TeamFlow 사용자 프로필 설정 페이지",
+    "isPartOf": {
+      "@type": "WebSite",
+      "name": "TeamFlow"
+    }
+  }
+</script>
+{% endblock %} {% block extra_js %}
+<script src="{% static 'js/pages/auth/profile-setup.js' %}"></script>
+{% endblock %}

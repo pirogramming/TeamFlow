@@ -1,1 +1,187 @@
-<!-- 기본 템플릿 (공통 head, 스크립트 로드) -->
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+
+    <!-- SEO 메타 태그 -->
+    <meta
+      name="description"
+      content="대학생 팀플 관리를 더 효율적으로 도와주는 팀플 전용 플랫폼"
+    />
+    <meta
+      name="keywords"
+      content="팀플, 협업, 대학생, 프로젝트 관리, TeamFlow"
+    />
+    <meta name="author" content="TeamFlow" />
+
+    <!-- Open Graph 메타 태그 (소셜 미디어 공유용) -->
+    <meta
+      property="og:title"
+      content="{% block og_title %}TeamFlow - 팀 프로젝트를 더 스마트하게{% endblock %}"
+    />
+    <meta
+      property="og:description"
+      content="{% block og_description %}AI 기반 역할분담부터 일정 조율까지, 팀 프로젝트의 모든 것을 한 곳에서 관리하세요.{% endblock %}"
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="{{ request.build_absolute_uri }}" />
+
+    <title>
+      {% block title %}TeamFlow - 팀 프로젝트를 더 스마트하게{% endblock %}
+    </title>
+
+    <!-- Favicon -->
+    <link
+      rel="icon"
+      type="image/x-icon"
+      href="{% static 'images/favicon.ico' %}"
+    />
+
+    <!-- Google Fonts - TeamFlow 브랜딩에 맞는 깔끔한 폰트 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- CSS 파일들 로드 순서 중요: 공통 스타일 → 페이지별 스타일 -->
+    <link rel="stylesheet" href="{% static 'css/common/reset.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/common/variables.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/common/typography.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/common/layout.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/common/components.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/common/animations.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/responsive.css' %}" />
+
+    <!-- 페이지별 추가 CSS -->
+    {% block extra_css %}{% endblock %}
+
+    <!-- Google OAuth API - 백엔드에서 CLIENT_ID 설정 필요 -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+    <!-- 
+        백엔드 개발자 참고사항:
+        1. Google OAuth CLIENT_ID는 settings.py에서 환경변수로 관리
+        2. CSRF 토큰은 모든 POST 요청에 필수 포함
+        3. API 응답은 항상 JSON 형태로 통일
+    -->
+  </head>
+  <body class="{% block body_class %}{% endblock %}">
+    <!-- CSRF 토큰을 전역적으로 사용할 수 있도록 메타 태그에 포함 -->
+    <meta name="csrf-token" content="{{ csrf_token }}" />
+
+    <!-- 
+        전역 로딩 스피너 
+        API 호출 중 사용자 경험 향상을 위함
+    -->
+    <div id="global-loading" class="loading-overlay" style="display: none">
+      <div class="loading-spinner">
+        <div class="spinner"></div>
+        <p>처리 중입니다...</p>
+      </div>
+    </div>
+
+    <!-- 
+        전역 알림 시스템 
+        성공/오류 메시지 표시용
+        백엔드에서 Django messages 프레임워크 사용 권장
+    -->
+    <div id="global-notifications" class="notifications-container">
+      {% if messages %} {% for message in messages %}
+      <div
+        class="notification notification-{{ message.tags }}"
+        data-auto-hide="true"
+      >
+        <span class="notification-text">{{ message }}</span>
+        <button class="notification-close" type="button" aria-label="닫기">
+          &times;
+        </button>
+      </div>
+      {% endfor %} {% endif %}
+    </div>
+
+    <!-- 헤더 영역 (로그인 후 페이지에서만 표시) -->
+    {% block header %}{% endblock %}
+
+    <!-- 사이드바 영역 (대시보드 등에서 사용) -->
+    {% block sidebar %}{% endblock %}
+
+    <!-- 메인 컨텐츠 영역 -->
+    <main class="main-content {% block main_class %}{% endblock %}">
+      {% block content %}{% endblock %}
+    </main>
+
+    <!-- 푸터 영역 -->
+    {% block footer %}{% endblock %}
+
+    <!-- 
+        공통 JavaScript 파일들 로드
+        의존성 순서: utils → constants → api → auth → 기타 모듈
+    -->
+    <script src="{% static 'js/common/utils.js' %}"></script>
+    <script src="{% static 'js/common/constants.js' %}"></script>
+    <script src="{% static 'js/common/api.js' %}"></script>
+    <script src="{% static 'js/common/auth.js' %}"></script>
+    <script src="{% static 'js/common/google-auth.js' %}"></script>
+    <script src="{% static 'js/common/validation.js' %}"></script>
+    <script src="{% static 'js/common/components.js' %}"></script>
+    <script src="{% static 'js/app.js' %}"></script>
+    <script src="{% static 'js/init.js' %}"></script>
+
+    <!-- 페이지별 추가 JavaScript -->
+    {% block extra_js %}{% endblock %}
+
+    <!-- 
+        전역 JavaScript 설정
+        백엔드에서 제공해야 할 설정 값들
+    -->
+    <script>
+      // 백엔드에서 템플릿 컨텍스트로 전달해야 할 설정값들
+      window.APP_CONFIG = {
+          // Google OAuth 클라이언트 ID (백엔드 settings.py에서 관리)
+          GOOGLE_CLIENT_ID: '{{ GOOGLE_CLIENT_ID|default:"" }}',
+
+          // API 기본 URL (개발/운영 환경별 다름)
+          API_BASE_URL: '{% url "api_root" %}',
+
+          // CSRF 토큰 (모든 POST 요청에 필요)
+          CSRF_TOKEN: '{{ csrf_token }}',
+
+          // 현재 사용자 정보 (로그인 상태 확인용)
+          USER: {
+              isAuthenticated: {{ user.is_authenticated|yesno:"true,false" }},
+              id: {{ user.id|default:"null" }},
+              email: '{{ user.email|default:"" }}',
+              name: '{{ user.first_name|default:"" }} {{ user.last_name|default:"" }}'.trim()
+          },
+
+          // 환경별 설정
+          DEBUG: {{ settings.DEBUG|yesno:"true,false" }},
+
+          // 언어/지역 설정
+          LANGUAGE_CODE: '{{ LANGUAGE_CODE }}',
+          TIME_ZONE: '{{ TIME_ZONE }}'
+      };
+
+      // 전역 에러 핸들러
+      window.addEventListener('error', function(e) {
+          console.error('전역 JavaScript 오류:', e.error);
+          // 백엔드로 오류 로그 전송 (선택사항)
+          if (!window.APP_CONFIG.DEBUG) {
+              // 운영 환경에서만 오류 로그 전송
+              // fetch('/api/log/frontend-error/', { ... });
+          }
+      });
+
+      // 페이지 언로드 시 정리 작업
+      window.addEventListener('beforeunload', function() {
+          // 진행 중인 API 요청 취소, 임시 데이터 저장 등
+      });
+    </script>
+  </body>
+</html>

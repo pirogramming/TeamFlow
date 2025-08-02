@@ -1,1 +1,224 @@
-<!-- 기존 팀 참여 -->
+{% extends "base.html" %} {% load static %} {% block title %}팀 참여하기 -
+TeamFlow{% endblock %} {% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/team-setup.css' %}" />
+<link rel="stylesheet" href="{% static 'css/pages/team-create.css' %}" />
+<link rel="stylesheet" href="{% static 'css/pages/team-join.css' %}" />
+{% endblock %} {% block body_class %}auth-page team-join-page{% endblock %} {%
+block content %}
+<!-- 
+    팀 참여 페이지
+    
+    백엔드 개발자 참고사항:
+    1. 팀 설정 선택 페이지에서 "팀 참여하기" 선택 시 이 페이지로 이동
+    2. 폼 제출 시 /api/teams/join/ 엔드포인트로 POST 요청을 보냄
+    3. 성공 시 팀 정보와 함께 대시보드로 리다이렉션
+    4. 이미 팀이 있는 사용자도 새로운 팀에 참여할 수 있음
+-->
+
+<div class="team-setup-container">
+  <div class="container">
+    <div class="team-setup-content">
+      <!-- 헤더 섹션 -->
+      <div class="setup-header">
+        <!-- 사용자 정보 표시 -->
+        <div class="user-info">
+          <div class="user-avatar">
+            <!-- 사용자 이니셜 표시 -->
+            <span class="user-initial">
+              {{ user.first_name.0|default:"U" }}{{ user.last_name.0|default:""
+              }}
+            </span>
+          </div>
+          <div class="user-details">
+            <h2 class="user-name">{{ user.get_full_name|default:"사용자" }}</h2>
+            <p class="user-major">
+              {{ user.profile.major_display|default:"전공 정보" }}
+            </p>
+          </div>
+        </div>
+
+        <!-- 페이지 제목 -->
+        <div class="page-header">
+          <h1 class="page-title">팀 설정</h1>
+          <p class="page-subtitle">새 팀을 만들거나 기존 팀에 참여하세요</p>
+        </div>
+      </div>
+
+      <!-- 팀 설정 탭 -->
+      <div class="team-tabs">
+        <div class="tab-buttons">
+          <button
+            type="button"
+            class="tab-btn"
+            data-tab="create"
+            onclick="navigateToTeamCreate()"
+          >
+            팀 만들기
+          </button>
+          <button type="button" class="tab-btn active" data-tab="join">
+            팀 참여하기
+          </button>
+        </div>
+      </div>
+
+      <!-- 팀 참여하기 폼 -->
+      <div class="team-form-section" id="join-form-section">
+        <form id="team-join-form" class="team-form" novalidate>
+          {% csrf_token %}
+
+          <!-- 초대 코드 입력 -->
+          <div class="form-group">
+            <label for="invite-code" class="form-label required"
+              >초대 코드</label
+            >
+            <input
+              type="text"
+              id="invite-code"
+              name="invite_code"
+              class="form-input invite-code-input"
+              placeholder="6자리 초대 코드를 입력하세요"
+              required
+              maxlength="6"
+              pattern="[A-Z0-9]{6}"
+              autocomplete="off"
+              autocapitalize="characters"
+            />
+            <small class="form-help-text">
+              팀장으로부터 받은 6자리 초대 코드를 입력해주세요
+            </small>
+          </div>
+
+          <!-- 제출 버튼 -->
+          <div class="form-actions">
+            <button
+              type="submit"
+              class="btn btn-primary btn-full btn-lg"
+              id="team-join-btn"
+            >
+              <svg
+                class="btn-icon"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+                width="20"
+                height="20"
+              >
+                <path
+                  d="M16 4c0-1.11.89-2 2-2s2 .89 2 2-.89 2-2 2-2-.89-2-2zm4 18v-6h2.5l-2.54-7.63A1.999 1.999 0 0 0 18.06 7c-.8 0-1.54.5-1.85 1.26l-1.45 3.63c-.25.65-.65 1.15-1.18 1.46C14.28 13.78 15 14.8 15 16v6h5z"
+                />
+              </svg>
+              팀 참여하기
+            </button>
+          </div>
+        </form>
+
+        <!-- 또는 새 팀 만들기 링크 -->
+        <div class="alternative-action">
+          <p class="alternative-text">또는</p>
+          <button
+            type="button"
+            class="btn btn-text"
+            onclick="navigateToTeamCreate()"
+          >
+            <svg
+              class="btn-icon"
+              fill="currentColor"
+              viewBox="0 0 24 24"
+              width="16"
+              height="16"
+            >
+              <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+            </svg>
+            새 팀 만들기
+          </button>
+        </div>
+      </div>
+
+      <!-- 팀 참여 성공 화면 (초기에는 숨김) -->
+      <div
+        class="team-success-section"
+        id="join-success-section"
+        style="display: none"
+      >
+        <div class="success-content">
+          <div class="success-icon">
+            <!-- 성공 아이콘 -->
+            <svg fill="currentColor" viewBox="0 0 24 24" width="48" height="48">
+              <path
+                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"
+              />
+            </svg>
+          </div>
+
+          <h2 class="success-title">팀 참여 완료!</h2>
+          <p class="success-subtitle">성공적으로 팀에 참여했습니다</p>
+
+          <!-- 참여한 팀 정보 -->
+          <div class="team-info-card">
+            <div class="team-info-row">
+              <span class="info-label">팀 이름</span>
+              <span class="info-value" id="joined-team-name">-</span>
+            </div>
+            <div class="team-info-row">
+              <span class="info-label">팀 설명</span>
+              <span class="info-value" id="joined-team-description">-</span>
+            </div>
+            <div class="team-info-row">
+              <span class="info-label">팀 멤버 수</span>
+              <span class="info-value" id="joined-team-members">-명</span>
+            </div>
+          </div>
+
+          <!-- 액션 버튼들 -->
+          <div class="success-actions">
+            <button
+              type="button"
+              class="btn btn-primary btn-full"
+              onclick="navigateToDashboard()"
+            >
+              대시보드로 이동
+              <svg
+                class="btn-icon"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+                width="20"
+                height="20"
+              >
+                <path
+                  d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"
+                />
+              </svg>
+            </button>
+
+            <button
+              type="button"
+              class="btn btn-secondary btn-full"
+              onclick="joinAnotherTeam()"
+            >
+              다른 팀 참여하기
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 
+    구조화된 데이터 (SEO)
+    백엔드: 팀 참여 프로세스 추적용
+-->
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "팀 참여하기",
+    "description": "TeamFlow 팀 참여 페이지",
+    "isPartOf": {
+      "@type": "WebSite",
+      "name": "TeamFlow"
+    }
+  }
+</script>
+{% endblock %} {% block extra_js %}
+<script src="{% static 'js/pages/team-setup/team-join.js' %}"></script>
+{% endblock %}
