@@ -22,15 +22,18 @@ from dashboard import views as dashboard
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+
+    # API 엔드포인트 (팀, 대시보드)
     path('api/teams/', include('teams.urls')),
     path('api/dashboard/', include('dashboard.urls')),
-    path('api/auth/', include('users.urls')),
 
-    # django allauth에서 제공하는 계정 관련 URL 추가
+    # allauth 로그인/콜백
     path('accounts/', include('allauth.urls')),
+
+    # 랜딩 페이지
     path('', dashboard.landing_page_view, name='landing_index'),
 ]
 
-# 개발 환경에서 static 파일 서빙
+# 개발 환경 static 파일 서빙
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

@@ -1,1 +1,7 @@
 /* 랜딩 페이지 (히어로 섹션, 기능 카드) */
+a.btn.btn-primary svg.icon {
+    width: 20px;
+    height: 20px;
+    display: inline-block;
+    vertical-align: middle;
+}
