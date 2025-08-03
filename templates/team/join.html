@@ -72,7 +72,8 @@ auth-page team-join-page
 
       <!-- 팀 참여하기 폼 -->
       <div class="team-form-section" id="join-form-section">
-        <form id="team-join-form" class="team-form" novalidate>
+        <!-- ✨ 이 부분을 수정했습니다: id와 novalidate 속성을 제거 -->
+        <form class="team-form" method="POST" action="{% url 'team_join' %}">
           {% csrf_token %}
 
           <!-- 초대 코드 입력 -->
@@ -102,7 +103,6 @@ auth-page team-join-page
             <button
               type="submit"
               class="btn btn-primary btn-full btn-lg"
-              id="team-join-btn"
             >
               <svg
                 class="btn-icon"
