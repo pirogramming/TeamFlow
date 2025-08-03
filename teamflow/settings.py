@@ -176,7 +176,7 @@ REST_FRAMEWORK = {
     ]
 }
 
-LOGIN_REDIRECT_URL = '/api/dashboard/'  # 로그인 후 이동할 페이지
+LOGIN_REDIRECT_URL = '/users/after-login/'  # 로그인 후 이동
 LOGOUT_REDIRECT_URL = '/'           # 로그아웃 후 이동할 페이지
 
 # 구글 OAuth 클라이언트 정보
