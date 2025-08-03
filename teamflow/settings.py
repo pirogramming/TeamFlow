@@ -16,9 +16,20 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+import environ
+
+# .env 파일을 읽어오기 위한 설정
+env = environ.Env(DEBUG=(bool, False))
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+
+GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID')
+# .env 파일에서 GOOGLE_CLIENT_SECRET 변수 값을 가져와 사용
+GOOGLE_CLIENT_SECRET = env('GOOGLE_CLIENT_SECRET')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
@@ -171,18 +182,14 @@ LOGOUT_REDIRECT_URL = '/'           # 로그아웃 후 이동할 페이지
 # 구글 OAuth 클라이언트 정보
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
-        
+        "APP": {
+        "client_id": (f"{GOOGLE_CLIENT_ID}"),
+        "secret": (f"{GOOGLE_CLIENT_SECRET}"),
+        "key": ""
+        },
+
         'SCOPE': ['profile', 'email'],
         'AUTH_PARAMS': {'access_type': 'online'},
     }
 }
 
-import environ
-
-# .env 파일을 읽어오기 위한 설정
-env = environ.Env(DEBUG=(bool, False))
-environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
-
-GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID')
-# .env 파일에서 GOOGLE_CLIENT_SECRET 변수 값을 가져와 사용
-GOOGLE_CLIENT_SECRET = env('GOOGLE_CLIENT_SECRET')
