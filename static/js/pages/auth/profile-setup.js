@@ -63,10 +63,10 @@
  * - 실시간 피드백
  * - 로딩 상태 관리
  * - 에러 처리
- * - API 연동 (/api/users/me/)
+ * - API 연동 (/api/auth/me/)
  * 
  * 백엔드 개발자 참고:
- * - PATCH /api/users/me/ 엔드포인트로 프로필 정보 전송
+ * - PATCH /api/auth/me/ 엔드포인트로 프로필 정보 전송
  * - 필드: name, major, specialization
  */
 
@@ -179,41 +179,41 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     // 폼 제출 처리
-        form.addEventListener('submit', async function(e) {
-            e.preventDefault();
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
         
         if (!validateForm() || isSubmitting) return;
         
         isSubmitting = true;
         updateSubmitButton();
-            
-            const formData = new FormData(form);
-            const data = {
+        
+        const formData = new FormData(form);
+        const data = {
             name: formData.get('name').trim(),
             major: formData.get('major').trim(),
             specialization: formData.get('specialization')?.trim() || ''
         };
 
-            try {
-                const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        try {
+            const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
             const response = await fetch('/api/auth/me/', {
-                    method: 'PATCH',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': csrftoken
-                    },
-                    body: JSON.stringify(data)
-                });
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken
+                },
+                body: JSON.stringify(data)
+            });
 
             if (!response.ok) {
                 const errorData = await response.json().catch(() => ({}));
                 throw new Error(errorData.message || `HTTP ${response.status}`);
             }
             
-                const result = await response.json();
+            const result = await response.json();
 
-                if (result.id) {
+            if (result.success) {
                 // 성공 애니메이션
                 submitBtn.innerHTML = `
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
@@ -227,7 +227,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // 바로 팀 설정 선택 페이지로 리다이렉션
                 window.location.href = '/preview/team-setup-selection/';
-                } else {
+            } else {
                 throw new Error('프로필 저장에 실패했습니다.');
             }
             

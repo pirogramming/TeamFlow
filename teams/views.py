@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from .models import Team
+from .models import Team, TeamMember # ⬅️ TeamMember도 import 해야 합니다.
 
 @login_required
 def team_create_view(request):
@@ -13,11 +13,12 @@ def team_create_view(request):
             description=description,
             owner=request.user 
         )
-        new_team.members.add(request.user)
         
-        # 팀 생성 후 이동할 페이지 (예: 대시보드)
-        # return redirect('dashboard') 
-        return redirect('/') # 임시로 메인 페이지로 이동
+        # ✨ 이 부분을 수정했습니다.
+        # TeamMember 객체를 직접 생성하여 생성자를 '팀장'으로 추가합니다.
+        TeamMember.objects.create(team=new_team, user=request.user, role="팀장")
+        
+        return redirect('/')
 
     return render(request, 'team/create.html')
 
@@ -29,12 +30,15 @@ def team_join_view(request):
         try:
             team_to_join = Team.objects.get(invite_code=code)
             
-            if request.user in team_to_join.members.all():
+            # members 필드를 직접 확인하는 대신, TeamMember 모델을 통해 확인합니다.
+            if TeamMember.objects.filter(team=team_to_join, user=request.user).exists():
                 return render(request, 'team/join.html', {'error': '이미 참여한 팀입니다.'})
 
-            team_to_join.members.add(request.user)
-            # 원래는 대시보드로 리다이렉트 
-            return redirect('/') # 임시로 메인 페이지로 이동
+            # ✨ 이 부분을 수정했습니다.
+            # TeamMember 객체를 직접 생성하여 참여자를 '팀원'으로 추가합니다.
+            TeamMember.objects.create(team=team_to_join, user=request.user, role="팀원")
+            
+            return redirect('/')
             
         except Team.DoesNotExist:
             return render(request, 'team/join.html', {'error': '유효하지 않은 초대 코드입니다.'})
