@@ -23,9 +23,9 @@ from dashboard import views as dashboard
 urlpatterns = [
     path('admin/', admin.site.urls),
 
-    # API 엔드포인트 (팀, 대시보드)
     path('api/teams/', include('teams.urls')),
     path('api/dashboard/', include('dashboard.urls')),
+    path('api/auth/', include('users.urls')),
 
     # allauth 로그인/콜백
     path('accounts/', include('allauth.urls')),
