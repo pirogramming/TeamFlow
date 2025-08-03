@@ -1,1 +1,260 @@
-/* 팀 설정 (탭 스타일, 초대 코드 UI) */
+/* 팀 설정 선택 페이지 - Notion 스타일 */
+/* 전체 컨테이너 */
+.team-setup-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', sans-serif;
+}
+
+.container {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.team-setup-content {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+}
+
+/* 헤더 섹션 */
+.setup-header {
+  padding: 2rem 2rem 1.5rem;
+  border-bottom: 1px solid #f1f5f9;
+  background: #fafbfc;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.user-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 1rem;
+  color: white;
+  font-weight: 600;
+  font-size: 1.125rem;
+}
+
+.user-details {
+  flex: 1;
+}
+
+.user-name {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0 0 0.25rem 0;
+}
+
+.user-major {
+  font-size: 0.875rem;
+  color: #64748b;
+  margin: 0;
+}
+
+.page-header {
+  text-align: center;
+}
+
+.page-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 0.5rem 0;
+}
+
+.page-subtitle {
+  font-size: 0.875rem;
+  color: #64748b;
+  margin: 0 0 1rem 0;
+}
+
+.page-info {
+  font-size: 0.75rem;
+  color: #6b7280;
+  line-height: 1.5;
+  margin: 0;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+/* 팀 설정 옵션 */
+.team-options {
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.option-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 2rem;
+  text-align: center;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.option-card:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.option-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.5rem;
+  color: white;
+}
+
+.option-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 1rem 0;
+}
+
+.option-description {
+  font-size: 0.875rem;
+  color: #64748b;
+  line-height: 1.6;
+  margin: 0 0 1.5rem 0;
+}
+
+/* 버튼 스타일 */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  font-family: inherit;
+}
+
+.btn-primary {
+  background: #3b82f6;
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #2563eb;
+}
+
+.btn-secondary {
+  background: #3b82f6;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background: #2563eb;
+}
+
+.btn-icon {
+  flex-shrink: 0;
+}
+
+/* 반응형 */
+@media (max-width: 640px) {
+  .team-setup-container {
+    padding: 1rem;
+  }
+  
+  .setup-header {
+    padding: 1.5rem;
+  }
+  
+  .team-options {
+    padding: 1.5rem;
+  }
+  
+  .option-card {
+    padding: 1.5rem;
+  }
+  
+  .page-title {
+    font-size: 1.25rem;
+  }
+  
+  .user-avatar {
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
+  }
+  
+  .option-icon {
+    width: 48px;
+    height: 48px;
+  }
+  
+  .option-title {
+    font-size: 1.125rem;
+  }
+}
+
+/* 애니메이션 */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.option-card {
+  animation: fadeInUp 0.6s ease;
+}
+
+.option-card:nth-child(2) {
+  animation-delay: 0.1s;
+}
+
+/* 뒤로가기 링크 (팀 옵션 하단) */
+.back-action-bottom {
+  margin-top: 0.5rem;
+  text-align: center;
+}
+
+.back-link-bottom {
+  color: #6b7280;
+  text-decoration: none;
+  font-size: 0.875rem;
+  transition: color 0.2s ease;
+}
+
+.back-link-bottom:hover {
+  color: #374151;
+}

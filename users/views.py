@@ -17,6 +17,19 @@ def profile_setup_preview(request):
     return render(request, 'auth/profile-setup.html')
 # ========================================
 
+# ========================================
+# CSS 팀 설정 미리보기용 임시 뷰 (협업에 영향 없음)
+# MGP:프론트엔드 개발 중 CSS 확인을 위해 추가
+def team_setup_preview(request):
+    return render(request, 'team/create.html')
+
+def team_join_preview(request):
+    return render(request, 'team/join.html')
+
+def team_setup_selection_preview(request):
+    return render(request, 'auth/team-setup.html')
+# ========================================
+
 # 프로필 업데이트 API
 class UserMeUpdateView(APIView):
     permission_classes = [IsAuthenticated]

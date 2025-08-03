@@ -222,13 +222,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     완료!
                 `;
                 
-                // 성공 메시지 표시 (임시)
+                // 성공 메시지 표시
                 showNotification('프로필 설정이 완료되었습니다!', 'success');
                 
-                // 잠시 후 리다이렉션 (임시로 랜딩 페이지로)
-                setTimeout(() => {
-                    window.location.href = '/';
-                }, 2000);
+                // 바로 팀 설정 선택 페이지로 리다이렉션
+                window.location.href = '/preview/team-setup-selection/';
                 } else {
                 throw new Error('프로필 저장에 실패했습니다.');
             }

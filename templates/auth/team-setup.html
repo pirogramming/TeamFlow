@@ -1,15 +1,26 @@
-{% extends "base.html" %} {% load static %} {% block title %}팀 설정 -
-TeamFlow{% endblock %} {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/pages/auth/team-setup.css' %}" />
-{% endblock %} {% block body_class %}auth-page team-setup-page{% endblock %} {%
-block content %}
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+팀 설정 - TeamFlow
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/team-setup.css' %}" />
+{% endblock %}
+
+{% block body_class %}
+auth-page team-setup-page
+{% endblock %}
+
+{% block content %}
 <!-- 
     팀 설정 선택 페이지
     
     백엔드 개발자 참고사항:
     1. 사용자 정보 입력 완료 후 이 페이지로 리다이렉션됩니다
-    2. "팀 만들기" 선택 시 /auth/team-create/ 페이지로 이동
-    3. "팀 참여하기" 선택 시 /auth/team-join/ 페이지로 이동
+    2. "팀 만들기" 선택 시 /preview/team-setup/ 페이지로 이동
+    3. "팀 참여하기" 선택 시 /preview/team-join/ 페이지로 이동
     4. 이미 팀이 있는 사용자는 대시보드로 리다이렉션 처리 필요
 -->
 
@@ -23,8 +34,7 @@ block content %}
           <div class="user-avatar">
             <!-- 사용자 이니셜 표시 -->
             <span class="user-initial">
-              {{ user.first_name.0|default:"U" }}{{ user.last_name.0|default:""
-              }}
+              {{ user.first_name.0|default:"U" }}{{ user.last_name.0|default:"" }}
             </span>
           </div>
           <div class="user-details">
@@ -39,6 +49,9 @@ block content %}
         <div class="page-header">
           <h1 class="page-title">팀 설정</h1>
           <p class="page-subtitle">새 팀을 만들거나 기존 팀에 참여하세요</p>
+          <p class="page-info">* 팀 설정은 언제든 변경할 수 있습니다. 나중에 새로운 팀을 만들거나 다른 팀에 참여할 수 있으며, 여러 팀에 동시에 소속될 수도 있습니다.</p>
+          
+
         </div>
       </div>
 
@@ -115,28 +128,15 @@ block content %}
             </svg>
           </button>
         </div>
-      </div>
-
-      <!-- 추가 정보 -->
-      <div class="setup-footer">
-        <div class="info-card">
-          <div class="info-icon">
-            <!-- 정보 아이콘 -->
-            <svg fill="currentColor" viewBox="0 0 24 24" width="20" height="20">
-              <path
-                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"
-              />
-            </svg>
-          </div>
-          <div class="info-content">
-            <h4 class="info-title">팀 설정은 언제든 변경할 수 있습니다</h4>
-            <p class="info-description">
-              나중에 새로운 팀을 만들거나 다른 팀에 참여할 수 있습니다. 여러
-              팀에 동시에 소속될 수도 있습니다.
-            </p>
-          </div>
+        
+        <!-- 뒤로가기 링크 (팀 옵션 하단) -->
+        <div class="back-action-bottom">
+          <a href="/preview/profile-setup/" class="back-link-bottom">
+            뒤로가기
+          </a>
         </div>
       </div>
+
     </div>
   </div>
 </div>
@@ -165,6 +165,8 @@ block content %}
     }
   }
 </script>
-{% endblock %} {% block extra_js %}
-<script src="{% static 'js/pages/auth/team-setup.js' %}"></script>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/pages/team-setup.js' %}"></script>
 {% endblock %}
