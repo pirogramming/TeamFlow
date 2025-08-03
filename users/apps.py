@@ -27,3 +27,6 @@ class UsersConfig(AppConfig):
                 app.sites.add(site)
         except:
             pass
+
+def ready(self):
+    import users.signals

@@ -21,18 +21,27 @@ document.addEventListener('DOMContentLoaded', function() {
             };
             
             console.log('프로필 데이터 전송:', data);
-            
+
             try {
-                const result = await apiCall('/api/users/me/', {
+                const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+                const response = await fetch('/api/users/me/', {
                     method: 'PATCH',
-                    data: data
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrftoken
+                    },
+                    body: JSON.stringify(data)
                 });
-                
-                if (result.success) {
+
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const result = await response.json();
+
+                if (result.id) {
                     alert('프로필 설정 완료!');
-                    window.location.href = '/auth/team-setup/';
+                    window.location.href = '/dashboard/';  // 대시보드로 이동
                 } else {
-                    alert('프로필 설정 실패: ' + result.error);
+                    alert('프로필 설정 실패');
                 }
             } catch (error) {
                 alert('오류 발생: ' + error.message);
