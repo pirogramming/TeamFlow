@@ -4,8 +4,9 @@ from django.conf import settings
 from django.conf.urls.static import static
 from dashboard import views as dashboard
 # ========================================
-# MGP: CSS 미리보기용 임시 import (프론트엔드 개발 중 CSS 확인용)
+# MGP: 프론트엔드 페이지 URL 패턴 추가 (프리뷰 제거 후 실제 페이지 연결)
 from users import views as users
+from teams import views as teams
 # ========================================
 
 urlpatterns = [
@@ -18,16 +19,32 @@ urlpatterns = [
     # allauth 로그인/콜백
     path('accounts/', include('allauth.urls')),
 
-    # 인증 페이지들
-    path('auth/profile-setup/', users.profile_setup_page, name='auth_profile_setup'),
     # ========================================
-# MGP: CSS 미리보기용 임시 URL (프론트엔드 개발 중 CSS 확인용)
-path('preview/profile-setup/', users.profile_setup_preview, name='profile_setup_preview'),
-path('preview/team-setup/', users.team_setup_preview, name='team_setup_preview'),
-path('preview/team-join/', users.team_join_preview, name='team_join_preview'),
-    path('preview/team-setup-selection/', users.team_setup_selection_preview, name='team_setup_selection_preview'),
-    path('preview/dashboard/', users.dashboard_preview, name='dashboard_preview'),
+    # MGP: 실제 페이지들 URL 패턴 (프리뷰 제거 후 실제 페이지 연결)
+    path('auth/profile-setup/', users.profile_setup_page, name='profile-setup'),
+    path('team-setup/', teams.team_setup_page, name='team-setup'),
+    path('team/create/', teams.team_create_page, name='team_create'),
+    path('team/join/', teams.team_join_page, name='team_join'),
+    path('dashboard/', dashboard.dashboard_page, name='dashboard'),
     # ========================================
+
+    # ========================================
+    # MGP: 로그인 후 리다이렉트 URL 패턴 추가
+    # 백엔드 팀원이 해결해야 할 부분 대신 해결: 로그인 후 리다이렉트 로직 수정
+    # ========================================
+    path('api/auth/after-login/', users.after_login_redirect, name='after_login_redirect'),
+
+    # ========================================
+    # MGP: 커스텀 Google 로그인 URL 추가
+    # 백엔드 팀원이 해결해야 할 부분 대신 해결: 소셜 로그인 후 리다이렉트 로직
+    # ========================================
+    path('auth/google-login/', users.custom_google_login, name='custom_google_login'),
+
+    # ========================================
+    # MGP: 로그아웃 URL 추가
+    # 백엔드 팀원이 해결해야 할 부분 대신 해결: 로그인/로그아웃 로직
+    # ========================================
+    path('auth/logout/', users.logout_view, name='logout'),
 
     # 랜딩 페이지
     path('', dashboard.landing_page_view, name='landing_index'),

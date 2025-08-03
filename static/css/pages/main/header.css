@@ -22,7 +22,7 @@
     margin: 0 auto;
 }
 
-/* 좌측: 로고 및 프로젝트 정보 */
+/* 좌측: 로고 */
 .header-left {
     display: flex;
     align-items: center;
@@ -42,33 +42,219 @@
     line-height: 1;
 }
 
-.project-name {
-    font-size: 0.8rem;
-    color: #6b7280;
-    font-weight: 500;
-}
-
-/* 중앙: 프로젝트 정보 */
+/* 중앙: 팀 정보 */
 .header-center {
     display: flex;
     align-items: center;
 }
 
-.project-info {
+.team-info {
     text-align: center;
 }
 
-.project-title {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: #1a1a1a;
-    margin: 0 0 0.25rem 0;
+/* 프로젝트 드롭다운 */
+.project-selector {
+    position: relative;
+    display: inline-block;
 }
 
-.project-subtitle {
-    font-size: 0.9rem;
+.project-dropdown {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: white;
+    border: 1px solid #e1e5e9;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 200px;
+}
+
+.project-dropdown:hover {
+    border-color: #3b82f6;
+    box-shadow: 0 2px 4px rgba(59, 130, 246, 0.1);
+}
+
+.project-name {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #1a1a1a;
+}
+
+.project-status {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    background: #f3f4f6;
     color: #6b7280;
-    margin: 0;
+    border-radius: 12px;
+    font-weight: 500;
+}
+
+.dropdown-icon {
+    color: #6b7280;
+    transition: transform 0.2s ease;
+}
+
+.project-dropdown.active .dropdown-icon {
+    transform: rotate(180deg);
+}
+
+/* 드롭다운 메뉴 */
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #e1e5e9;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    margin-top: 0.25rem;
+    min-width: 250px;
+    display: none; /* 기본적으로 숨김 */
+}
+
+/* 드롭다운 메뉴 표시 상태 */
+.dropdown-menu.show {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    z-index: 9999 !important;
+}
+
+.dropdown-header {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #f3f4f6;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #6b7280;
+}
+
+.dropdown-items {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.dropdown-item:hover {
+    background-color: #f9fafb;
+}
+
+.dropdown-item.active {
+    background-color: #eff6ff;
+}
+
+.dropdown-item-icon {
+    color: #3b82f6;
+    opacity: 0;
+}
+
+.dropdown-item.active .dropdown-item-icon {
+    opacity: 1;
+}
+
+.dropdown-item-content {
+    flex: 1;
+    text-align: left;
+}
+
+.dropdown-item-name {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #1a1a1a;
+    margin-bottom: 0.25rem;
+}
+
+.dropdown-item-status {
+    font-size: 0.75rem;
+    padding: 0.125rem 0.375rem;
+    background: #f3f4f6;
+    color: #6b7280;
+    border-radius: 8px;
+    display: inline-block;
+}
+
+.dropdown-footer {
+    padding: 0.75rem 1rem;
+    border-top: 1px solid #f3f4f6;
+}
+
+.dropdown-action {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 0.5rem;
+    background: none;
+    border: none;
+    color: #3b82f6;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+}
+
+.dropdown-action:hover {
+    background-color: #eff6ff;
+}
+
+/* 프로젝트 항목 스타일 */
+.project-item {
+    justify-content: space-between;
+}
+
+.project-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+}
+
+.project-title {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #1a1a1a;
+}
+
+.project-role {
+    font-size: 0.75rem;
+    color: #6b7280;
+}
+
+.project-status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.owner-badge {
+    font-size: 0.75rem;
+    padding: 0.125rem 0.375rem;
+    background: #dbeafe;
+    color: #1d4ed8;
+    border-radius: 8px;
+    font-weight: 500;
+}
+
+.no-projects {
+    color: #6b7280;
+    font-style: italic;
+    cursor: default;
+}
+
+.no-projects:hover {
+    background-color: transparent;
 }
 
 /* 우측: 알림 및 액션 버튼 */

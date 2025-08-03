@@ -127,18 +127,46 @@ document.addEventListener('DOMContentLoaded', function() {
         
         try {
             const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-            const response = await fetch('/api/teams/create', {
+            
+            /**
+             * 🔗 백엔드 API 연결점 - 팀 생성
+             * 
+             * 엔드포인트: POST /api/teams/create/
+             * 요청 데이터: {team_name: string, team_description: string}
+             * 
+             * 기대하는 응답:
+             * - 성공시 (200): {success: true, team_id: number, team_name: string}
+             * - 실패시 (400/500): {error: string}
+             * 
+             * 📋 백엔드 처리 사항:
+             * 1. 팀 생성 (Team 모델)
+             * 2. 생성자를 팀장으로 설정 (TeamMember 모델)
+             * 3. 고유한 6자리 초대 코드 생성 (영숫자)
+             * 4. 생성된 팀을 사용자의 current_team_id로 세션에 저장
+             */
+            const response = await fetch('/api/teams/create/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRFToken': csrftoken
                 },
-                body: JSON.stringify(data)
+                body: JSON.stringify(data),
+                credentials: 'same-origin'  // Django 세션 쿠키 포함
             });
             
             if (response.ok) {
                 const result = await response.json();
-                showTeamCreateSuccess(result);
+                
+                // 생성한 팀을 현재 팀으로 설정
+                if (result.success && result.team_id) {
+                    await setCurrentTeam(result.team_id);
+                }
+                
+                // 성공 메시지와 함께 대시보드로 이동
+                showNotification(`"${result.team_name}" 팀이 생성되었습니다!`, 'success');
+                setTimeout(() => {
+                    window.location.href = '/dashboard/';
+                }, 1500);
             } else {
                 const error = await response.json();
                 throw new Error(error.message || '팀 생성에 실패했습니다.');
@@ -175,7 +203,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // 2초 후 대시보드로 이동
         setTimeout(() => {
-            window.location.href = '/preview/dashboard/';
+            window.location.href = '/dashboard/';
         }, 2000);
     }
     
@@ -250,11 +278,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // 전역 함수들 (HTML에서 호출)
 function navigateToDashboard() {
-    window.location.href = '/preview/dashboard/';
+    window.location.href = '/dashboard/';
 }
 
 function navigateToTeamJoin() {
-    window.location.href = '/preview/team-join/';
+    window.location.href = '/team/join/';
 }
 
 function createAnotherTeam() {
@@ -268,10 +296,57 @@ function goBack() {
     
     // 대시보드에서 온 경우 대시보드로 돌아가기
     if (from === 'dashboard') {
-        window.location.href = '/preview/dashboard/';
+        window.location.href = '/dashboard/';
     } else {
         // 팀 설정 선택 페이지에서 온 경우 팀 설정 선택 페이지로 돌아가기
-        window.location.href = '/preview/team-setup-selection/';
+        window.location.href = '/team-setup/';
+    }
+}
+
+// CSRF 토큰 가져오기 함수
+function getCsrfToken() {
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]');
+    return csrfToken ? csrfToken.value : '';
+}
+
+/**
+ * 🔗 백엔드 API 연결점 - 현재 팀 설정
+ * 
+ * 엔드포인트: POST /api/teams/current/
+ * 요청 데이터: {team_id: number}
+ * 
+ * 기대하는 응답:
+ * - 성공시 (200): {success: true, team: {id, name, description, role}}
+ * - 실패시 (400/403): {error: string}
+ * 
+ * 📋 백엔드 처리 사항:
+ * 1. 사용자가 해당 팀의 멤버인지 확인
+ * 2. request.session['current_team_id'] = team_id 설정
+ * 3. 헤더의 프로젝트 선택에서 사용됨
+ */
+async function setCurrentTeam(teamId) {
+    try {
+        const csrftoken = getCsrfToken();
+        const response = await fetch('/api/teams/current/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken
+            },
+            body: JSON.stringify({ team_id: teamId }),
+            credentials: 'same-origin'
+        });
+        
+        if (response.ok) {
+            console.log('현재 팀 설정 완료:', teamId);
+            return true;
+        } else {
+            console.error('현재 팀 설정 실패:', response.status);
+            return false;
+        }
+    } catch (error) {
+        console.error('현재 팀 설정 오류:', error);
+        return false;
     }
 }
 

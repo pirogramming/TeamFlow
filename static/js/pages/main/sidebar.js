@@ -13,8 +13,8 @@ function initializeSidebar() {
     // 현재 페이지에 따른 활성 메뉴 설정
     setActiveMenuItem();
     
-    // 사용자 정보 로드
-    loadSidebarUserInfo();
+    // 사용자 정보는 대시보드에서 통합 관리
+    console.log('사이드바 초기화 완료');
     
     // 반응형 처리
     handleResponsiveSidebar();
@@ -39,23 +39,10 @@ function setActiveMenuItem() {
     });
 }
 
-// 사용자 정보 로드
+// 사용자 정보 로드 (대시보드에서 통합 관리)
 async function loadSidebarUserInfo() {
-    try {
-        // 공통 유틸리티에서 사용자 정보 가져오기
-        const userData = await fetchUserData();
-        
-        // 사이드바용 사용자 정보 업데이트
-        const sidebarUserData = {
-            name: userData.name,
-            role: userData.role,
-            avatar: userData.avatar || null
-        };
-        
-        updateSidebarUserInfo(sidebarUserData);
-    } catch (error) {
-        console.error('사용자 정보 로드 오류:', error);
-    }
+    // 대시보드에서 사용자 정보를 관리하므로 여기서는 빈 함수
+    console.log('사이드바 사용자 정보는 대시보드에서 관리됩니다.');
 }
 
 // 사용자 정보 업데이트
@@ -112,9 +99,9 @@ function handleNavLinkClick(e) {
     const href = link.getAttribute('href');
     
     // 대시보드 링크 클릭 시 현재 페이지로 이동
-    if (href === '/preview/dashboard/') {
-        e.preventDefault();
-        window.location.href = '/preview/dashboard/';
+            if (href === '/dashboard/') {
+            e.preventDefault();
+            window.location.href = '/dashboard/';
         return;
     }
     

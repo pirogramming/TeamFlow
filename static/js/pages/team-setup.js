@@ -73,16 +73,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // 전역 함수들 (HTML에서 호출)
 function navigateToTeamCreate() {
-    window.location.href = '/preview/team-setup/';
+    window.location.href = '/team/create/';
 }
 
 function navigateToTeamJoin() {
-    window.location.href = '/preview/team-join/';
+    window.location.href = '/team/join/';
 }
 
 function goBack() {
-    // 기존 회원인지 확인 (프로필이 설정되어 있는지)
-    handleBackNavigation('/preview/profile-setup/');
+    window.location.href = '/auth/profile-setup/';
 }
 
 // 전역 스코프에 함수 할당

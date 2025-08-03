@@ -71,6 +71,20 @@
  */
 
 document.addEventListener('DOMContentLoaded', function() {
+    // 디버깅: 페이지 로드 상태 확인
+    console.log('프로필 설정 페이지 로드됨');
+    console.log('현재 URL:', window.location.href);
+    
+    // CSRF 토큰 확인
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]');
+    console.log('CSRF 토큰 존재:', !!csrfToken);
+    
+    // 세션 쿠키 확인 (디버깅용)
+    const sessionCookie = document.cookie.includes('sessionid');
+    console.log('세션 쿠키 존재:', sessionCookie);
+    console.log('전체 쿠키:', document.cookie);
+
+    // DOM 요소들
     const form = document.getElementById('profile-setup-form');
     const submitBtn = document.getElementById('profile-submit-btn');
     
@@ -196,6 +210,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
         try {
             const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            
+            // 디버깅: 요청 정보 로그
+            console.log('프로필 설정 요청:', {
+                url: '/api/auth/me/',
+                method: 'PATCH',
+                data: data,
+                csrftoken: csrftoken ? '존재함' : '없음'
+            });
 
             const response = await fetch('/api/auth/me/', {
                 method: 'PATCH',
@@ -203,15 +225,25 @@ document.addEventListener('DOMContentLoaded', function() {
                     'Content-Type': 'application/json',
                     'X-CSRFToken': csrftoken
                 },
-                body: JSON.stringify(data)
+                body: JSON.stringify(data),
+                credentials: 'same-origin'  // 세션 쿠키 포함
+            });
+
+            // 디버깅: 응답 정보 로그
+            console.log('프로필 설정 응답:', {
+                status: response.status,
+                statusText: response.statusText,
+                ok: response.ok
             });
 
             if (!response.ok) {
                 const errorData = await response.json().catch(() => ({}));
-                throw new Error(errorData.message || `HTTP ${response.status}`);
+                console.error('프로필 설정 오류 상세:', errorData);
+                throw new Error(errorData.message || errorData.detail || `HTTP ${response.status}`);
             }
             
             const result = await response.json();
+            console.log('프로필 설정 성공:', result);
 
             if (result.success) {
                 // 성공 애니메이션
@@ -226,7 +258,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 showNotification('프로필 설정이 완료되었습니다!', 'success');
                 
                 // 바로 팀 설정 선택 페이지로 리다이렉션
-                window.location.href = '/preview/team-setup-selection/';
+                window.location.href = '/team-setup/';
             } else {
                 throw new Error('프로필 저장에 실패했습니다.');
             }

@@ -43,8 +43,14 @@
                 <!-- 
                     Google OAuth 로그인 버튼
                     백엔드: onclick 이벤트에서 Google OAuth 플로우 시작
+                    
+                    원래 코드:
+                    <a href="{% provider_login_url 'google' %}" class="btn btn-primary" aria-label="Google 계정으로 로그인">
+                    
+                    MGP 수정:
+                    <a href="{% url 'custom_google_login' %}" class="btn btn-primary" aria-label="Google 계정으로 로그인">
                 -->
-                <a href="{% provider_login_url 'google' %}" class="btn btn-primary" aria-label="Google 계정으로 로그인">
+                <a href="{% url 'custom_google_login' %}" class="btn btn-primary" aria-label="Google 계정으로 로그인">
                     <!-- Google 아이콘 (SVG) -->
                     <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
@@ -78,7 +84,17 @@
                 
                 <!-- 행동 유도 버튼 -->
                 <div class="hero-actions">
-                    <a href="/accounts/google/login/?process=login" class="hero-primary-btn" aria-label="무료로 TeamFlow 시작하기">
+                    <!-- 
+                        행동 유도 버튼
+                        백엔드: Google OAuth 로그인으로 연결
+                        
+                        원래 코드:
+                        <a href="/accounts/google/login/?process=login" class="hero-primary-btn" aria-label="무료로 TeamFlow 시작하기">
+                        
+                        MGP 수정:
+                        <a href="{% url 'custom_google_login' %}" class="hero-primary-btn" aria-label="무료로 TeamFlow 시작하기">
+                    -->
+                    <a href="{% url 'custom_google_login' %}" class="hero-primary-btn" aria-label="무료로 TeamFlow 시작하기">
                         <!-- 사용자 아이콘 -->
                         <svg class="icon" fill="currentColor" width="20" height="20" viewBox="0 0 24 24">
                             <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>

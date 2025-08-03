@@ -1,19 +1,44 @@
 <!-- 상단 헤더 (로고, 알림, 프로필) -->
 <header class="header">
     <div class="header-container">
-        <!-- 좌측: 로고 및 프로젝트 정보 -->
+        <!-- 좌측: 로고 -->
         <div class="header-left">
             <div class="logo-section">
                 <h1 class="logo">TeamFlow</h1>
-                <span class="project-name" id="current-project-name">웹 개발 스터디</span>
             </div>
         </div>
 
-        <!-- 중앙: 프로젝트 정보 -->
+        <!-- 중앙: 팀 정보 -->
         <div class="header-center">
-            <div class="project-info">
-                <h2 class="project-title" id="project-title">웹 개발 프로젝트</h2>
-                <p class="project-subtitle" id="project-subtitle">2024년 1학기 캡스톤 디자인</p>
+            <div class="team-info">
+                <!-- 프로젝트 드롭다운 -->
+                <div class="project-selector">
+                    <button class="project-dropdown" id="project-dropdown">
+                        <span class="project-name" id="current-project-name">클로디</span>
+                        <span class="project-status">진행중</span>
+                        <svg class="dropdown-icon" fill="currentColor" viewBox="0 0 24 24" width="16" height="16">
+                            <path d="M7 10l5 5 5-5z"/>
+                        </svg>
+                    </button>
+                    
+                    <!-- 드롭다운 메뉴 -->
+                    <div class="dropdown-menu" id="project-dropdown-menu" style="display: none;">
+                        <div class="dropdown-header">
+                            <span>프로젝트 선택</span>
+                        </div>
+                        <div class="dropdown-items" id="project-list">
+                            <!-- 프로젝트 목록이 동적으로 로드됩니다 -->
+                        </div>
+                        <div class="dropdown-footer">
+                            <button class="dropdown-action" id="create-new-project">
+                                <svg fill="currentColor" viewBox="0 0 24 24" width="16" height="16">
+                                    <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                                </svg>
+                                새 프로젝트 만들기
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 

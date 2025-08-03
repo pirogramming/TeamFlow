@@ -4,10 +4,17 @@
  */
 
 document.addEventListener('DOMContentLoaded', function() {
-    // DOM 요소들
-    const joinForm = document.getElementById('team-join-form');
-    const joinBtn = document.getElementById('team-join-btn');
+    console.log('🚀 팀 참여 페이지 JavaScript 로드됨');
+    
+    // DOM 요소들 (실제 HTML 구조에 맞게 수정)
+    const joinForm = document.querySelector('.team-form');
+    const joinBtn = document.querySelector('.btn.btn-primary.btn-full');
     const tabBtns = document.querySelectorAll('.tab-btn');
+    
+    console.log('DOM 요소 확인:');
+    console.log('- joinForm:', joinForm);
+    console.log('- joinBtn:', joinBtn);
+    console.log('- tabBtns:', tabBtns.length);
     
     // 폼 상태
     let isSubmitting = false;
@@ -137,25 +144,51 @@ document.addEventListener('DOMContentLoaded', function() {
             // 로딩 상태 표시
             showTeamInfoLoading();
 
-            // 실제 API 호출 (백엔드 개발자와 협의 필요)
-            // const response = await fetch(`/api/teams/info/${inviteCode}/`);
-            // if (response.ok) {
-            //     const teamData = await response.json();
-            //     showTeamInfo(teamData);
-            // } else {
-            //     hideTeamInfo();
-            // }
+            console.log(`🔍 팀 정보 조회 시작: ${inviteCode}`);
+            
+            /**
+             * 🔗 백엔드 API 연결점 - 팀 정보 미리보기
+             * 
+             * 엔드포인트: GET /api/teams/info/{invite_code}/
+             * URL 파라미터: invite_code (6자리 영숫자)
+             * 
+             * 기대하는 응답:
+             * - 성공시 (200): {success: true, team: {id, name, description, leader, members, created_at}}
+             * - 실패시 (404): {error: "유효하지 않은 초대 코드입니다."}
+             * 
+             * 📋 백엔드 처리 사항:
+             * 1. 초대 코드로 팀 검색 (Team.objects.get(invite_code=code))
+             * 2. 팀 멤버 수 계산 (TeamMember.objects.filter(team=team).count())
+             * 3. 팀장 정보 조회 (role='팀장'인 멤버 또는 team.owner)
+             * 4. 팀에 참여하지 않은 사용자도 볼 수 있는 공개 정보만 반환
+             */
+            const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            const response = await fetch(`/api/teams/info/${inviteCode}/`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken
+                },
+                credentials: 'same-origin'
+            });
 
-            // 임시로 더미 데이터 사용 (백엔드 API 완성 후 제거)
-            setTimeout(() => {
-                const dummyTeamData = {
-                    name: '웹 개발 스터디',
-                    description: 'React와 Node.js를 활용한 풀스택 개발',
-                    leader: '이영희',
-                    members: 2
-                };
-                showTeamInfo(dummyTeamData);
-            }, 500);
+            console.log(`📡 API 응답 상태: ${response.status}`);
+
+            if (response.ok) {
+                const result = await response.json();
+                console.log('📋 팀 정보 응답:', result);
+                
+                if (result.success && result.team) {
+                    showTeamInfo(result.team);
+                } else {
+                    console.log('❌ 팀 정보 없음');
+                    hideTeamInfo();
+                }
+            } else {
+                const error = await response.json();
+                console.log('❌ API 에러:', error);
+                hideTeamInfo();
+            }
 
         } catch (error) {
             console.error('팀 정보 불러오기 실패:', error);
@@ -215,14 +248,20 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // 팀 참여 처리
     async function handleTeamJoin(e) {
+        console.log('🎯 팀 참여 폼 제출됨!');
         e.preventDefault();
         
-        if (isSubmitting) return;
+        if (isSubmitting) {
+            console.log('⚠️ 이미 제출 중...');
+            return;
+        }
         
         const formData = new FormData(joinForm);
         const data = {
             invite_code: formData.get('invite_code').trim().toUpperCase()
         };
+        
+        console.log('📋 폼 데이터:', data);
         
         // 유효성 검사 및 에러 메시지 표시
         if (!validateJoinForm()) {
@@ -237,21 +276,55 @@ document.addEventListener('DOMContentLoaded', function() {
         
         try {
             const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-            const response = await fetch('/api/teams/join', {
+            console.log('팀 참여 API 호출 시작');
+            console.log('초대 코드:', data.invite_code);
+            console.log('CSRF 토큰:', csrftoken ? '존재함' : '없음');
+            
+            /**
+             * 🔗 백엔드 API 연결점 - 팀 참여
+             * 
+             * 엔드포인트: POST /api/teams/join/
+             * 요청 데이터: {invite_code: string}
+             * 
+             * 기대하는 응답:
+             * - 성공시 (200): {success: true, team_id: number, team_name: string}
+             * - 실패시 (400/404): {error: string}
+             * 
+             * 📋 백엔드 처리 사항:
+             * 1. 초대 코드로 팀 검색 (Team.objects.get(invite_code=code))
+             * 2. 이미 해당 팀 멤버인지 확인 (중복 참여 방지)
+             * 3. 새 팀원으로 추가 (TeamMember 생성, 기본 역할: "팀원")
+             * 4. 참여한 팀을 current_team_id로 세션에 저장
+             */
+            const response = await fetch('/api/teams/join/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRFToken': csrftoken
                 },
-                body: JSON.stringify(data)
+                body: JSON.stringify(data),
+                credentials: 'same-origin'  // Django 세션 쿠키 포함
             });
+            
+            console.log('API 응답 상태:', response.status);
             
             if (response.ok) {
                 const result = await response.json();
-                showTeamJoinSuccess(result);
+                
+                // 참여한 팀을 현재 팀으로 설정
+                if (result.success && result.team_id) {
+                    await setCurrentTeam(result.team_id);
+                }
+                
+                // 성공 메시지와 함께 대시보드로 이동
+                showNotification(`"${result.team_name}" 팀에 참여했습니다!`, 'success');
+                setTimeout(() => {
+                    window.location.href = '/dashboard/';
+                }, 1500);
             } else {
                 const error = await response.json();
-                throw new Error(error.message || '팀 참여에 실패했습니다.');
+                console.log('API 에러 응답:', error);
+                throw new Error(error.error || error.message || '팀 참여에 실패했습니다.');
             }
         } catch (error) {
             console.error('팀 참여 오류:', error);
@@ -285,7 +358,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // 2초 후 대시보드로 이동
         setTimeout(() => {
-            window.location.href = '/preview/dashboard/';
+            window.location.href = '/dashboard/';
         }, 2000);
     }
     
@@ -328,11 +401,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // 전역 함수들 (HTML에서 호출)
 function navigateToDashboard() {
-    window.location.href = '/preview/dashboard/';
+    window.location.href = '/dashboard/';
 }
 
 function navigateToTeamCreate() {
-    window.location.href = '/preview/team-setup/';
+    window.location.href = '/team/create/';
 }
 
 function joinAnotherTeam() {
@@ -346,10 +419,43 @@ function goBack() {
     
     // 대시보드에서 온 경우 대시보드로 돌아가기
     if (from === 'dashboard') {
-        window.location.href = '/preview/dashboard/';
+        window.location.href = '/dashboard/';
     } else {
         // 팀 설정 선택 페이지에서 온 경우 팀 설정 선택 페이지로 돌아가기
-        window.location.href = '/preview/team-setup-selection/';
+        window.location.href = '/team-setup/';
+    }
+}
+
+// CSRF 토큰 가져오기 함수
+function getCsrfToken() {
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]');
+    return csrfToken ? csrfToken.value : '';
+}
+
+// 현재 팀 설정 함수
+async function setCurrentTeam(teamId) {
+    try {
+        const csrftoken = getCsrfToken();
+        const response = await fetch('/api/teams/current/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken
+            },
+            body: JSON.stringify({ team_id: teamId }),
+            credentials: 'same-origin'
+        });
+        
+        if (response.ok) {
+            console.log('현재 팀 설정 완료:', teamId);
+            return true;
+        } else {
+            console.error('현재 팀 설정 실패:', response.status);
+            return false;
+        }
+    } catch (error) {
+        console.error('현재 팀 설정 오류:', error);
+        return false;
     }
 }
 

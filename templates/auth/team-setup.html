@@ -38,9 +38,9 @@ auth-page team-setup-page
             </span>
           </div>
           <div class="user-details">
-            <h2 class="user-name">{{ user.get_full_name|default:"사용자" }}</h2>
+            <h2 class="user-name">{{ user.first_name|default:"사용자" }}</h2>
             <p class="user-major">
-              {{ user.profile.major_display|default:"전공 정보" }}
+              {{ user_profile.major|default:"전공 정보" }}
             </p>
           </div>
         </div>
@@ -168,6 +168,6 @@ auth-page team-setup-page
 {% endblock %}
 
 {% block extra_js %}
-<script src="{% static 'js/common/user-profile.js' %}"></script>
+
 <script src="{% static 'js/pages/team-setup.js' %}"></script>
 {% endblock %}

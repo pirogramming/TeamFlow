@@ -14,104 +14,115 @@ async function initializeDashboard() {
         // 로딩 상태 표시
         showLoadingState();
         
-        // 대시보드 데이터 로드
-        await loadDashboardData();
+        // 헤더는 자체적으로 초기화됨 (header.js에서 처리)
         
-        // 더미 데이터로 UI 구성 (API 연결 전까지)
-        setupDummyData();
+        // 대시보드 데이터 로드
+        const data = await loadDashboardData();
+        
+        // 실제 데이터로 UI 구성
+        setupDashboardData(data);
+        
+        // 로딩 상태 숨기기
+        hideLoadingState();
         
     } catch (error) {
         console.error('대시보드 초기화 오류:', error);
         showNotification('대시보드 로딩에 실패했습니다.', 'error');
+        hideLoadingState();
     }
 }
 
-// 대시보드 데이터 로드
+/**
+ * 🔗 백엔드 API 연결점 - 대시보드 데이터 로드
+ * 
+ * 엔드포인트: GET /api/dashboard/api/
+ * 요청 데이터: 없음 (GET 요청)
+ * 
+ * 기대하는 응답:
+ * {
+ *   user: {name: string, role: string},
+ *   team: {id: number, name: string, description: string, invite_code: string, created_at: string},
+ *   user_role: string,
+ *   team_members: [{user__first_name: string, user__profile__major: string, role: string}, ...],
+ *   total_progress: number,
+ *   personal_progress: number,
+ *   deadline_count: number,
+ *   team_tasks: [...],
+ *   personal_tasks: [...]
+ * }
+ * 
+ * 📋 백엔드 처리 사항:
+ * 1. request.session['current_team_id']로 현재 선택된 팀 확인
+ * 2. 없으면 사용자의 첫 번째 팀을 current_team_id로 설정
+ * 3. 팀 정보, 멤버 목록, 작업 현황, 마감일 등 종합 데이터 반환
+ * 4. 헤더에서 프로젝트 변경 시 이 API가 다시 호출됨
+ */
 async function loadDashboardData() {
-    // TODO: 실제 API 연결 시 사용
-    // const teamId = getCurrentTeamId(); // 현재 팀 ID 가져오기
-    // const response = await fetch(`/api/dashboard/${teamId}/`);
-    // const data = await response.json();
-    // return data;
-    
-    // 임시로 더미 데이터 반환
-    return {
-        overall_progress: 33,
-        personal_progress: 50,
-        deadline_count: 3,
-        team_tasks: [
-            {
-                id: 1,
-                title: 'UI 디자인 완성',
-                assignee: '김철수',
-                due_date: '2024-01-15',
-                completed: false,
-                urgent: true
+    try {
+        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+        const response = await fetch('/api/dashboard/api/', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken
             },
-            {
-                id: 2,
-                title: '백엔드 API 개발',
-                assignee: '이영희',
-                due_date: '2024-01-18',
-                completed: true,
-                urgent: false
+            credentials: 'same-origin'
+        });
+        
+        if (!response.ok) {
+            throw new Error('대시보드 데이터 로드에 실패했습니다.');
+        }
+        
+        const data = await response.json();
+        console.log('대시보드 API 응답:', data); // 디버깅 로그 추가
+        return data;
+        
+    } catch (error) {
+        console.error('대시보드 데이터 로드 오류:', error);
+        // 에러 시 더미 데이터 반환
+        return {
+            user: {
+                name: '사용자 이름',
+                role: '사용자 역할'
             },
-            {
-                id: 3,
-                title: '데이터베이스 설계',
-                assignee: '박민수',
-                due_date: '2024-01-20',
-                completed: false,
-                urgent: false
-            }
-        ],
-        personal_tasks: [
-            {
-                id: 4,
-                title: '개인 과제 제출',
-                due_date: '2024-01-16',
-                completed: false,
-                urgent: true
+            team: {
+                name: '팀 이름',
+                description: '팀 설명'
             },
-            {
-                id: 5,
-                title: '논문 리뷰',
-                due_date: '2024-01-19',
-                completed: true,
-                urgent: false
-            }
-        ],
-        team_members: [
-            {
-                id: 1,
-                name: '김철수',
-                major: '컴퓨터공학과',
-                role: '디자이너',
-                avatar: null
-            },
-            {
-                id: 2,
-                name: '이영희',
-                major: '소프트웨어학과',
-                role: '개발자',
-                avatar: null
-            },
-            {
-                id: 3,
-                name: '박민수',
-                major: '디자인학과',
-                role: '미정',
-                avatar: null
-            },
-            {
-                id: 4,
-                name: '최지은',
-                major: '컴퓨터공학과',
-                role: '미정',
-                avatar: null
-            }
-        ]
-    };
+            total_progress: 0,
+            personal_progress: 0,
+            deadline_count: 0,
+            team_tasks: [],
+            personal_tasks: [],
+            team_members: []
+        };
+    }
+}
+
+// 대시보드 새로고침 (헤더에서 프로젝트 변경 시 호출)
+async function refreshDashboard() {
+    console.log('🔄 대시보드 새로고침 시작 (프로젝트 변경됨)');
+    try {
+        // 로딩 상태 표시
+        showLoadingState();
+        
+        // 새로운 팀 데이터 로드
+        const data = await loadDashboardData();
+        console.log('🔄 새로운 팀 데이터:', data);
+        
+        // UI 업데이트
+        setupDashboardData(data);
+        
+        // 로딩 상태 숨기기
+        hideLoadingState();
+        
+        console.log('✅ 대시보드 새로고침 완료');
+        
+    } catch (error) {
+        console.error('❌ 대시보드 새로고침 오류:', error);
+        showNotification('팀 정보 업데이트에 실패했습니다.', 'error');
+        hideLoadingState();
+    }
 }
 
 // 더미 데이터로 UI 구성
@@ -131,58 +142,25 @@ function setupDummyData() {
 }
 
 // 진행률 바 업데이트
-function updateProgressBars() {
-    // 전체 진행률
-    const overallProgress = document.getElementById('overall-progress');
-    const overallProgressFill = document.getElementById('overall-progress-fill');
-    const overallProgressText = document.getElementById('overall-progress-text');
+function updateProgressBars(totalProgress, personalProgress) {
+    const overallProgressBar = document.querySelector('.overall-progress-bar');
+    const personalProgressBar = document.querySelector('.personal-progress-bar');
     
-    if (overallProgress) overallProgress.textContent = '33%';
-    if (overallProgressFill) overallProgressFill.style.width = '33%';
-    if (overallProgressText) overallProgressText.textContent = '2/6';
+    if (overallProgressBar) {
+        overallProgressBar.style.width = `${totalProgress}%`;
+        overallProgressBar.setAttribute('aria-valuenow', totalProgress);
+    }
     
-    // 개인 완료율
-    const personalProgress = document.getElementById('personal-progress');
-    const personalProgressFill = document.getElementById('personal-progress-fill');
-    const personalProgressText = document.getElementById('personal-progress-text');
-    
-    if (personalProgress) personalProgress.textContent = '50%';
-    if (personalProgressFill) personalProgressFill.style.width = '50%';
-    if (personalProgressText) personalProgressText.textContent = '1/2';
-    
-    // 마감 임박
-    const deadlineCount = document.getElementById('deadline-count');
-    if (deadlineCount) deadlineCount.textContent = '3';
+    if (personalProgressBar) {
+        personalProgressBar.style.width = `${personalProgress}%`;
+        personalProgressBar.setAttribute('aria-valuenow', personalProgress);
+    }
 }
 
 // 팀 작업 목록 렌더링
-function renderTeamTasks() {
+function renderTeamTasks(tasks = []) {
     const teamTasksContainer = document.getElementById('team-tasks');
     if (!teamTasksContainer) return;
-    
-    const tasks = [
-        {
-            title: 'UI 디자인 완성',
-            assignee: '김철수',
-            dueDate: '2024-01-15',
-            completed: false,
-            urgent: true
-        },
-        {
-            title: '백엔드 API 개발',
-            assignee: '이영희',
-            dueDate: '2024-01-18',
-            completed: true,
-            urgent: false
-        },
-        {
-            title: '데이터베이스 설계',
-            assignee: '박민수',
-            dueDate: '2024-01-20',
-            completed: false,
-            urgent: false
-        }
-    ];
     
     teamTasksContainer.innerHTML = tasks.map(task => `
         <div class="task-item" data-task-id="${task.id || Math.random()}">
@@ -197,24 +175,9 @@ function renderTeamTasks() {
 }
 
 // 개인 작업 목록 렌더링
-function renderPersonalTasks() {
+function renderPersonalTasks(tasks = []) {
     const personalTasksContainer = document.getElementById('personal-tasks');
     if (!personalTasksContainer) return;
-    
-    const tasks = [
-        {
-            title: '개인 과제 제출',
-            dueDate: '2024-01-16',
-            completed: false,
-            urgent: true
-        },
-        {
-            title: '논문 리뷰',
-            dueDate: '2024-01-19',
-            completed: true,
-            urgent: false
-        }
-    ];
     
     personalTasksContainer.innerHTML = tasks.map(task => `
         <div class="task-item" data-task-id="${task.id || Math.random()}">
@@ -229,45 +192,30 @@ function renderPersonalTasks() {
 }
 
 // 팀원 목록 렌더링
-function renderTeamMembers() {
+function renderTeamMembers(members = []) {
     const teamMembersContainer = document.getElementById('team-members');
     if (!teamMembersContainer) return;
     
-    const members = [
-        {
-            name: '김철수',
-            major: '컴퓨터공학과',
-            role: '디자이너'
-        },
-        {
-            name: '이영희',
-            major: '소프트웨어학과',
-            role: '개발자'
-        },
-        {
-            name: '박민수',
-            major: '디자인학과',
-            role: '미정'
-        },
-        {
-            name: '최지은',
-            major: '컴퓨터공학과',
-            role: '미정'
-        }
-    ];
-    
-    teamMembersContainer.innerHTML = members.map(member => `
-        <div class="team-member">
-            <div class="member-avatar">
-                ${member.name.charAt(0)}
+    teamMembersContainer.innerHTML = members.map(member => {
+        // 안전한 문자열 처리
+        const name = member.user__first_name || member.name || '사용자';
+        const major = member.user__profile__major || member.major || '전공 미정';
+        const role = member.role || '미정';
+        const avatarText = name.charAt(0) || '사';
+        
+        return `
+            <div class="team-member">
+                <div class="member-avatar">
+                    ${avatarText}
+                </div>
+                <div class="member-info">
+                    <h4 class="member-name">${name}</h4>
+                    <p class="member-major">${major}</p>
+                    <span class="member-role">${role}</span>
+                </div>
             </div>
-            <div class="member-info">
-                <h4 class="member-name">${member.name}</h4>
-                <p class="member-major">${member.major}</p>
-                <span class="member-role">${member.role}</span>
-            </div>
-        </div>
-    `).join('');
+        `;
+    }).join('');
 }
 
 // 작업 토글 함수
@@ -317,12 +265,12 @@ function handleProjectDropdown() {
 
 // 팀 생성 핸들러
 function handleCreateTeam() {
-    window.location.href = '/preview/team-setup/?from=dashboard';
+                window.location.href = '/team/create/?from=dashboard';
 }
 
 // 팀 참여 핸들러
 function handleJoinTeam() {
-    window.location.href = '/preview/team-join/?from=dashboard';
+                window.location.href = '/team/join/?from=dashboard';
 }
 
 // 마감 임박 알림 핸들러
@@ -387,4 +335,257 @@ function showNotification(message, type = 'info') {
             }
         }, 300);
     }, 3000);
+}
+
+// 초대 코드 섹션 업데이트
+function updateInviteCodeSection(team) {
+    console.log('🔑 초대 코드 섹션 업데이트 시작');
+    console.log('📋 팀 데이터:', team);
+    
+    const inviteCodeInput = document.getElementById('invite-code-input');
+    const copyButton = document.getElementById('copy-invite-code');
+    
+    console.log('🎯 초대 코드 입력란:', inviteCodeInput);
+    
+    if (inviteCodeInput && team && team.invite_code) {
+        console.log(`✅ 초대 코드 설정: ${team.invite_code}`);
+        inviteCodeInput.value = team.invite_code;
+    } else {
+        console.log('❌ 초대 코드 설정 실패:');
+        console.log('- 입력란:', !!inviteCodeInput);
+        console.log('- 팀 데이터:', !!team);
+        console.log('- 초대 코드:', team?.invite_code);
+    }
+    
+    // 복사 버튼 이벤트 리스너 등록
+    if (copyButton && !copyButton.hasAttribute('data-listener-added')) {
+        copyButton.addEventListener('click', copyInviteCode);
+        copyButton.setAttribute('data-listener-added', 'true');
+        console.log('복사 버튼 이벤트 리스너 등록됨');
+    }
+}
+
+// 초대 코드 복사 함수
+async function copyInviteCode() {
+    const inviteCodeInput = document.getElementById('invite-code-input');
+    const copyButton = document.getElementById('copy-invite-code');
+    
+    if (!inviteCodeInput || !inviteCodeInput.value || inviteCodeInput.value === '------') {
+        showNotification('복사할 초대 코드가 없습니다.', 'error');
+        return;
+    }
+    
+    try {
+        // 클립보드에 복사
+        await navigator.clipboard.writeText(inviteCodeInput.value);
+        
+        // 시각적 피드백
+        copyButton.classList.add('copied');
+        
+        // 복사 성공 알림
+        showNotification('복사 완료!', 'success');
+        
+        // 1.5초 후 원래 상태로 복원
+        setTimeout(() => {
+            copyButton.classList.remove('copied');
+        }, 1500);
+        
+        console.log('초대 코드 복사 완료:', inviteCodeInput.value);
+        
+    } catch (error) {
+        console.error('클립보드 복사 실패:', error);
+        
+        // Fallback: input 선택하여 복사
+        try {
+            inviteCodeInput.select();
+            inviteCodeInput.setSelectionRange(0, 99999); // 모바일 대응
+            document.execCommand('copy');
+            showNotification('초대 코드가 복사되었습니다!', 'success');
+        } catch (fallbackError) {
+            console.error('Fallback 복사도 실패:', fallbackError);
+            showNotification('복사에 실패했습니다. 수동으로 복사해주세요.', 'error');
+        }
+    }
+}
+
+// 실제 데이터로 UI 구성
+function setupDashboardData(data) {
+    // 사용자 정보 표시
+    updateUserInfo(data.user);
+    
+    // 팀 정보 표시
+    updateTeamInfo(data.team);
+    
+    // 초대 코드 섹션 업데이트
+    updateInviteCodeSection(data.team);
+    
+    // 프로젝트 드롭다운 설정
+    setupProjectDropdown(data.team);
+    
+    // 진행률 업데이트
+    updateProgressBars(data.total_progress, data.personal_progress);
+    
+    // 팀 멤버 표시 (데이터가 있는 경우에만)
+    if (data.team_members && Array.isArray(data.team_members)) {
+        renderTeamMembers(data.team_members);
+    }
+    
+    // 작업 목록 표시 (임시로 빈 배열)
+    renderTeamTasks(data.team_tasks || []);
+    renderPersonalTasks(data.personal_tasks || []);
+}
+
+// 사용자 정보 업데이트
+function updateUserInfo(user) {
+    console.log('사용자 정보 업데이트:', user); // 디버깅 로그 추가
+    
+    // 사이드바의 사용자 이름과 역할 업데이트
+    const userNameElement = document.getElementById('user-name');
+    const userRoleElement = document.getElementById('user-role');
+    const avatarTextElement = document.getElementById('avatar-text');
+    
+    console.log('아바타 텍스트 요소:', avatarTextElement); // 디버깅 로그 추가
+    
+    if (userNameElement && user.name) {
+        userNameElement.textContent = user.name;
+    }
+    
+    if (userRoleElement && user.role) {
+        userRoleElement.textContent = user.role;
+    }
+    
+    // 아바타 텍스트 업데이트 (이름의 첫 글자)
+    if (avatarTextElement && user.name) {
+        const firstChar = user.name.charAt(0);
+        avatarTextElement.textContent = firstChar;
+        console.log('아바타 텍스트 설정됨:', firstChar); // 디버깅 로그 추가
+    } else {
+        console.log('아바타 텍스트 요소를 찾을 수 없거나 사용자 이름이 없음'); // 디버깅 로그 추가
+    }
+}
+
+// 팀 정보 업데이트
+function updateTeamInfo(team) {
+    console.log('팀 정보 업데이트:', team); // 디버깅 로그 추가
+    
+    // 헤더의 프로젝트 이름은 헤더 JavaScript에서 관리하므로 여기서는 제거
+    // 대시보드에서는 다른 팀 관련 정보만 업데이트
+    console.log('팀 정보가 로드됨:', team.name);
+}
+
+// 프로젝트 드롭다운 설정
+function setupProjectDropdown(currentTeam) {
+    const dropdownButton = document.getElementById('project-dropdown');
+    const dropdownMenu = document.getElementById('project-dropdown-menu');
+    const projectList = document.getElementById('project-list');
+    const createNewProjectBtn = document.getElementById('create-new-project');
+    
+    if (!dropdownButton || !dropdownMenu) return;
+    
+    // 드롭다운 토글
+    dropdownButton.addEventListener('click', function(e) {
+        e.stopPropagation();
+        const isOpen = dropdownMenu.style.display === 'block';
+        
+        if (isOpen) {
+            dropdownMenu.style.display = 'none';
+            dropdownButton.classList.remove('active');
+        } else {
+            dropdownMenu.style.display = 'block';
+            dropdownButton.classList.add('active');
+            loadProjectList();
+        }
+    });
+    
+    // 드롭다운 외부 클릭 시 닫기
+    document.addEventListener('click', function(e) {
+        if (!dropdownButton.contains(e.target) && !dropdownMenu.contains(e.target)) {
+            dropdownMenu.style.display = 'none';
+            dropdownButton.classList.remove('active');
+        }
+    });
+    
+    // 새 프로젝트 만들기 버튼
+    if (createNewProjectBtn) {
+        createNewProjectBtn.addEventListener('click', function() {
+            window.location.href = '/team/create/?from=dashboard';
+        });
+    }
+}
+
+// 프로젝트 목록 로드
+async function loadProjectList() {
+    const projectList = document.getElementById('project-list');
+    if (!projectList) return;
+    
+    try {
+        // 현재는 더미 데이터 사용 (나중에 API로 변경)
+        const projects = [
+            {
+                id: 1,
+                name: '웹 개발 프로젝트',
+                status: '진행중',
+                isActive: true
+            },
+            {
+                id: 2,
+                name: '모바일 앱 개발',
+                status: '진행중',
+                isActive: false
+            },
+            {
+                id: 3,
+                name: '신세 신잉플',
+                status: '진행중',
+                isActive: false
+            }
+        ];
+        
+        renderProjectList(projects);
+        
+    } catch (error) {
+        console.error('프로젝트 목록 로드 오류:', error);
+    }
+}
+
+// 프로젝트 목록 렌더링
+function renderProjectList(projects) {
+    const projectList = document.getElementById('project-list');
+    if (!projectList) return;
+    
+    projectList.innerHTML = projects.map(project => `
+        <div class="dropdown-item ${project.isActive ? 'active' : ''}" data-project-id="${project.id}">
+            <svg class="dropdown-item-icon" fill="currentColor" viewBox="0 0 24 24" width="16" height="16">
+                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+            </svg>
+            <div class="dropdown-item-content">
+                <div class="dropdown-item-name">${project.name}</div>
+                <span class="dropdown-item-status">${project.status}</span>
+            </div>
+        </div>
+    `).join('');
+    
+    // 프로젝트 선택 이벤트
+    projectList.querySelectorAll('.dropdown-item').forEach(item => {
+        item.addEventListener('click', function() {
+            const projectId = this.dataset.projectId;
+            selectProject(projectId);
+        });
+    });
+}
+
+// 프로젝트 선택
+function selectProject(projectId) {
+    console.log('프로젝트 선택됨:', projectId);
+    
+    // 드롭다운 닫기
+    const dropdownMenu = document.getElementById('project-dropdown-menu');
+    const dropdownButton = document.getElementById('project-dropdown');
+    
+    if (dropdownMenu) dropdownMenu.style.display = 'none';
+    if (dropdownButton) dropdownButton.classList.remove('active');
+    
+    // TODO: 선택된 프로젝트로 대시보드 데이터 로드
+    // 현재는 페이지 새로고침으로 처리
+    window.location.reload();
 }
