@@ -41,8 +41,9 @@ urlpatterns = [
 path('preview/profile-setup/', users.profile_setup_preview, name='profile_setup_preview'),
 path('preview/team-setup/', users.team_setup_preview, name='team_setup_preview'),
 path('preview/team-join/', users.team_join_preview, name='team_join_preview'),
-path('preview/team-setup-selection/', users.team_setup_selection_preview, name='team_setup_selection_preview'),
-# ========================================
+    path('preview/team-setup-selection/', users.team_setup_selection_preview, name='team_setup_selection_preview'),
+    path('preview/dashboard/', users.dashboard_preview, name='dashboard_preview'),
+    # ========================================
 
     # 랜딩 페이지
     path('', dashboard.landing_page_view, name='landing_index'),

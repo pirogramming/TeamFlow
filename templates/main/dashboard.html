@@ -1,1 +1,133 @@
-<!-- 대시보드 (통계, 진행률, 최근 활동) -->
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}대시보드 - TeamFlow{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/main/dashboard.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/main/header.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/main/sidebar.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/main/footer.css' %}">
+{% endblock %}
+
+{% block content %}
+<!-- 헤더 -->
+{% include 'includes/header.html' %}
+
+<div class="dashboard-container">
+    <!-- 사이드바 -->
+    {% include 'includes/sidebar.html' %}
+    
+    <!-- 메인 콘텐츠 -->
+    <main class="main-content">
+        <div class="dashboard-content">
+            <!-- 상단 요약 카드들 -->
+            <div class="summary-cards">
+                <!-- 전체 진행률 -->
+                <div class="summary-card">
+                    <div class="card-header">
+                        <h3 class="card-title">전체 진행률</h3>
+                    </div>
+                    <div class="card-content">
+                        <div class="progress-display">
+                            <span class="progress-percentage" id="overall-progress">33%</span>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="overall-progress-fill" style="width: 33%"></div>
+                            </div>
+                            <span class="progress-text" id="overall-progress-text">2/6</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 개인 완료율 -->
+                <div class="summary-card">
+                    <div class="card-header">
+                        <h3 class="card-title">개인 완료율</h3>
+                    </div>
+                    <div class="card-content">
+                        <div class="progress-display">
+                            <span class="progress-percentage" id="personal-progress">50%</span>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="personal-progress-fill" style="width: 50%"></div>
+                            </div>
+                            <span class="progress-text" id="personal-progress-text">1/2</span>
+                        </div>
+                        <p class="progress-description">내가 담당한 작업</p>
+                    </div>
+                </div>
+
+                <!-- 마감 임박 -->
+                <div class="summary-card">
+                    <div class="card-header">
+                        <h3 class="card-title">마감 임박</h3>
+                    </div>
+                    <div class="card-content">
+                        <div class="deadline-display">
+                            <div class="deadline-icon">
+                                <svg fill="currentColor" viewBox="0 0 24 24" width="24" height="24">
+                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                                </svg>
+                            </div>
+                            <span class="deadline-count" id="deadline-count">3</span>
+                            <span class="deadline-text">개 작업</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 작업 목록 -->
+            <div class="tasks-section">
+                <!-- 팀 작업 -->
+                <div class="tasks-card">
+                    <div class="card-header">
+                        <h3 class="card-title">팀 작업</h3>
+                        <p class="card-subtitle">팀의 최근 작업 현황</p>
+                    </div>
+                    <div class="card-content">
+                        <div class="task-list" id="team-tasks">
+                            <!-- 팀 작업들이 동적으로 로드됩니다 -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 개인 작업 -->
+                <div class="tasks-card">
+                    <div class="card-header">
+                        <h3 class="card-title">개인 작업</h3>
+                        <p class="card-subtitle">나의 개인 작업 현황</p>
+                    </div>
+                    <div class="card-content">
+                        <div class="task-list" id="personal-tasks">
+                            <!-- 개인 작업들이 동적으로 로드됩니다 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 팀 현황 -->
+            <div class="team-status-section">
+                <div class="team-status-card">
+                    <div class="card-header">
+                        <h3 class="card-title">팀 현황</h3>
+                    </div>
+                    <div class="card-content">
+                        <div class="team-members" id="team-members">
+                            <!-- 팀원들이 동적으로 로드됩니다 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- 푸터 -->
+{% include 'includes/footer.html' %}
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/common/user-profile.js' %}"></script>
+<script src="{% static 'js/pages/main/dashboard.js' %}"></script>
+<script src="{% static 'js/pages/main/header.js' %}"></script>
+<script src="{% static 'js/pages/main/sidebar.js' %}"></script>
+{% endblock %}

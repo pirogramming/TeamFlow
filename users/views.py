@@ -28,6 +28,10 @@ def team_join_preview(request):
 
 def team_setup_selection_preview(request):
     return render(request, 'auth/team-setup.html')
+
+def dashboard_preview(request):
+    """대시보드 페이지 미리보기 (CSS 테스트용) - MGP 개발"""
+    return render(request, 'main/dashboard.html')
 # ========================================
 
 # 프로필 업데이트 API

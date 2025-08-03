@@ -131,7 +131,7 @@ auth-page team-setup-page
         
         <!-- 뒤로가기 링크 (팀 옵션 하단) -->
         <div class="back-action-bottom">
-          <a href="/preview/profile-setup/" class="back-link-bottom">
+          <a href="#" class="back-link-bottom" onclick="goBack(); return false;">
             뒤로가기
           </a>
         </div>
@@ -168,5 +168,6 @@ auth-page team-setup-page
 {% endblock %}
 
 {% block extra_js %}
+<script src="{% static 'js/common/user-profile.js' %}"></script>
 <script src="{% static 'js/pages/team-setup.js' %}"></script>
 {% endblock %}

@@ -80,6 +80,12 @@ function navigateToTeamJoin() {
     window.location.href = '/preview/team-join/';
 }
 
+function goBack() {
+    // 기존 회원인지 확인 (프로필이 설정되어 있는지)
+    handleBackNavigation('/preview/profile-setup/');
+}
+
 // 전역 스코프에 함수 할당
 window.navigateToTeamCreate = navigateToTeamCreate;
-window.navigateToTeamJoin = navigateToTeamJoin; 
+window.navigateToTeamJoin = navigateToTeamJoin;
+window.goBack = goBack; 

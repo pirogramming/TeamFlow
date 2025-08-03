@@ -1,1 +1,88 @@
+{% load static %}
 <!-- 사이드바 메뉴 (네비게이션 링크) -->
+<aside class="sidebar">
+    <div class="sidebar-container">
+        <!-- 상단 네비게이션 -->
+        <nav class="sidebar-nav">
+            <ul class="nav-list">
+                <!-- 대시보드 (현재 활성) -->
+                <li class="nav-item active">
+                    <a href="/preview/dashboard/" class="nav-link" id="dashboard-link">
+                        <svg class="nav-icon" fill="currentColor" viewBox="0 0 24 24" width="20" height="20">
+                            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                        </svg>
+                        <span class="nav-text">대시보드</span>
+                    </a>
+                </li>
+
+                <!-- 일정 -->
+                <li class="nav-item">
+                    <a href="/calendar/" class="nav-link">
+                        <svg class="nav-icon" fill="currentColor" viewBox="0 0 24 24" width="20" height="20">
+                            <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/>
+                        </svg>
+                        <span class="nav-text">일정</span>
+                    </a>
+                </li>
+
+                <!-- 작업 -->
+                <li class="nav-item">
+                    <a href="/tasks/" class="nav-link">
+                        <svg class="nav-icon" fill="currentColor" viewBox="0 0 24 24" width="20" height="20">
+                            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                        </svg>
+                        <span class="nav-text">작업</span>
+                    </a>
+                </li>
+
+                <!-- 자료 -->
+                <li class="nav-item">
+                    <a href="/files/" class="nav-link">
+                        <svg class="nav-icon" fill="currentColor" viewBox="0 0 24 24" width="20" height="20">
+                            <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+                        </svg>
+                        <span class="nav-text">자료</span>
+                    </a>
+                </li>
+
+                <!-- 역할 -->
+                <li class="nav-item">
+                    <a href="/roles/" class="nav-link">
+                        <svg class="nav-icon" fill="currentColor" viewBox="0 0 24 24" width="20" height="20">
+                            <path d="M16 4c0-1.11.89-2 2-2s2 .89 2 2-.89 2-2 2-2-.89-2-2zm4 18v-6h2.5l-2.54-7.63A1.999 1.999 0 0 0 18.06 7c-.8 0-1.54.5-1.85 1.26l-1.45 3.63c-.25.65-.65 1.15-1.18 1.46C14.28 13.78 15 14.8 15 16v6h5z"/>
+                        </svg>
+                        <span class="nav-text">역할</span>
+                    </a>
+                </li>
+
+                <!-- 팀플 기록 -->
+                <li class="nav-item">
+                    <a href="/team-log/" class="nav-link">
+                        <svg class="nav-icon" fill="currentColor" viewBox="0 0 24 24" width="20" height="20">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                        </svg>
+                        <span class="nav-text">팀플 기록</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- 하단 프로필 섹션 -->
+        <div class="sidebar-footer">
+            <div class="profile-section">
+                <div class="profile-avatar">
+                    <div class="avatar-placeholder" id="user-avatar">김</div>
+                </div>
+                <div class="profile-info">
+                    <span class="profile-name" id="user-name">김철수</span>
+                    <span class="profile-role" id="user-role">미정</span>
+                </div>
+                <button class="profile-toggle" id="profile-toggle">
+                    <svg fill="currentColor" viewBox="0 0 24 24" width="16" height="16">
+                        <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+</aside>

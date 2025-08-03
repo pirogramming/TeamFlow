@@ -172,6 +172,11 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         showNotification('팀이 성공적으로 생성되었습니다!', 'success');
+        
+        // 2초 후 대시보드로 이동
+        setTimeout(() => {
+            window.location.href = '/preview/dashboard/';
+        }, 2000);
     }
     
     // 초대 코드 생성
@@ -245,7 +250,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // 전역 함수들 (HTML에서 호출)
 function navigateToDashboard() {
-    window.location.href = '/dashboard/';
+    window.location.href = '/preview/dashboard/';
 }
 
 function navigateToTeamJoin() {
@@ -257,7 +262,17 @@ function createAnotherTeam() {
 }
 
 function goBack() {
-    window.location.href = '/preview/team-setup-selection/';
+    // URL 파라미터에서 어디서 왔는지 확인
+    const urlParams = new URLSearchParams(window.location.search);
+    const from = urlParams.get('from');
+    
+    // 대시보드에서 온 경우 대시보드로 돌아가기
+    if (from === 'dashboard') {
+        window.location.href = '/preview/dashboard/';
+    } else {
+        // 팀 설정 선택 페이지에서 온 경우 팀 설정 선택 페이지로 돌아가기
+        window.location.href = '/preview/team-setup-selection/';
+    }
 }
 
 // 전역 스코프에 함수 할당
