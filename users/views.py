@@ -1,8 +1,9 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from django.views.generic import View
-from django.http import JsonResponse
-from django.contrib.auth.models import User
+from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework import status
 
 # 프로필 설정 페이지
 @login_required
@@ -10,11 +11,6 @@ def profile_setup_page(request):
     return render(request, 'auth/profile-setup.html')
 
 # 프로필 업데이트 API
-from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
-from rest_framework import status
-
 class UserMeUpdateView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -24,12 +20,18 @@ class UserMeUpdateView(APIView):
         specialization = request.data.get('specialization')
 
         user = request.user
+
+        # 이름 업데이트
         if name:
-            user.first_name = name  # 단순하게 first_name에 저장
+            user.first_name = name
+            user.save()
+
+        # Profile 필드 업데이트
+        profile = user.profile
         if major:
-            user.profile.major = major  # 커스텀 필드라면 profile 모델 필요
+            profile.major = major
         if specialization:
-            user.profile.specialization = specialization
-        user.save()
+            profile.specialization = specialization
+        profile.save()
 
         return Response({"success": True})
