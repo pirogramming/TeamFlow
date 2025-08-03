@@ -23,8 +23,8 @@ def save_user_profile(sender, instance, **kwargs):
     # User 저장될 때 Profile도 같이 저장
     if hasattr(instance, 'profile'):
         instance.profile.save()
+        
 
-#allauth가 user를 생성한 직후 profile이 없으면 생성하도록 수정
 from allauth.account.signals import user_signed_up
 from django.dispatch import receiver
 

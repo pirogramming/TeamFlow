@@ -2,7 +2,7 @@
  * 프로필 설정 페이지 (백엔드 테스트용)
  * 
  * 백엔드 개발자 참고:
- * - PATCH /api/users/me/ 엔드포인트로 프로필 정보 전송
+ * - PATCH /api/auth/me/ 엔드포인트로 프로필 정보 전송
  * - 필드: name, major, specialization
  */
 
@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', function() {
             try {
                 const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
-                const response = await fetch('/api/users/me/', {
+                const response = await fetch('/api/auth/me/', {
                     method: 'PATCH',
                     headers: {
                         'Content-Type': 'application/json',
@@ -37,13 +37,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 const result = await response.json();
 
-                if (result.id) {
+                if (result.success) {
                     alert('프로필 설정 완료!');
-                    window.location.href = '/dashboard/';  // 대시보드로 이동
+                    window.location.href = '/api/auth/after-login/';  // 여기로 리다이렉트
                 } else {
                     alert('프로필 설정 실패');
                 }
-            } catch (error) {
+                
+                } catch (error) {
                 alert('오류 발생: ' + error.message);
             }
         });
