@@ -5,7 +5,14 @@ from .models import Profile
 
 @receiver(post_save, sender=User)
 def create_or_update_user_profile(sender, instance, created, **kwargs):
-    # 프로필이 없으면 생성
-    Profile.objects.get_or_create(user=instance)
-    # 이후 save 호출
-    instance.profile.save()
+    # 프로필이 없으면 생성할 때 기본값 넣기
+    Profile.objects.get_or_create(
+        user=instance,
+        defaults={
+            'major': '',
+            'specialization': ''
+        }
+    )
+    # 이후 save 호출 (이미 존재해도 업데이트 동작)
+    if hasattr(instance, 'profile'):
+        instance.profile.save()
