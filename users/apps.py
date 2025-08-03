@@ -7,6 +7,7 @@ class UsersConfig(AppConfig):
     name = 'users'
 
     def ready(self):
+        # 1) SocialApp 자동 생성
         from allauth.socialaccount.models import SocialApp
         from django.contrib.sites.models import Site
         import os
@@ -25,8 +26,9 @@ class UsersConfig(AppConfig):
                     secret=secret,
                 )
                 app.sites.add(site)
-        except:
-            pass
+        except Exception as e:
+            # 에러 디버깅 위해 print 추가
+            print(f"[UsersConfig.ready] SocialApp setup skipped: {e}")
 
-def ready(self):
-    import users.signals
+        # 2) signals 불러오기
+        import users.signals
