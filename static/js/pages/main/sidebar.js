@@ -1,12 +1,37 @@
 // 사이드바 JavaScript - MGP 개발
 
-document.addEventListener('DOMContentLoaded', function() {
-    // 사이드바 초기화
-    initializeSidebar();
-    
-    // 이벤트 리스너 등록
-    setupSidebarEventListeners();
+// 모달 폼 제출 (PATCH 요청)
+document.addEventListener("DOMContentLoaded", function () {
+    const profileForm = document.getElementById("profile-form");
+    if (profileForm) {
+        profileForm.addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            fetch("/users/me/", { // PATCH
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": document.querySelector('[name=csrfmiddlewaretoken]').value,
+                },
+                body: JSON.stringify({
+                    name: document.getElementById("first_name").value,
+                    major: document.getElementById("major").value,
+                    specialization: document.getElementById("specialization").value,
+                }),
+            })
+                .then(res => res.json())
+                .then(() => {
+                    alert("프로필이 수정되었습니다.");
+                    document.getElementById("profile-modal").classList.add("hidden");
+
+                    // 사이드바 이름 갱신
+                    document.getElementById("user-name").textContent =
+                        document.getElementById("first_name").value;
+                });
+        });
+    }
 });
+
 
 // 사이드바 초기화
 function initializeSidebar() {
@@ -129,9 +154,20 @@ function handleNavLinkClick(e) {
 
 // 프로필 토글 핸들러
 function handleProfileToggle() {
-    // TODO: 프로필 메뉴 또는 설정 페이지로 이동
-    showSidebarNotification('프로필 설정 기능은 준비 중입니다.', 'info');
+    const modal = document.getElementById("profile-modal");
+    modal.classList.remove("hidden");
+
+    // API 호출해서 프로필 데이터 불러오기
+    fetch("/api/profile/me/")
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById("first_name").value = data.first_name || "";
+            document.getElementById("major").value = data.major || "";
+            document.getElementById("specialization").value = data.specialization || "";
+        });
+
 }
+
 
 // 윈도우 리사이즈 핸들러
 function handleWindowResize() {

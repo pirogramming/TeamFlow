@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<h2>내 프로필</h2>
+<form id="profile-form">
+    {% csrf_token %}
+    <label>이름</label>
+    <input type="text" id="first_name">
+    <label>전공</label>
+    <input type="text" id="major">
+    <label>세부전공</label>
+    <input type="text" id="specialization">
+    <button type="submit">저장</button>
+</form>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    // 1. 프로필 불러오기 (GET)
+    fetch("/api/auth/me")
+      .then(res => res.json())
+      .then(data => {
+          document.getElementById("first_name").value = data.first_name || "";
+          document.getElementById("major").value = data.major || "";
+          document.getElementById("specialization").value = data.specialization || "";
+      });
+
+    // 2. 프로필 저장 (PATCH)
+    document.getElementById("profile-form").addEventListener("submit", function (e) {
+        e.preventDefault();
+        fetch("/api/auth/me", {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": document.querySelector('[name=csrfmiddlewaretoken]').value,
+            },
+            body: JSON.stringify({
+                name: document.getElementById("first_name").value,
+                major: document.getElementById("major").value,
+                specialization: document.getElementById("specialization").value,
+            }),
+        })
+          .then(res => res.json())
+          .then(() => {
+              alert("프로필이 수정되었습니다.");
+          });
+    });
+});
+</script>
+{% endblock %}
