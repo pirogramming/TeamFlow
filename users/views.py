@@ -150,6 +150,18 @@ def after_login_redirect(request):
 class UserMeUpdateView(APIView):
     permission_classes = [IsAuthenticated]
 
+    def get(self, request):
+        """
+        로그인한 사용자 정보 반환
+        """
+        user = request.user
+        return Response({
+            "id": user.id,
+            "first_name": user.first_name,
+            "major": user.profile.major,
+            "specialization": user.profile.specialization,
+        })
+
     def patch(self, request):
         name = request.data.get('name')
         major = request.data.get('major')
@@ -191,3 +203,7 @@ class UserMeUpdateView(APIView):
         return Response(response_data)
 
         # ========================================
+
+@login_required
+def profile_page(request):
+    return render(request, 'auth/profile.html')  # 템플릿 경로는 네가 쓰는 구조에 맞춰 조정

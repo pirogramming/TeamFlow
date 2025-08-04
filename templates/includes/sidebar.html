@@ -69,23 +69,25 @@
 
         <!-- 하단 프로필 섹션 -->
         <div class="sidebar-footer">
-            <div class="profile-section">
-                <div class="profile-avatar">
-                    <div class="avatar-placeholder" id="user-avatar">
-                        <!-- 사용자 이름의 첫 글자 표시 -->
-                        <span class="avatar-text" id="avatar-text"></span>
+            <a href="{% url 'profile-page' %}" class="profile-section-link">
+                <div class="profile-section">
+                    <div class="profile-avatar">
+                        <div class="avatar-placeholder" id="user-avatar">
+                            <!-- 사용자 이름의 첫 글자 표시 -->
+                            <span class="avatar-text" id="avatar-text"></span>
+                        </div>
+                    </div>
+                    <div class="profile-info">
+                        <span class="profile-name" id="user-name">김철수</span>
+                        <span class="profile-role" id="user-role">미정</span>
+                    </div>
+                    <div class="profile-arrow">
+                        <svg fill="currentColor" viewBox="0 0 24 24" width="16" height="16">
+                            <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/>
+                        </svg>
                     </div>
                 </div>
-                <div class="profile-info">
-                    <span class="profile-name" id="user-name">김철수</span>
-                    <span class="profile-role" id="user-role">미정</span>
-                </div>
-                <button class="profile-toggle" id="profile-toggle">
-                    <svg fill="currentColor" viewBox="0 0 24 24" width="16" height="16">
-                        <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/>
-                    </svg>
-                </button>
-            </div>
+            </a>
         </div>
     </div>
 </aside>
