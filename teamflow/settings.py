@@ -238,6 +238,8 @@ ACCOUNT_EMAIL_VERIFICATION = 'none'
 SOCIALACCOUNT_AUTO_SIGNUP = True  # 자동 회원가입 활성화
 SOCIALACCOUNT_EMAIL_REQUIRED = False  # 이메일 필수 아님
 SOCIALACCOUNT_EMAIL_VERIFICATION = 'none'  # 이메일 인증 안함
+SOCIALACCOUNT_LOGIN_ON_GET = True  # GET 요청으로 바로 소셜 로그인 시작
+
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
         'APP': {
