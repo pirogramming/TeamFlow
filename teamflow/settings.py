@@ -31,6 +31,15 @@ GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID')
 # .env 파일에서 GOOGLE_CLIENT_SECRET 변수 값을 가져와 사용
 GOOGLE_CLIENT_SECRET = env('GOOGLE_CLIENT_SECRET')
 
+# ========================================
+# MGP: Google OAuth 환경 변수 디버깅
+# 백엔드 팀원이 해결해야 할 부분 대신 해결: 환경 변수 로딩 문제
+# ========================================
+print(f"Google OAuth 설정 확인:")
+print(f"GOOGLE_CLIENT_ID: {'설정됨' if GOOGLE_CLIENT_ID else '설정되지 않음'}")
+print(f"GOOGLE_CLIENT_SECRET: {'설정됨' if GOOGLE_CLIENT_SECRET else '설정되지 않음'}")
+# ========================================
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
@@ -68,11 +77,20 @@ INSTALLED_APPS = [
     'users',
 ]
 
+# ========================================
+# MGP: REST Framework 설정 추가
+# 백엔드 팀원이 해결해야 할 부분 대신 해결: API 인증 문제
+# ========================================
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-    )
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ]
 }
+# ========================================
 
 SITE_ID = 2
 
@@ -164,31 +182,93 @@ STATICFILES_DIRS = [
 #로그인 인증 백엔드, REST 설정
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-AUTHENTICATION_BACKENDS = (
+# allauth 설정
+AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
     'allauth.account.auth_backends.AuthenticationBackend',
-)
+]
 
-REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.SessionAuthentication',
-        'rest_framework.authentication.TokenAuthentication',
-    ]
-}
+# ========================================
+# 원래 백엔드 개발자 설정 (주석처리)
+# AUTHENTICATION_BACKENDS = (
+#     'django.contrib.auth.backends.ModelBackend',
+#     'allauth.account.auth_backends.AuthenticationBackend',
+# )
+# 
+# REST_FRAMEWORK = {
+#     'DEFAULT_AUTHENTICATION_CLASSES': [
+#         'rest_framework.authentication.SessionAuthentication',
+#         'rest_framework.authentication.TokenAuthentication',
+#     ]
+# }
+# 
+# LOGIN_REDIRECT_URL = '/api/auth/after-login/'  # 로그인 후 이동
+# LOGOUT_REDIRECT_URL = '/'           # 로그아웃 후 이동할 페이지
+# 
+# # 구글 OAuth 클라이언트 정보
+# SOCIALACCOUNT_PROVIDERS = {
+#     'google': {
+#         "APP": {
+#         "client_id": (f"{GOOGLE_CLIENT_ID}"),
+#         "secret": (f"{GOOGLE_CLIENT_SECRET}"),
+#         "key": ""
+#          },
+# 
+#         'SCOPE': ['profile', 'email'],
+#         'AUTH_PARAMS': {'access_type': 'online'},
+#     }
+# }
+# ========================================
 
-LOGIN_REDIRECT_URL = '/api/auth/after-login/'  # 로그인 후 이동
-LOGOUT_REDIRECT_URL = '/'           # 로그아웃 후 이동할 페이지
+# ========================================
+# MGP: allauth 로그인 후 리다이렉트 설정 추가
+# 백엔드 팀원이 해결해야 할 부분 대신 해결: 로그인 후 리다이렉트 로직 수정
+# ========================================
+LOGIN_REDIRECT_URL = '/api/auth/after-login/'  # 로그인 후 after_login_redirect 함수 호출
+ACCOUNT_LOGOUT_REDIRECT_URL = '/'
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_EMAIL_VERIFICATION = 'none'
 
-# 구글 OAuth 클라이언트 정보
+# ========================================
+# MGP: 3rdparty signup 완전 비활성화 설정
+# 백엔드 팀원이 해결해야 할 부분 대신 해결: 소셜 로그인 후 리다이렉트 로직
+# ========================================
+SOCIALACCOUNT_AUTO_SIGNUP = True  # 자동 회원가입 활성화
+SOCIALACCOUNT_EMAIL_REQUIRED = False  # 이메일 필수 아님
+SOCIALACCOUNT_EMAIL_VERIFICATION = 'none'  # 이메일 인증 안함
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
-        "APP": {
-        "client_id": (f"{GOOGLE_CLIENT_ID}"),
-        "secret": (f"{GOOGLE_CLIENT_SECRET}"),
-        "key": ""
+        'APP': {
+            "client_id": (f"{GOOGLE_CLIENT_ID}"),
+            "secret": (f"{GOOGLE_CLIENT_SECRET}"),
+            "key": ""
         },
-
-        'SCOPE': ['profile', 'email'],
-        'AUTH_PARAMS': {'access_type': 'online'},
+        'SCOPE': [
+            'profile',
+            'email',
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'online',
+        }
     }
 }
+
+# ========================================
+# MGP: allauth 커스텀 어댑터 설정 추가 (3rdparty signup 우회)
+# 백엔드 팀원이 해결해야 할 부분 대신 해결: 소셜 로그인 후 리다이렉트 로직
+# ========================================
+ACCOUNT_ADAPTER = 'users.adapters.CustomAccountAdapter'
+SOCIALACCOUNT_ADAPTER = 'users.adapters.CustomSocialAccountAdapter'
+
+# ========================================
+# MGP: 3rdparty signup 완전 비활성화
+# 백엔드 팀원이 해결해야 할 부분 대신 해결: 소셜 로그인 후 리다이렉트 로직
+# ========================================
+SOCIALACCOUNT_SIGNUP_FORM_CLASS = None  # 3rdparty signup 폼 비활성화
+SOCIALACCOUNT_QUERY_EMAIL = True  # 이메일 쿼리 활성화
+SOCIALACCOUNT_EMAIL_REQUIRED = False  # 이메일 필수 아님
+SOCIALACCOUNT_STORE_TOKENS = True  # 토큰 저장 활성화
+
+

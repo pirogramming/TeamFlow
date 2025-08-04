@@ -6,7 +6,6 @@
 {% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/pages/team-setup.css' %}" />
 <link rel="stylesheet" href="{% static 'css/pages/team-create.css' %}" />
 {% endblock %}
 
@@ -47,27 +46,12 @@ auth-page team-create-page
 
         <!-- 페이지 제목 -->
         <div class="page-header">
-          <h1 class="page-title">팀 설정</h1>
-          <p class="page-subtitle">새 팀을 만들거나 기존 팀에 참여하세요</p>
+          <h1 class="page-title">팀 만들기</h1>
+          <p class="page-subtitle">새로운 팀을 생성하고 멤버들을 초대하세요</p>
         </div>
       </div>
 
-      <!-- 팀 설정 탭 -->
-      <div class="team-tabs">
-        <div class="tab-buttons">
-          <button type="button" class="tab-btn active" data-tab="create">
-            팀 만들기
-          </button>
-          <button
-            type="button"
-            class="tab-btn"
-            data-tab="join"
-            onclick="navigateToTeamJoin()"
-          >
-            팀 참여하기
-          </button>
-        </div>
-      </div>
+
 
       <!-- 팀 만들기 폼 -->
       <div class="team-form-section" id="create-form-section">
@@ -107,6 +91,37 @@ auth-page team-create-page
             </small>
           </div>
 
+          <!-- 초대 코드 섹션 -->
+          <div class="form-group">
+            <label class="form-label">초대 코드</label>
+            <div class="invite-code-container">
+              <div class="invite-code-display">
+                <span class="invite-code" id="invite-code-text">------</span>
+                <button
+                  type="button"
+                  class="copy-btn"
+                  id="copy-code-btn"
+                  title="코드 복사"
+                  aria-label="초대 코드 복사"
+                >
+                  <svg
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                    width="20"
+                    height="20"
+                  >
+                    <path
+                      d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"
+                    />
+                  </svg>
+                </button>
+              </div>
+              <small class="form-help-text">
+                팀 생성 후 팀원들에게 이 코드를 공유하세요
+              </small>
+            </div>
+          </div>
+
           <!-- 제출 버튼 -->
           <div class="form-actions">
             <button
@@ -129,6 +144,13 @@ auth-page team-create-page
             </button>
           </div>
         </form>
+
+        <!-- 뒤로가기 링크 -->
+        <div class="back-action">
+          <a href="#" onclick="goBack(); return false;" class="back-link">
+            뒤로가기
+          </a>
+        </div>
       </div>
 
       <!-- 팀 생성 성공 화면 (초기에는 숨김) -->
@@ -247,5 +269,5 @@ auth-page team-create-page
 {% endblock %}
 
 {% block extra_js %}
-<script src="{% static 'js/pages/team-setup/team-create.js' %}"></script>
+<script src="{% static 'js/pages/team-create.js' %}"></script>
 {% endblock %}

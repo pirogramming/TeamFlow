@@ -38,7 +38,7 @@ TeamFlow{% endblock %} {% block extra_css %}
         <div class="form-card">
           <div class="form-header">
             <h2 class="form-title">기본 정보 입력</h2>
-            <p class="form-description">프로필 성정을 입력해주세요</p>
+            <p class="form-description">프로필 설정을 완료해주세요</p>
           </div>
 
           <!-- 
@@ -56,8 +56,8 @@ TeamFlow{% endblock %} {% block extra_css %}
                 id="name"
                 name="name"
                 class="form-input"
-                placeholder="팀 이름을 입력하세요"
-                value="{{ user.first_name|default:'' }} {{ user.last_name|default:'' }}"
+                placeholder="이름을 입력해주세요"
+                value=""
                 required
                 autocomplete="name"
               />
@@ -76,28 +76,10 @@ TeamFlow{% endblock %} {% block extra_css %}
                 maxlength="100"
                 autocomplete="organization-title"
               />
-              <small class="form-help-text">
-                본인의 전공을 정확히 입력해주세요 (학과명 포함)
-              </small>
+
             </div>
 
-            <!-- 세부 전공 (선택사항) -->
-            <div class="form-group">
-              <label for="specialization" class="form-label"
-                >전공 세부사항</label
-              >
-              <input
-                type="text"
-                id="specialization"
-                name="specialization"
-                class="form-input"
-                placeholder="물리학과"
-                maxlength="100"
-              />
-              <small class="form-help-text">
-                세부 전공이나 복수전공이 있다면 입력해주세요 (선택사항)
-              </small>
-            </div>
+
 
             <!-- 제출 버튼 -->
             <div class="form-actions">

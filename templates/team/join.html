@@ -6,8 +6,6 @@
 {% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/pages/team-setup.css' %}" />
-<link rel="stylesheet" href="{% static 'css/pages/team-create.css' %}" />
 <link rel="stylesheet" href="{% static 'css/pages/team-join.css' %}" />
 {% endblock %}
 
@@ -48,27 +46,12 @@ auth-page team-join-page
 
         <!-- 페이지 제목 -->
         <div class="page-header">
-          <h1 class="page-title">팀 설정</h1>
-          <p class="page-subtitle">새 팀을 만들거나 기존 팀에 참여하세요</p>
+          <h1 class="page-title">팀 참여하기</h1>
+          <p class="page-subtitle">초대 코드를 입력하여 기존 팀에 참여하세요</p>
         </div>
       </div>
 
-      <!-- 팀 설정 탭 -->
-      <div class="team-tabs">
-        <div class="tab-buttons">
-          <button
-            type="button"
-            class="tab-btn"
-            data-tab="create"
-            onclick="navigateToTeamCreate()"
-          >
-            팀 만들기
-          </button>
-          <button type="button" class="tab-btn active" data-tab="join">
-            팀 참여하기
-          </button>
-        </div>
-      </div>
+
 
       <!-- 팀 참여하기 폼 -->
       <div class="team-form-section" id="join-form-section">
@@ -98,6 +81,31 @@ auth-page team-join-page
             </small>
           </div>
 
+          <!-- 팀 정보 표시 섹션 (초기에는 숨김) -->
+          <div class="team-info-section" id="team-info-section" style="display: none;">
+            <div class="team-info-card">
+              <div class="team-info-header">
+                <div class="team-avatar">
+                  <svg fill="currentColor" viewBox="0 0 24 24" width="20" height="20">
+                    <path d="M16 4c0-1.11.89-2 2-2s2 .89 2 2-.89 2-2 2-2-.89-2-2zm4 18v-6h2.5l-2.54-7.63A1.999 1.999 0 0 0 18.06 7c-.8 0-1.54.5-1.85 1.26l-1.45 3.63c-.25.65-.65 1.15-1.18 1.46C14.28 13.78 15 14.8 15 16v6h5z"/>
+                  </svg>
+                </div>
+                <div class="team-details">
+                  <h3 class="team-name" id="preview-team-name">팀 이름</h3>
+                  <p class="team-description" id="preview-team-description">팀 설명</p>
+                  <div class="team-meta">
+                    <span class="team-leader" id="preview-team-leader">팀장: -</span>
+                  </div>
+                </div>
+                <div class="team-arrow">
+                  <svg fill="currentColor" viewBox="0 0 24 24" width="16" height="16">
+                    <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <!-- 제출 버튼 -->
           <div class="form-actions">
             <button
@@ -120,25 +128,11 @@ auth-page team-join-page
           </div>
         </form>
 
-        <!-- 또는 새 팀 만들기 링크 -->
-        <div class="alternative-action">
-          <p class="alternative-text">또는</p>
-          <button
-            type="button"
-            class="btn btn-text"
-            onclick="navigateToTeamCreate()"
-          >
-            <svg
-              class="btn-icon"
-              fill="currentColor"
-              viewBox="0 0 24 24"
-              width="16"
-              height="16"
-            >
-              <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
-            </svg>
-            새 팀 만들기
-          </button>
+        <!-- 뒤로가기 링크 -->
+        <div class="back-action">
+          <a href="#" onclick="goBack(); return false;" class="back-link">
+            뒤로가기
+          </a>
         </div>
       </div>
 
@@ -231,5 +225,5 @@ auth-page team-join-page
 {% endblock %}
 
 {% block extra_js %}
-<script src="{% static 'js/pages/team-setup/team-join.js' %}"></script>
+<script src="{% static 'js/pages/team-join.js' %}"></script>
 {% endblock %}
