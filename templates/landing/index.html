@@ -5,278 +5,422 @@
 {% block title %}TeamFlow - 팀 프로젝트를 더 스마트하게{% endblock %}
 
 {% block og_title %}TeamFlow - 팀 프로젝트를 더 스마트하게{% endblock %}
+
 {% block og_description %}AI 기반 역할분담부터 일정 조율까지, 팀 프로젝트의 모든 것을 한 곳에서 관리하세요. 더 효율적이고 체계적인 팀워크를 경험하세요.{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/pages/landing.css' %}">
+    <link rel="stylesheet" href="{% static 'css/pages/landing.css' %}" />
 {% endblock %}
 
 {% block body_class %}landing-page{% endblock %}
 
 {% block content %}
-<!-- 
-    TeamFlow 랜딩 페이지
-    
-    백엔드 개발자 참고사항:
-    1. 이 페이지는 비로그인 사용자를 위한 메인 페이지
-    2. "구글로 시작하기", "무료로 시작하기" 버튼은 Google OAuth 인증으로 연결
-    3. 로그인된 사용자는 대시보드로 리다이렉션 처리 필요
--->
+    <!-- 
+        TeamFlow 랜딩 페이지
+        
+        백엔드 개발자 참고사항:
+        1. 이 페이지는 비로그인 사용자를 위한 메인 페이지
+        2. "구글로 시작하기", "무료로 시작하기" 버튼은 Google OAuth 인증으로 연결
+        3. 섹션별 상세 설명은 아래 주석 참조
+    -->
 
-<!-- 헤더 및 네비게이션 -->
-<header class="landing-header">
-    <div class="container">
-        <nav class="landing-nav">
-            <!-- TeamFlow 로고 -->
-            <a href="{% url 'landing_index' %}" class="landing-logo">
-                <div class="landing-logo-icon">
-                    <!-- 
-                        TeamFlow 로고 아이콘
-                        백엔드: 실제 로고 이미지로 교체 가능
-                    -->
-                </div>
-                <span>TeamFlow</span>
-            </a>
-            
-            <!-- 네비게이션 액션 -->
-            <div class="landing-nav-actions">
-                <!-- 
-                    Google OAuth 로그인 버튼
-                    백엔드: onclick 이벤트에서 Google OAuth 플로우 시작
-                    
-                    원래 코드:
-                    <a href="{% provider_login_url 'google' %}" class="btn btn-primary" aria-label="Google 계정으로 로그인">
-                    
-                    MGP 수정:
-                    <a href="{% url 'custom_google_login' %}" class="btn btn-primary" aria-label="Google 계정으로 로그인">
-                -->
-                <a href="{% url 'custom_google_login' %}" class="btn btn-primary" aria-label="Google 계정으로 로그인">
-                    <!-- Google 아이콘 (SVG) -->
-                    <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-                        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-                        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-                        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-                    </svg>
-                    Google로 시작하기
-                </a>
-            </div>
-        </nav>
-    </div>
-</header>
-
-<!-- 메인 컨텐츠 -->
-<main class="landing-main">
-    <!-- 히어로 섹션 -->
-    <section class="hero-section" id="hero">
-        <div class="container">
+    <!-- 섹션 1: 히어로 (Hero) -->
+    <section class="hero">
+        <div class="hero-container">
             <div class="hero-content">
-                <!-- 메인 제목 -->
                 <h1 class="hero-title">
-                    팀 프로젝트를 더 <span class="highlight">스마트하게</span>
+                    팀 프로젝트를<br />
+                    <span class="highlight">더 스마트하게</span>
                 </h1>
-                
-                <!-- 부제목 -->
-                <p class="hero-subtitle">
-                    AI 기반 역할분담부터 일정 조율까지, 팀 프로젝트의 모든 것을 한 곳에서 관리하세요.<br>
-                    더 효율적이고 체계적인 팀워크를 경험하세요.
+                <p class="hero-description">
+                    AI 기반 역할분담부터 일정 조율까지<br />
+                    팀 프로젝트의 모든 것을 한 곳에서 관리하세요
                 </p>
-                
-                <!-- 행동 유도 버튼 -->
-                <div class="hero-actions">
-                    <!-- 
-                        행동 유도 버튼
-                        백엔드: Google OAuth 로그인으로 연결
-                        
-                        원래 코드:
-                        <a href="/accounts/google/login/?process=login" class="hero-primary-btn" aria-label="무료로 TeamFlow 시작하기">
-                        
-                        MGP 수정:
-                        <a href="{% url 'custom_google_login' %}" class="hero-primary-btn" aria-label="무료로 TeamFlow 시작하기">
-                    -->
-                    <a href="{% url 'custom_google_login' %}" class="hero-primary-btn" aria-label="무료로 TeamFlow 시작하기">
-                        <!-- 사용자 아이콘 -->
-                        <svg class="icon" fill="currentColor" width="20" height="20" viewBox="0 0 24 24">
-                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                        </svg>
-                        무료로 시작하기
+                <div class="hero-buttons">
+                    <a href="{% provider_login_url 'google' %}" class="btn btn-primary">
+                        <img src="{% static 'images/icons/google-icon.svg' %}" alt="Google" />
+                        구글로 시작하기
                     </a>
+                    <a href="{% provider_login_url 'google' %}" class="btn btn-secondary">무료로 시작하기</a>
                 </div>
             </div>
-        </div>
-    </section>
-    
-    <!-- 소개 섹션 -->
-    <section class="intro-section" id="about">
-        <div class="container">
-            <h2 class="intro-title">왜 TeamFlow인가요?</h2>
-            <p class="intro-subtitle">
-                팀 프로젝트 관리의 새로운 기준을 제시합니다
-            </p>
-        </div>
-    </section>
-    
-    <!-- 기능 섹션 -->
-    <section class="features-section" id="features">
-        <div class="container">
-            <div class="features-grid">
-                <!-- AI 역할분담 -->
-                <div class="feature-card">
-                    <div class="feature-icon feature-icon-lightning">
-                        <!-- 번개 아이콘 -->
-                        <svg fill="currentColor" viewBox="0 0 24 24" width="32" height="32">
-                            <path d="M7 2v11h3v9l7-12h-4l4-8z"/>
-                        </svg>
-                    </div>
-                    <h3 class="feature-title">AI 역할분담</h3>
-                    <p class="feature-description">
-                        개인의 전공, 성향, 선호도를 분석하여 최적의 역할을 AI가 추천해드립니다.
-                    </p>
-                </div>
-                
-                <!-- 스마트 일정 조율 -->
-                <div class="feature-card">
-                    <div class="feature-icon feature-icon-calendar">
-                        <!-- 캘린더 아이콘 -->
-                        <svg fill="currentColor" viewBox="0 0 24 24" width="32" height="32">
-                            <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/>
-                        </svg>
-                    </div>
-                    <h3 class="feature-title">스마트 일정 조율</h3>
-                    <p class="feature-description">
-                        시간표 기반으로 팀원들의 가능한 시간을 시각화하여 최적의 미팅 시간을 찾아드립니다.
-                    </p>
-                </div>
-                
-                <!-- 실시간 진행률 추적 -->
-                <div class="feature-card">
-                    <div class="feature-icon feature-icon-chart">
-                        <!-- 차트 아이콘 -->
-                        <svg fill="currentColor" viewBox="0 0 24 24" width="32" height="32">
-                            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/>
-                        </svg>
-                    </div>
-                    <h3 class="feature-title">실시간 진행률 추적</h3>
-                    <p class="feature-description">
-                        팀 전체와 개인의 작업 진행률을 실시간으로 확인하고 관리할 수 있습니다.
-                    </p>
-                </div>
-                
-                <!-- 통합 자료 관리 -->
-                <div class="feature-card">
-                    <div class="feature-icon feature-icon-folder">
-                        <!-- 폴더 아이콘 -->
-                        <svg fill="currentColor" viewBox="0 0 24 24" width="32" height="32">
-                            <path d="M10 4H4c-1.11 0-2 .89-2 2v12c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2h-8l-2-2z"/>
-                        </svg>
-                    </div>
-                    <h3 class="feature-title">통합 자료 관리</h3>
-                    <p class="feature-description">
-                        프로젝트 관련 모든 파일과 자료를 한 곳에서 체계적으로 관리하세요.
-                    </p>
-                </div>
-                
-                <!-- 안전한 협업 -->
-                <div class="feature-card">
-                    <div class="feature-icon feature-icon-shield">
-                        <!-- 방패 아이콘 -->
-                        <svg fill="currentColor" viewBox="0 0 24 24" width="32" height="32">
-                            <path d="M12,1L3,5V11C3,16.55 6.84,21.74 12,23C17.16,21.74 21,16.55 21,11V5L12,1M12,7C13.4,7 14.8,8.6 14.8,10V11H16V18H8V11H9.2V10C9.2,8.6 10.6,7 12,7M12,8.2C11.2,8.2 10.4,8.7 10.4,10V11H13.6V10C13.6,8.7 12.8,8.2 12,8.2Z"/>
-                        </svg>
-                    </div>
-                    <h3 class="feature-title">안전한 협업</h3>
-                    <p class="feature-description">
-                        팀원 간의 안전하고 효율적인 소통과 협업을 지원합니다.
-                    </p>
-                </div>
-                
-                <!-- 언제 어디서나 -->
-                <div class="feature-card">
-                    <div class="feature-icon feature-icon-globe">
-                        <!-- 지구 아이콘 -->
-                        <svg fill="currentColor" viewBox="0 0 24 24" width="32" height="32">
-                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.94-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
-                        </svg>
-                    </div>
-                    <h3 class="feature-title">언제 어디서나</h3>
-                    <p class="feature-description">
-                        웹 기반 플랫폼으로 언제 어디서나 팀 프로젝트에 접근할 수 있습니다.
-                    </p>
-                </div>
+            <div class="hero-visual">
+                <img
+                    src="{% static 'images/illustrations/landing-hero.svg' %}"
+                    alt="TeamFlow 대시보드 미리보기"
+                />
             </div>
         </div>
-    </section>
-    
-    <!-- CTA 섹션 (환영합니다!) -->
-    <section class="cta-section" id="start">
-        <div class="container">
-            <!-- 환영 아이콘 -->
-            <div class="cta-icon">
-                <!-- 사용자 그룹 아이콘 -->
-                <svg fill="currentColor" viewBox="0 0 24 24" width="40" height="40">
-                    <path d="M16 4c0-1.11.89-2 2-2s2 .89 2 2-.89 2-2 2-2-.89-2-2zm4 18v-6h2.5l-2.54-7.63A1.999 1.999 0 0 0 18.06 7c-.8 0-1.54.5-1.85 1.26l-1.45 3.63c-.25.65-.65 1.15-1.18 1.46C14.28 13.78 15 14.8 15 16v6h5zM12.5 11.5c.83 0 1.5-.67 1.5-1.5s-.67-1.5-1.5-1.5S11 9.17 11 10s.67 1.5 1.5 1.5zM5.5 6c1.11 0 2-.89 2-2s-.89-2-2-2-2 .89-2 2 .89 2 2 2zm2 16v-7H9V9.5a2.5 2.5 0 1 0-5 0V15h1.5v7h2z"/>
-                </svg>
-            </div>
-            
-            <h2 class="cta-title">환영합니다!</h2>
-            <p class="cta-subtitle">
-                TeamFlow 시작을 위해 기본 정보를 입력해주세요
-            </p>
-            
-            <!-- 시작하기 버튼 -->
-            <button 
-                type="button" 
-                class="cta-button" 
-                onclick="window.location.href='{% provider_login_url 'google' %}'"
-                aria-label="무료로 TeamFlow 시작하기"
-            >
-                <!-- 사용자 아이콘 -->
-                <svg class="icon" fill="currentColor" width="20" height="20" viewBox="0 0 24 24">
-                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                </svg>
-                무료로 시작하기
-            </button>
+        <div class="scroll-indicator">
+            <span>아래로 스크롤하여 더 알아보기</span>
+            <div class="scroll-arrow"></div>
         </div>
     </section>
-</main>
 
-<!-- 
-    구조화된 데이터 (SEO)
-    백엔드: 검색 엔진 최적화를 위한 JSON-LD 스키마
--->
-<script type="application/ld+json">
-{
-    "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    "name": "TeamFlow",
-    "description": "AI 기반 팀 프로젝트 관리 플랫폼",
-    "url": "{{ request.build_absolute_uri }}",
-    "applicationCategory": "ProductivityApplication",
-    "operatingSystem": "Web Browser",
-    "offers": {
-        "@type": "Offer",
-        "price": "0",
-        "priceCurrency": "KRW"
-    },
-    "aggregateRating": {
-        "@type": "AggregateRating",
-        "ratingValue": "4.8",
-        "ratingCount": "1000"
-    },
-    "creator": {
-        "@type": "Organization",
-        "name": "TeamFlow"
-    }
-}
-</script>
+    <!-- 섹션 2: 핵심 기능 (Features) -->
+    <section class="features">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">모든 팀워크, 한 곳에서</h2>
+                <p class="section-description">
+                    복잡한 팀 프로젝트도 TeamFlow와 함께라면 간단해집니다
+                </p>
+            </div>
+
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <img
+                            src="{% static 'images/icons/dashboard-icon.svg' %}"
+                            alt="대시보드"
+                        />
+                    </div>
+                    <h3 class="feature-title">실시간 대시보드</h3>
+                    <p class="feature-description">
+                        프로젝트 진행상황을 한눈에 파악하고<br />
+                        팀원들의 작업 현황을 실시간으로 확인하세요
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <img src="{% static 'images/icons/role-icon.svg' %}" alt="역할분담" />
+                    </div>
+                    <h3 class="feature-title">AI 기반 역할분담</h3>
+                    <p class="feature-description">
+                        각 팀원의 능력과 성향을 분석하여<br />
+                        최적의 역할분담을 제안합니다
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <img
+                            src="{% static 'images/icons/calendar-icon.svg' %}"
+                            alt="일정관리"
+                        />
+                    </div>
+                    <h3 class="feature-title">스마트 일정관리</h3>
+                    <p class="feature-description">
+                        팀원들의 스케줄을 고려한<br />
+                        효율적인 일정 조율과 마일스톤 관리
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <img src="{% static 'images/icons/file-icon.svg' %}" alt="자료공유" />
+                    </div>
+                    <h3 class="feature-title">통합 자료관리</h3>
+                    <p class="feature-description">
+                        프로젝트 관련 모든 파일과 자료를<br />
+                        체계적으로 관리하고 공유하세요
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 섹션 3: 작업 흐름 (Workflow) -->
+    <section class="workflow">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">간단한 3단계로 시작하세요</h2>
+                <p class="section-description">
+                    복잡한 설정 없이 바로 팀 프로젝트를 시작할 수 있습니다
+                </p>
+            </div>
+
+            <div class="workflow-steps">
+                <div class="workflow-step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h3 class="step-title">팀 생성 또는 참여</h3>
+                        <p class="step-description">
+                            새로운 팀을 만들거나<br />
+                            초대코드로 기존 팀에 참여하세요
+                        </p>
+                    </div>
+                    <div class="step-visual">
+                        <div class="step-preview">팀 설정</div>
+                    </div>
+                </div>
+
+                <div class="workflow-step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h3 class="step-title">프로필 설정</h3>
+                        <p class="step-description">
+                            간단한 질문에 답하여<br />
+                            AI가 최적의 역할을 추천받으세요
+                        </p>
+                    </div>
+                    <div class="step-visual">
+                        <div class="step-preview">프로필 입력</div>
+                    </div>
+                </div>
+
+                <div class="workflow-step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h3 class="step-title">프로젝트 시작</h3>
+                        <p class="step-description">
+                            대시보드에서 작업을 확인하고<br />
+                            팀원들과 협업을 시작하세요
+                        </p>
+                    </div>
+                    <div class="step-visual">
+                        <div class="step-preview">협업 시작</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 섹션 4: 혜택 (Benefits) -->
+    <section class="benefits">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">TeamFlow로 달라지는 팀워크</h2>
+            </div>
+
+            <div class="benefits-grid">
+                <div class="benefit-item">
+                    <div class="benefit-stat">
+                        <span class="stat-number">75%</span>
+                        <span class="stat-label">프로젝트 기획 시간 단축</span>
+                    </div>
+                    <p class="benefit-description">
+                        AI 기반 역할분담으로 팀 구성에 드는 시간을 대폭 줄일 수 있습니다
+                    </p>
+                </div>
+
+                <div class="benefit-item">
+                    <div class="benefit-stat">
+                        <span class="stat-number">90%</span>
+                        <span class="stat-label">일정 관리 효율성 증대</span>
+                    </div>
+                    <p class="benefit-description">
+                        스마트 일정 조율로 팀원 간 스케줄 충돌을 미리 방지합니다
+                    </p>
+                </div>
+
+                <div class="benefit-item">
+                    <div class="benefit-stat">
+                        <span class="stat-number">50%</span>
+                        <span class="stat-label">의사소통 비용 절감</span>
+                    </div>
+                    <p class="benefit-description">
+                        중앙화된 자료 관리로 정보 찾기와 공유가 훨씬 쉬워집니다
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 섹션 5: 사용자 후기 (Testimonials) -->
+    <section class="testimonials">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">사용자들의 실제 후기</h2>
+            </div>
+
+            <div class="testimonials-slider">
+                <div class="testimonial-card active">
+                    <div class="testimonial-content">
+                        <p class="testimonial-text">
+                            "팀 프로젝트 때마다 역할분담으로 고민이 많았는데, TeamFlow의 AI 추천
+                            덕분에 훨씬 효율적으로 팀을 구성할 수 있었어요."
+                        </p>
+                        <div class="testimonial-author">
+                            <img
+                                src="{% static 'images/avatars/default-avatar.png' %}"
+                                alt="김지은"
+                                class="author-avatar"
+                            />
+                            <div class="author-info">
+                                <span class="author-name">김지은</span>
+                                <span class="author-role">컴퓨터공학과 3학년</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="testimonial-card">
+                    <div class="testimonial-content">
+                        <p class="testimonial-text">
+                            "일정 관리가 정말 편해졌어요. 팀원들 스케줄을 한눈에 보고 회의
+                            시간을 정하니까 시간 낭비가 줄어들었습니다."
+                        </p>
+                        <div class="testimonial-author">
+                            <img
+                                src="{% static 'images/avatars/default-avatar.png' %}"
+                                alt="박민수"
+                                class="author-avatar"
+                            />
+                            <div class="author-info">
+                                <span class="author-name">박민수</span>
+                                <span class="author-role">경영학과 4학년</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="testimonial-card">
+                    <div class="testimonial-content">
+                        <p class="testimonial-text">
+                            "자료 관리가 체계적이어서 프로젝트 진행이 훨씬 수월해졌어요. 파일
+                            찾느라 헤매는 시간이 없어졌습니다."
+                        </p>
+                        <div class="testimonial-author">
+                            <img
+                                src="{% static 'images/avatars/default-avatar.png' %}"
+                                alt="이서연"
+                                class="author-avatar"
+                            />
+                            <div class="author-info">
+                                <span class="author-name">이서연</span>
+                                <span class="author-role">디자인학과 2학년</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="testimonial-navigation">
+                <button class="nav-dot active" data-slide="0"></button>
+                <button class="nav-dot" data-slide="1"></button>
+                <button class="nav-dot" data-slide="2"></button>
+            </div>
+        </div>
+    </section>
+
+    <!-- 섹션 6: FAQ -->
+    <section class="faq">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">자주 묻는 질문</h2>
+            </div>
+
+            <div class="faq-list">
+                <div class="faq-item">
+                    <button class="faq-question">
+                        <span>TeamFlow는 무료로 사용할 수 있나요?</span>
+                        <span class="faq-icon">+</span>
+                    </button>
+                    <div class="faq-answer">
+                        <p>
+                            네, TeamFlow는 기본 기능을 무료로 제공합니다. 팀 생성, 기본적인
+                            역할분담, 일정 관리 등 핵심 기능들을 제한 없이 사용하실 수 있습니다.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question">
+                        <span>팀원 수에 제한이 있나요?</span>
+                        <span class="faq-icon">+</span>
+                    </button>
+                    <div class="faq-answer">
+                        <p>
+                            무료 버전에서는 팀당 최대 10명까지 참여할 수 있습니다. 더 큰 팀이
+                            필요하시다면 프리미엄 플랜을 이용해 주세요.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question">
+                        <span>AI 역할분담은 어떻게 작동하나요?</span>
+                        <span class="faq-icon">+</span>
+                    </button>
+                    <div class="faq-answer">
+                        <p>
+                            팀원들의 전공, 관심분야, 경험, 성향 등을 종합적으로 분석하여 최적의
+                            역할을 추천합니다. 물론 추천 결과를 참고로 직접 조정하실 수도
+                            있습니다.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question">
+                        <span>데이터 보안은 어떻게 관리되나요?</span>
+                        <span class="faq-icon">+</span>
+                    </button>
+                    <div class="faq-answer">
+                        <p>
+                            모든 데이터는 암호화되어 안전하게 저장되며, 팀원들만 접근할 수
+                            있습니다. 개인정보는 역할분담 추천 목적으로만 사용되고 외부에
+                            공유되지 않습니다.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question">
+                        <span>모바일에서도 사용할 수 있나요?</span>
+                        <span class="faq-icon">+</span>
+                    </button>
+                    <div class="faq-answer">
+                        <p>
+                            네, TeamFlow는 반응형 웹사이트로 제작되어 스마트폰, 태블릿 등 모든
+                            기기에서 편리하게 사용하실 수 있습니다.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 섹션 7: CTA (Call to Action) -->
+    <section class="cta">
+        <div class="container">
+            <div class="cta-content">
+                <h2 class="cta-title">지금 바로 TeamFlow를 시작하세요</h2>
+                <p class="cta-description">
+                    더 스마트한 팀워크, 더 효율적인 프로젝트 관리가 여러분을 기다립니다
+                </p>
+                <div class="cta-buttons">
+                    <a href="{% provider_login_url 'google' %}" class="btn btn-primary btn-large">
+                        <img src="{% static 'images/icons/google-icon.svg' %}" alt="Google" />
+                        구글로 시작하기
+                    </a>
+                    <a href="{% provider_login_url 'google' %}" class="btn btn-secondary btn-large">무료로 시작하기</a>
+                </div>
+                <p class="cta-note">신용카드 정보 없이도 바로 시작할 수 있습니다</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- JSON-LD 스키마 마크업 -->
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "SoftwareApplication",
+            "name": "TeamFlow",
+            "description": "AI 기반 팀 프로젝트 관리 플랫폼",
+            "url": "https://teamflow.com",
+            "applicationCategory": "ProductivityApplication",
+            "operatingSystem": "Web",
+            "offers": {
+                "@type": "Offer",
+                "price": "0",
+                "priceCurrency": "KRW"
+            },
+            "aggregateRating": {
+                "@type": "AggregateRating",
+                "ratingValue": "4.8",
+                "ratingCount": "1000"
+            },
+            "creator": {
+                "@type": "Organization",
+                "name": "TeamFlow"
+            }
+        }
+    </script>
 {% endblock %}
 
 {% block extra_js %}
-<script>
-    const googleLoginUrl = "{% provider_login_url 'google' %}";
-    function startGoogleAuth() {
-        window.location.href = googleLoginUrl;
-    }
-</script>
-<script src="{% static 'js/pages/landing.js' %}"></script>
+    <script src="{% static 'js/pages/landing.js' %}"></script>
 {% endblock %}

@@ -6,33 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
 
-    <!-- SEO 메타 태그 -->
-    <meta
-      name="description"
-      content="대학생 팀플 관리를 더 효율적으로 도와주는 팀플 전용 플랫폼"
-    />
-    <meta
-      name="keywords"
-      content="팀플, 협업, 대학생, 프로젝트 관리, TeamFlow"
-    />
-    <meta name="author" content="TeamFlow" />
-
-    <!-- Open Graph 메타 태그 (소셜 미디어 공유용) -->
-    <meta
-      property="og:title"
-      content="{% block og_title %}TeamFlow - 팀 프로젝트를 더 스마트하게{% endblock %}"
-    />
-    <meta
-      property="og:description"
-      content="{% block og_description %}AI 기반 역할분담부터 일정 조율까지, 팀 프로젝트의 모든 것을 한 곳에서 관리하세요.{% endblock %}"
-    />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="{{ request.build_absolute_uri }}" />
-
-    <title>
-      {% block title %}TeamFlow - 팀 프로젝트를 더 스마트하게{% endblock %}
-    </title>
-
     <!-- Favicon -->
     <link
       rel="icon"
@@ -48,6 +21,75 @@
       rel="stylesheet"
     />
 
+    <!-- 외부 라이브러리 CDN -->
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              notion: {
+                // Primary Colors
+                primary: "#2F3349",
+                secondary: "#37352F",
+                accent: "#0F7B6C",
+
+                // Background
+                bg: "#FFFFFF",
+                "bg-secondary": "#F7F6F3",
+                "bg-tertiary": "#F1F1EF",
+
+                // Text
+                text: "#37352F",
+                "text-secondary": "#6F6E69",
+                "text-tertiary": "#9B9A97",
+
+                // Accent Colors
+                blue: "#0F7B6C",
+                purple: "#6366F1",
+                green: "#10B981",
+                orange: "#F59E0B",
+              },
+            },
+            fontFamily: {
+              notion: ["Inter", "Noto Sans KR", "sans-serif"],
+            },
+            animation: {
+              "fade-in-up": "fadeInUp 0.6s ease-out",
+              "scale-in": "scaleIn 0.4s ease-out",
+              "slide-in-right": "slideInRight 0.5s ease-out",
+              float: "float 3s ease-in-out infinite",
+            },
+            keyframes: {
+              fadeInUp: {
+                "0%": { opacity: "0", transform: "translateY(30px)" },
+                "100%": { opacity: "1", transform: "translateY(0)" },
+              },
+              scaleIn: {
+                "0%": { opacity: "0", transform: "scale(0.9)" },
+                "100%": { opacity: "1", transform: "scale(1)" },
+              },
+              slideInRight: {
+                "0%": { opacity: "0", transform: "translateX(30px)" },
+                "100%": { opacity: "1", transform: "translateX(0)" },
+              },
+              float: {
+                "0%, 100%": { transform: "translateY(0px)" },
+                "50%": { transform: "translateY(-10px)" },
+              },
+            },
+          },
+        },
+      };
+    </script>
+
+    <!-- AOS (Animate On Scroll) -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
     <!-- CSS 파일들 로드 순서 중요: 공통 스타일 → 페이지별 스타일 -->
     <link rel="stylesheet" href="{% static 'css/common/reset.css' %}" />
     <link rel="stylesheet" href="{% static 'css/common/variables.css' %}" />
@@ -60,7 +102,7 @@
 
     <!-- 페이지별 추가 CSS -->
     {% block extra_css %}{% endblock %}
-    
+
     <!-- 
         백엔드 개발자 참고사항:
         1. Google OAuth CLIENT_ID는 settings.py에서 환경변수로 관리
@@ -116,6 +158,15 @@
     <!-- 푸터 영역 -->
     {% block footer %}{% endblock %}
 
+    <!-- 외부 JavaScript 라이브러리 -->
+    <!-- GSAP (애니메이션) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollToPlugin.min.js"></script>
+
+    <!-- AOS (Animate On Scroll) -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
     <!-- 
         공통 JavaScript 파일들 로드
         의존성 순서: utils → constants → api → auth → 기타 모듈
@@ -144,7 +195,7 @@
           GOOGLE_CLIENT_ID: '{{ GOOGLE_CLIENT_ID }}',
 
           // API 기본 URL (개발/운영 환경별 다름)
-          // API_BASE_URL: '{#% url "api_root" %#}', 
+          // API_BASE_URL: '{#% url "api_root" %#}',
 
           // CSRF 토큰 (모든 POST 요청에 필요)
           CSRF_TOKEN: '{{ csrf_token }}',
