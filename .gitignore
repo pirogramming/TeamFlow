@@ -1,6 +1,15 @@
 # Created by https://www.toptal.com/developers/gitignore/api/windows,macos,react,django,python
 # Edit at https://www.toptal.com/developers/gitignore?templates=windows,macos,react,django,python
 
+##api 명세서##
+api-명세.md
+
+## 커서룰 설정 파일 ##
+.cursor/
+.rules/
+
+
+
 ### Django ###
 *.log
 *.pot
