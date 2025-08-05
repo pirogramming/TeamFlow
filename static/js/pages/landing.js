@@ -1,8 +1,8 @@
 /**
- * 랜딩 페이지 JavaScript (외부 라이브러리 활용)
- * - GSAP: 프리미엄 애니메이션
- * - AOS: 스크롤 애니메이션
- * - Lucide: 아이콘 렌더링
+ * TeamFlow 노션 스타일 랜딩 페이지 JavaScript
+ * - GSAP: 부드러운 애니메이션
+ * - 디자인 가이드 토큰 활용
+ * - 성능 최적화된 스크롤 애니메이션
  */
 
 // ========================================
@@ -18,10 +18,10 @@ document.addEventListener("DOMContentLoaded", function () {
   // AOS (Animate On Scroll) 초기화
   if (typeof AOS !== "undefined") {
     AOS.init({
-      duration: 600,
+      duration: 400,
       easing: "ease-out-cubic",
       once: true,
-      offset: 100,
+      offset: 80,
       delay: 0,
     });
   }
@@ -32,16 +32,19 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // 초기 애니메이션 실행
-  initLandingAnimations();
+  initNotionStyleAnimations();
 
   // 이벤트 리스너 등록
   initEventListeners();
 
-  console.log("🚀 TeamFlow 랜딩 페이지 초기화 완료");
+  // 통계 카운터 애니메이션 초기화
+  initStatsCounter();
+
+  console.log("✨ TeamFlow 노션 스타일 랜딩 페이지 초기화 완료");
 });
 
 // ========================================
-// 2. 구글 로그인 기능
+// 2. 구글 로그인 기능 (노션 스타일)
 // ========================================
 
 /**
@@ -50,15 +53,12 @@ document.addEventListener("DOMContentLoaded", function () {
  */
 function startGoogleAuth() {
   try {
-    // 로딩 상태 표시
-    showLoading("Google 로그인 중...");
-
-    // 버튼 애니메이션
-    const buttons = document.querySelectorAll('[onclick="startGoogleAuth()"]');
+    // 버튼 애니메이션 (노션 스타일)
+    const buttons = document.querySelectorAll('.btn-primary-large, .cta-btn-primary');
     buttons.forEach((button) => {
-      // GSAP 애니메이션: 버튼 클릭 효과
+      // 부드러운 클릭 효과
       gsap.to(button, {
-        scale: 0.95,
+        scale: 0.98,
         duration: 0.1,
         yoyo: true,
         repeat: 1,
@@ -66,139 +66,200 @@ function startGoogleAuth() {
       });
     });
 
-    // 0.2초 후 리다이렉션 (애니메이션 완료 후)
+    // 0.15초 후 리다이렉션 (더 빠른 반응)
     setTimeout(() => {
       window.location.href = "/accounts/google/login/";
-    }, 200);
+    }, 150);
   } catch (error) {
     console.error("구글 로그인 오류:", error);
-    hideLoading();
-    showError("로그인 중 오류가 발생했습니다. 다시 시도해주세요.");
+    showNotification("로그인 중 오류가 발생했습니다. 다시 시도해주세요.", "error");
   }
 }
 
 /**
- * 기능 둘러보기 - 부드러운 스크롤
+ * 섹션으로 부드러운 스크롤 (노션 스타일)
  */
-function scrollToFeatures() {
-  const featuresSection = document.getElementById("features");
-  if (featuresSection) {
-    // GSAP 스크롤 애니메이션
+function scrollToSection(sectionId) {
+  const section = document.getElementById(sectionId) || document.querySelector(`.${sectionId}`);
+  if (section) {
     gsap.to(window, {
-      duration: 1.5,
+      duration: 1.2,
       scrollTo: {
-        y: featuresSection,
-        offsetY: 80, // 헤더 높이만큼 오프셋
+        y: section,
+        offsetY: 60, // 노션 스타일 오프셋
       },
       ease: "power2.inOut",
     });
   }
 }
 
+/**
+ * 간단한 알림 시스템
+ */
+function showNotification(message, type = "info") {
+  const notification = document.createElement("div");
+  notification.className = `notification notification-${type}`;
+  notification.textContent = message;
+  notification.style.cssText = `
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 1rem 1.5rem;
+    border-radius: 0.75rem;
+    color: white;
+    background: ${type === "error" ? "#EF4444" : "#2383E2"};
+    z-index: 1000;
+    opacity: 0;
+    transform: translateY(-10px);
+  `;
+  
+  document.body.appendChild(notification);
+  
+  gsap.to(notification, {
+    opacity: 1,
+    y: 0,
+    duration: 0.3,
+    ease: "power2.out"
+  });
+  
+  setTimeout(() => {
+    gsap.to(notification, {
+      opacity: 0,
+      y: -10,
+      duration: 0.3,
+      ease: "power2.in",
+      onComplete: () => notification.remove()
+    });
+  }, 3000);
+}
+
 // ========================================
-// 3. GSAP 애니메이션
+// 3. 노션 스타일 애니메이션
 // ========================================
 
 /**
- * 메인 애니메이션 초기화
+ * 노션 스타일 애니메이션 초기화
  */
-function initLandingAnimations() {
+function initNotionStyleAnimations() {
   if (typeof gsap === "undefined") return;
 
-  // 히어로 섹션 메인 애니메이션
+  // 히어로 섹션 애니메이션
   initHeroAnimations();
 
-  // 기능 카드 호버 애니메이션
-  initFeatureCardAnimations();
+  // 카드 호버 애니메이션
+  initCardAnimations();
 
   // 스크롤 기반 애니메이션
   initScrollAnimations();
 
-  // 배경 요소 애니메이션
-  initBackgroundAnimations();
+  // 3D 목업 애니메이션
+  initMockupAnimations();
 }
 
 /**
- * 히어로 섹션 애니메이션
+ * 히어로 섹션 애니메이션 (노션 스타일)
  */
 function initHeroAnimations() {
-  // 페이지 로드 시 히어로 타임라인
-  const heroTl = gsap.timeline({ delay: 0.5 });
+  const heroTl = gsap.timeline({ delay: 0.3 });
 
   heroTl
-    .from(".hero h1", {
-      y: 60,
+    .from(".hero-badge", {
+      y: 30,
       opacity: 0,
-      duration: 1.2,
-      ease: "power3.out",
+      duration: 0.6,
+      ease: "power2.out",
     })
     .from(
-      ".hero p",
+      ".hero-title",
       {
         y: 40,
         opacity: 0,
-        duration: 1,
-        ease: "power3.out",
+        duration: 0.8,
+        ease: "power2.out",
       },
-      "-=0.8"
+      "-=0.4"
     )
     .from(
-      ".hero .hero-buttons",
+      ".hero-description",
       {
         y: 30,
         opacity: 0,
+        duration: 0.6,
+        ease: "power2.out",
+      },
+      "-=0.5"
+    )
+    .from(
+      ".hero-cta",
+      {
+        y: 20,
+        opacity: 0,
+        duration: 0.5,
+        ease: "power2.out",
+      },
+      "-=0.4"
+    )
+    .from(
+      ".hero-visual",
+      {
+        y: 20,
+        opacity: 0,
         duration: 0.8,
-        ease: "power3.out",
+        ease: "power2.out",
       },
       "-=0.6"
     )
     .from(
-      ".hero .hero-visual",
+      ".hero-trust",
       {
-        y: 20,
         opacity: 0,
-        duration: 0.6,
-        ease: "power3.out",
+        duration: 0.4,
+        ease: "power2.out",
       },
-      "-=0.4"
+      "-=0.3"
     );
 }
 
 /**
- * 기능 카드 호버 애니메이션
+ * 카드 호버 애니메이션 (노션 스타일)
  */
-function initFeatureCardAnimations() {
-  const featureCards = document.querySelectorAll(".feature-card");
+function initCardAnimations() {
+  const cards = document.querySelectorAll(".value-card, .case-card, .testimonial-card");
 
-  featureCards.forEach((card) => {
-    const icon = card.querySelector(".feature-icon");
-
-    // 마우스 엔터
+  cards.forEach((card) => {
     card.addEventListener("mouseenter", () => {
       gsap.to(card, {
-        y: -8,
-        duration: 0.3,
-        ease: "power2.out",
-      });
-
-      gsap.to(icon, {
-        rotation: 5,
-        duration: 0.3,
+        y: -4,
+        duration: 0.2,
         ease: "power2.out",
       });
     });
 
-    // 마우스 리브
     card.addEventListener("mouseleave", () => {
       gsap.to(card, {
         y: 0,
-        duration: 0.3,
+        duration: 0.2,
         ease: "power2.out",
       });
+    });
+  });
 
-      gsap.to(icon, {
-        rotation: 0,
-        duration: 0.3,
+  // 버튼 호버 애니메이션
+  const buttons = document.querySelectorAll(".btn-primary-large, .btn-secondary-large, .cta-btn-primary, .cta-btn-secondary");
+  
+  buttons.forEach((button) => {
+    button.addEventListener("mouseenter", () => {
+      gsap.to(button, {
+        y: -1,
+        duration: 0.2,
+        ease: "power2.out",
+      });
+    });
+
+    button.addEventListener("mouseleave", () => {
+      gsap.to(button, {
+        y: 0,
+        duration: 0.2,
         ease: "power2.out",
       });
     });
@@ -206,79 +267,178 @@ function initFeatureCardAnimations() {
 }
 
 /**
- * 스크롤 기반 애니메이션
+ * 스크롤 기반 애니메이션 (노션 스타일)
  */
 function initScrollAnimations() {
-  // 헤더 스크롤 효과
-  ScrollTrigger.create({
-    start: "top -80",
-    end: 99999,
-    toggleClass: {
-      className: "scrolled",
-      targets: "header",
-    },
-  });
-
-  // 섹션별 페이드 인 애니메이션
-  gsap.utils.toArray("section").forEach((section) => {
+  // 섹션별 순차 애니메이션
+  const sections = gsap.utils.toArray("section:not(.hero-section)");
+  
+  sections.forEach((section) => {
     gsap.fromTo(
       section,
       {
-        opacity: 0.8,
-        y: 50,
+        opacity: 0,
+        y: 30,
       },
       {
         opacity: 1,
         y: 0,
-        duration: 1,
+        duration: 0.8,
         ease: "power2.out",
         scrollTrigger: {
           trigger: section,
-          start: "top 80%",
-          end: "top 20%",
+          start: "top 85%",
+          end: "top 30%",
           scrub: false,
         },
       }
     );
   });
+
+  // 카드 격자 스태거 애니메이션
+  const cardGrids = [".values-grid", ".cases-grid", ".stats-grid", ".testimonials-grid"];
+  
+  cardGrids.forEach((gridSelector) => {
+    const grid = document.querySelector(gridSelector);
+    if (grid) {
+      const cards = grid.querySelectorAll(".value-card, .case-card, .stat-item, .testimonial-card");
+      
+      gsap.fromTo(
+        cards,
+        {
+          opacity: 0,
+          y: 20,
+        },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.5,
+          ease: "power2.out",
+          stagger: 0.1,
+          scrollTrigger: {
+            trigger: grid,
+            start: "top 80%",
+            end: "top 40%",
+            scrub: false,
+          },
+        }
+      );
+    }
+  });
 }
 
 /**
- * 배경 요소 애니메이션 (floating)
+ * 3D 목업 애니메이션
  */
-function initBackgroundAnimations() {
-  // 히어로 섹션 배경 원형 요소들
-  const floatingElements = document.querySelectorAll(".animate-float");
+function initMockupAnimations() {
+  const mockups = document.querySelectorAll(".hero-dashboard, .feature-mockup");
+  
+  mockups.forEach((mockup) => {
+    mockup.addEventListener("mouseenter", () => {
+      gsap.to(mockup, {
+        rotationY: mockup.classList.contains("hero-dashboard") ? -10 : 5,
+        rotationX: 5,
+        duration: 0.3,
+        ease: "power2.out",
+      });
+    });
 
-  floatingElements.forEach((element, index) => {
-    gsap.to(element, {
-      y: "random(-20, 20)",
-      x: "random(-10, 10)",
-      rotation: "random(-5, 5)",
-      duration: "random(3, 5)",
-      repeat: -1,
-      yoyo: true,
-      ease: "sine.inOut",
-      delay: index * 0.5,
+    mockup.addEventListener("mouseleave", () => {
+      gsap.to(mockup, {
+        rotationY: mockup.classList.contains("hero-dashboard") ? -15 : 10,
+        rotationX: 10,
+        duration: 0.3,
+        ease: "power2.out",
+      });
     });
   });
 }
 
 // ========================================
-// 4. 이벤트 리스너
+// 4. 통계 카운터 애니메이션
+// ========================================
+
+/**
+ * 통계 카운터 애니메이션 초기화
+ */
+function initStatsCounter() {
+  const statNumbers = document.querySelectorAll('.stat-number[data-target]');
+  
+  statNumbers.forEach((stat) => {
+    const target = parseInt(stat.getAttribute('data-target'));
+    const counter = { value: 0 };
+    
+    ScrollTrigger.create({
+      trigger: stat,
+      start: "top 80%",
+      onEnter: () => {
+        gsap.to(counter, {
+          value: target,
+          duration: 2,
+          ease: "power2.out",
+          onUpdate: () => {
+            stat.textContent = Math.round(counter.value);
+          }
+        });
+      },
+      once: true
+    });
+  });
+}
+
+// ========================================
+// 5. 이벤트 리스너 (노션 스타일)
 // ========================================
 
 /**
  * 이벤트 리스너 초기화
  */
 function initEventListeners() {
-  // 스크롤 다운 인디케이터 클릭
-  const scrollIndicator = document.querySelector(".animate-bounce");
-  if (scrollIndicator) {
-    scrollIndicator.addEventListener("click", () => {
-      scrollToFeatures();
+  // FAQ 아코디언 기능 (새로운 HTML 구조)
+  const faqItems = document.querySelectorAll(".faq-item");
+  faqItems.forEach((item) => {
+    const question = item.querySelector(".faq-question");
+    const answer = item.querySelector(".faq-answer");
+    
+    question.addEventListener("click", () => {
+      const isActive = item.classList.contains("active");
+      
+      // 다른 FAQ 아이템들 닫기
+      faqItems.forEach((otherItem) => {
+        if (otherItem !== item) {
+          otherItem.classList.remove("active");
+          const otherAnswer = otherItem.querySelector(".faq-answer");
+          gsap.to(otherAnswer, {
+            maxHeight: 0,
+            duration: 0.3,
+            ease: "power2.out"
+          });
+        }
+      });
+
+      // 현재 아이템 토글
+      if (isActive) {
+        item.classList.remove("active");
+        gsap.to(answer, {
+          maxHeight: 0,
+          duration: 0.3,
+          ease: "power2.out"
+        });
+      } else {
+        item.classList.add("active");
+        gsap.set(answer, { maxHeight: "auto" });
+        const height = answer.scrollHeight;
+        gsap.fromTo(answer, 
+          { maxHeight: 0 }, 
+          { 
+            maxHeight: height,
+            duration: 0.3,
+            ease: "power2.out"
+          }
+        );
+      }
     });
-  }
+  });
 
   // 키보드 네비게이션
   document.addEventListener("keydown", handleKeyboardNavigation);
@@ -286,79 +446,39 @@ function initEventListeners() {
   // 리사이즈 이벤트
   window.addEventListener("resize", handleWindowResize);
 
-  // 스크롤 이벤트 (성능 최적화)
-  let scrollTimeout;
-  window.addEventListener("scroll", () => {
-    if (scrollTimeout) {
-      clearTimeout(scrollTimeout);
-    }
-    scrollTimeout = setTimeout(handleScroll, 10);
+  // 부드러운 스크롤 링크
+  document.querySelectorAll('a[href^="#"]').forEach(link => {
+    link.addEventListener("click", (e) => {
+      e.preventDefault();
+      const targetId = link.getAttribute("href").substring(1);
+      scrollToSection(targetId);
+    });
   });
 
-  // FAQ 아코디언 기능
-  const faqItems = document.querySelectorAll(".faq-item");
-  faqItems.forEach((item) => {
-    const question = item.querySelector(".faq-question");
-    question.addEventListener("click", () => {
-      // 다른 FAQ 아이템들 닫기
-      faqItems.forEach((otherItem) => {
-        if (otherItem !== item) {
-          otherItem.classList.remove("active");
+  // 인터섹션 옵저버 (성능 최적화)
+  if ('IntersectionObserver' in window) {
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -10% 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
         }
       });
+    }, observerOptions);
 
-      // 현재 아이템 토글
-      item.classList.toggle("active");
+    // fade-in-up 클래스가 있는 요소들을 관찰
+    document.querySelectorAll('.fade-in-up').forEach(el => {
+      observer.observe(el);
     });
-  });
-
-  // 사용자 후기 슬라이더 기능
-  const testimonialCards = document.querySelectorAll(".testimonial-card");
-  const navDots = document.querySelectorAll(".nav-dot");
-
-  navDots.forEach((dot, index) => {
-    dot.addEventListener("click", () => {
-      // 모든 카드와 도트 비활성화
-      testimonialCards.forEach((card) => card.classList.remove("active"));
-      navDots.forEach((navDot) => navDot.classList.remove("active"));
-
-      // 선택된 카드와 도트 활성화
-      testimonialCards[index].classList.add("active");
-      dot.classList.add("active");
-    });
-  });
-
-  // 대시보드 미리보기 슬라이더 기능
-  const previewItems = document.querySelectorAll(".preview-item");
-  const previewDots = document.querySelectorAll(".preview-navigation .nav-dot");
-
-  previewDots.forEach((dot, index) => {
-    dot.addEventListener("click", () => {
-      // 모든 아이템과 도트 비활성화
-      previewItems.forEach((item) => item.classList.remove("active"));
-      previewDots.forEach((navDot) => navDot.classList.remove("active"));
-
-      // 선택된 아이템과 도트 활성화
-      previewItems[index].classList.add("active");
-      dot.classList.add("active");
-    });
-  });
-
-  // 자동 슬라이드 (선택사항)
-  let currentSlide = 0;
-  setInterval(() => {
-    currentSlide = (currentSlide + 1) % previewItems.length;
-
-    previewItems.forEach((item) => item.classList.remove("active"));
-    previewDots.forEach((dot) => dot.classList.remove("active"));
-
-    previewItems[currentSlide].classList.add("active");
-    previewDots[currentSlide].classList.add("active");
-  }, 4000); // 4초마다 자동 슬라이드
+  }
 }
 
 /**
- * 키보드 네비게이션 핸들러
+ * 키보드 네비게이션 핸들러 (접근성)
  */
 function handleKeyboardNavigation(e) {
   // 접근성: 키보드로 섹션 이동
@@ -366,15 +486,19 @@ function handleKeyboardNavigation(e) {
     switch (e.key) {
       case "1":
         e.preventDefault();
-        scrollToSection("hero");
+        scrollToSection("hero-section");
         break;
       case "2":
         e.preventDefault();
-        scrollToSection("features");
+        scrollToSection("core-values");
         break;
       case "3":
         e.preventDefault();
-        scrollToSection("start");
+        scrollToSection("use-cases");
+        break;
+      case "4":
+        e.preventDefault();
+        scrollToSection("faq-section");
         break;
     }
   }
@@ -395,45 +519,9 @@ function handleWindowResize() {
   }
 }
 
-/**
- * 스크롤 핸들러
- */
-function handleScroll() {
-  // 스크롤 진행률 표시 (옵션)
-  const scrolled =
-    (window.pageYOffset /
-      (document.documentElement.scrollHeight - window.innerHeight)) *
-    100;
-
-  // 헤더 배경 투명도 조절
-  const header = document.querySelector("header");
-  if (header && window.pageYOffset > 100) {
-    header.style.backgroundColor = "rgba(255, 255, 255, 0.95)";
-  } else if (header) {
-    header.style.backgroundColor = "rgba(255, 255, 255, 0.8)";
-  }
-}
-
 // ========================================
-// 5. 유틸리티 함수
+// 6. 유틸리티 함수
 // ========================================
-
-/**
- * 섹션으로 부드럽게 스크롤
- */
-function scrollToSection(sectionId) {
-  const section = document.getElementById(sectionId);
-  if (section) {
-    gsap.to(window, {
-      duration: 1.2,
-      scrollTo: {
-        y: section,
-        offsetY: 80,
-      },
-      ease: "power2.inOut",
-    });
-  }
-}
 
 /**
  * 성능 최적화: 디바운스 함수
@@ -464,22 +552,52 @@ function prefersReducedMotion() {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
+/**
+ * 로딩 상태 관리
+ */
+function showLoading(message = "로딩 중...") {
+  const loading = document.getElementById("global-loading");
+  if (loading) {
+    loading.style.display = "flex";
+    const text = loading.querySelector("p");
+    if (text) text.textContent = message;
+  }
+}
+
+function hideLoading() {
+  const loading = document.getElementById("global-loading");
+  if (loading) {
+    loading.style.display = "none";
+  }
+}
+
 // ========================================
-// 6. 전역 함수 노출
+// 7. 전역 함수 노출
 // ========================================
 
 // 전역 스코프에 함수 노출 (HTML onclick에서 사용)
 window.startGoogleAuth = startGoogleAuth;
-window.scrollToFeatures = scrollToFeatures;
 window.scrollToSection = scrollToSection;
+window.showNotification = showNotification;
 
-// 디버깅용 함수들
+// 디버깅용 함수들 (개발 환경에서만)
 if (window.APP_CONFIG && window.APP_CONFIG.DEBUG) {
-  window.landingDebug = {
-    replayAnimations: initLandingAnimations,
+  window.teamflowDebug = {
+    replayAnimations: initNotionStyleAnimations,
     refreshScrollTrigger: () => ScrollTrigger.refresh(),
     refreshAOS: () => AOS.refresh(),
+    statsCounter: initStatsCounter,
   };
 }
 
-console.log("✨ TeamFlow 랜딩 페이지 JavaScript 로드 완료");
+// 성능 모니터링 (개발 환경에서만)
+if (window.APP_CONFIG && window.APP_CONFIG.DEBUG) {
+  window.addEventListener('load', () => {
+    if (performance.mark) {
+      performance.mark('landing-page-loaded');
+      console.log('📊 Landing page performance metrics available in DevTools');
+    }
+  });
+}
+
+console.log("🎉 TeamFlow 노션 스타일 랜딩 페이지 JavaScript 완료");
