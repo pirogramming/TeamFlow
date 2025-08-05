@@ -165,7 +165,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 // 성공 메시지와 함께 대시보드로 이동
                 showNotification(`"${result.team_name}" 팀이 생성되었습니다!`, 'success');
                 setTimeout(() => {
-                    window.location.href = '/dashboard/';
+                    window.location.href = '/api/dashboard/';
                 }, 1500);
             } else {
                 const error = await response.json();
@@ -203,7 +203,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // 2초 후 대시보드로 이동
         setTimeout(() => {
-            window.location.href = '/dashboard/';
+            window.location.href = '/api/dashboard/';
         }, 2000);
     }
     

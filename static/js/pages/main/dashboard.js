@@ -88,6 +88,10 @@ async function refreshDashboard(teamId = null) {
 
         console.log('🔄 API 응답 데이터:', data);
 
+        if (teamId) {
+            window.location.href = `/api/dashboard/${teamId}/`;
+        }
+
         setupDashboardData(data);
         hideLoadingState();
 
