@@ -253,12 +253,13 @@ async function selectProject(teamId, teamName) {
                 
                 // 대시보드 새로고침 (만약 대시보드 페이지에 있다면)
                 if (typeof refreshDashboard === 'function') {
-                    console.log('🔄 헤더에서 대시보드 새로고침 요청');
-                    refreshDashboard();
+                    console.log('🔄 헤더에서 대시보드 새로고침 요청, teamId:', teamId);
+                    refreshDashboard(teamId); // teamId 전달
                 } else if (typeof loadDashboardData === 'function') {
                     console.log('⚠️ refreshDashboard 없음, loadDashboardData 사용');
-                    loadDashboardData();
+                    loadDashboardData(teamId); // teamId 전달
                 }
+
             }
         } else {
             showHeaderNotification('프로젝트 변경에 실패했습니다.', 'error');

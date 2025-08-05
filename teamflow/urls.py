@@ -7,6 +7,7 @@ from dashboard import views as dashboard
 # MGP: 프론트엔드 페이지 URL 패턴 추가 (프리뷰 제거 후 실제 페이지 연결)
 from users import views as users
 from teams import views as teams
+from dashboard.views import set_current_team # type: ignore
 # ========================================
 
 urlpatterns = [
@@ -26,6 +27,7 @@ urlpatterns = [
     path('team/create/', teams.team_create_page, name='team_create'),
     path('team/join/', teams.team_join_page, name='team_join'),
     path('dashboard/', dashboard.dashboard_page, name='dashboard'),
+    path('api/dashboard/set-current-team/', set_current_team, name='set-current-team'),
     # ========================================
 
     # ========================================

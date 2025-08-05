@@ -5,7 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from teams.models import Team, TeamMember
 from django.db.models import F
-# from tasks.models import Task # ⬅️ tasks 앱이 준비될 때까지 주석 처리합니다.
+from tasks.models import Task
 
 def landing_page_view(request):
     return render(request, 'landing/index.html')
@@ -17,54 +17,64 @@ def landing_page_view(request):
 # ========================================
 class DashboardAPIView(APIView):
     permission_classes = [IsAuthenticated]
-    
+
     def get(self, request):
         try:
-            # ========================================
-            # MGP: 세션 기반 현재 팀 선택 로직 추가
-            # 백엔드 부분 대신 수정: 헤더에서 선택한 팀을 대시보드에 반영
-            
-            # 세션에서 현재 선택된 팀 ID 가져오기
-            current_team_id = request.session.get('current_team_id')
-            print(f"[대시보드 API] 세션의 현재 팀 ID: {current_team_id}")
-            
-            if current_team_id:
-                # 현재 선택된 팀의 멤버십 확인
-                try:
-                    team_member = TeamMember.objects.get(user=request.user, team_id=current_team_id)
-                    team = team_member.team
-                    print(f"[대시보드 API] 현재 팀: {team.name} (ID: {team.id}, 코드: {team.invite_code})")
-                except TeamMember.DoesNotExist:
-                    print(f"[대시보드 API] 사용자가 팀 {current_team_id}의 멤버가 아님, 첫 번째 팀 사용")
-                    # 사용자가 해당 팀의 멤버가 아니면 첫 번째 팀 사용
-                    team_member = TeamMember.objects.filter(user=request.user).first()
-                    if not team_member:
-                        return Response({'error': '팀에 속해있지 않습니다.'}, status=404)
-                    team = team_member.team
-            else:
-                # 세션에 현재 팀이 없으면 첫 번째 팀 사용
-                print("[대시보드 API] 세션에 현재 팀 없음, 첫 번째 팀 사용")
-                team_member = TeamMember.objects.filter(user=request.user).first()
-                if not team_member:
+            print("\n===== [DashboardAPIView GET 호출] =====")
+
+            # 1. team_id 우선순위: 쿼리 파라미터 > 세션
+            team_id = request.query_params.get('team_id') or request.session.get('current_team_id')
+            print(f"[1] 요청 파라미터 team_id: {request.query_params.get('team_id')}")
+            print(f"[2] 세션 저장 team_id: {request.session.get('current_team_id')}")
+            print(f"[3] 최종 team_id: {team_id}")
+
+            # 2. team_id 없으면 첫 번째 팀 자동 선택
+            if not team_id:
+                first_team_member = TeamMember.objects.filter(user=request.user).first()
+                if not first_team_member:
+                    print("[Error] 사용자가 어떤 팀에도 속해있지 않음")
                     return Response({'error': '팀에 속해있지 않습니다.'}, status=404)
-                team = team_member.team
                 
-                # 첫 번째 팀을 세션에 저장
-                request.session['current_team_id'] = team.id
-                print(f"[대시보드 API] 첫 번째 팀을 현재 팀으로 설정: {team.name} (ID: {team.id})")
-            # ========================================
-            
-            # 현재 사용자의 팀 멤버십 다시 가져오기 (역할 정보 포함)
-            team_member = TeamMember.objects.get(user=request.user, team=team)
-            
-            # 팀 멤버 정보 가져오기
+                team_id = first_team_member.team.id
+                request.session['current_team_id'] = team_id
+                request.session.save()
+                print(f"[4] 세션에 첫 번째 팀 저장: {team_id}")
+
+            # 3. 해당 팀의 멤버십 검증
+            try:
+                team_member = TeamMember.objects.get(user=request.user, team_id=team_id)
+                print(f"[5] 팀 멤버십 확인 성공: {team_member.team.name} (ID: {team_id})")
+            except TeamMember.DoesNotExist:
+                print(f"[Error] 팀 멤버 아님: team_id={team_id}")
+                return Response({'error': '해당 팀의 멤버가 아닙니다.'}, status=403)
+
+            team = team_member.team
+
+            # 4. 팀 멤버 목록
             team_members = TeamMember.objects.filter(team=team).values(
                 'user__first_name', 
                 'user__profile__major', 
                 'role'
             )
-            
-            # 대시보드 데이터 구성
+            print(f"[6] 팀 멤버 수: {len(team_members)}명")
+
+            # 5. 팀 작업 / 개인 작업 조회
+            all_tasks = Task.objects.filter(team=team).order_by('-created_at')
+            personal_tasks = all_tasks.filter(assignee=request.user)
+            print(f"[7] 전체 작업 수: {all_tasks.count()}, 개인 작업 수: {personal_tasks.count()}")
+
+            # 6. 진행률 계산
+            total_tasks_count = all_tasks.count()
+            completed_tasks_count = all_tasks.filter(status='완료').count()
+            total_progress = int((completed_tasks_count / total_tasks_count) * 100) if total_tasks_count > 0 else 0
+
+            personal_tasks_count = personal_tasks.count()
+            personal_completed_count = personal_tasks.filter(status='완료').count()
+            personal_progress = int((personal_completed_count / personal_tasks_count) * 100) if personal_tasks_count > 0 else 0
+
+            print(f"[8] 전체 진행률: {total_progress}%, 개인 진행률: {personal_progress}%")
+
+            # 7. 응답 데이터 구성
             dashboard_data = {
                 'user': {
                     'name': request.user.first_name or '사용자',
@@ -79,18 +89,19 @@ class DashboardAPIView(APIView):
                 },
                 'user_role': team_member.role,
                 'team_members': list(team_members),
-                'total_progress': 0,  # 임시 데이터
-                'completed_tasks_count': 0,  # 임시 데이터
-                'total_tasks_count': 0,  # 임시 데이터
-                'personal_progress': 0,  # 임시 데이터
-                'personal_completed_count': 0,  # 임시 데이터
-                'personal_tasks_count': 0,  # 임시 데이터
+                'total_progress': total_progress,
+                'personal_progress': personal_progress,
+                'team_tasks': list(all_tasks.values('id', 'name', 'priority', 'status', 'due_date')),
+                'personal_tasks': list(personal_tasks.values('id', 'name', 'priority', 'status', 'due_date')),
             }
-            
+
+            print(f"[9] 응답 데이터 준비 완료: team_id={team.id}, team_name={team.name}")
             return Response(dashboard_data)
-            
+
         except Exception as e:
+            print(f"[Error] DashboardAPIView 예외 발생: {e}")
             return Response({'error': str(e)}, status=500)
+
 # ========================================
 
 
@@ -119,8 +130,11 @@ def dashboard_view(request, team_id):
     user = request.user
 
     # 1. 팀 작업 및 개인 작업 정보 (임시로 빈 리스트 전달)
-    all_team_tasks = []
-    personal_tasks = []
+    # 팀 전체 작업
+    all_team_tasks = Task.objects.filter(team=team).order_by('-created_at')
+
+    # 개인 작업 (담당자가 현재 로그인한 사용자)
+    personal_tasks = all_team_tasks.filter(assignee=user)
 
     # 2. 팀 현황 정보 불러오기 (이름, 학과, 역할)
     # User 모델에 'profile'과 'major' 필드가 있다고 가정
@@ -129,15 +143,17 @@ def dashboard_view(request, team_id):
         major=F('user__profile__major')
     ).values('name', 'major', 'role')
 
-    # 3. 전체 진행률 및 개인 완료율 계산 (임시로 0으로 설정)
-    total_tasks_count = 0
-    completed_tasks_count = 0
-    total_progress = 0
+    # 3. 전체 진행률 및 개인 완료율 계산
+    # 전체 진행률
+    total_tasks_count = all_team_tasks.count()
+    completed_tasks_count = all_team_tasks.filter(status='완료').count()
+    total_progress = int((completed_tasks_count / total_tasks_count) * 100) if total_tasks_count > 0 else 0
 
-    personal_tasks_count = 0
-    personal_completed_count = 0
-    personal_progress = 0
-    
+    # 개인 진행률
+    personal_tasks_count = personal_tasks.count()
+    personal_completed_count = personal_tasks.filter(status='완료').count()
+    personal_progress = int((personal_completed_count / personal_tasks_count) * 100) if personal_tasks_count > 0 else 0
+        
     # 프론트엔드에 전달할 모든 데이터를 context에 담기
     context = {
         'team': team,
@@ -153,3 +169,21 @@ def dashboard_view(request, team_id):
     }
     
     return render(request, 'main/dashboard.html', context)
+
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from teams.models import TeamMember
+
+@api_view(['POST'])
+def set_current_team(request):
+    team_id = request.data.get('team_id')
+    if not team_id:
+        return Response({'error': 'team_id 누락'}, status=400)
+
+    # 해당 팀의 멤버인지 확인
+    if not TeamMember.objects.filter(user=request.user, team_id=team_id).exists():
+        return Response({'error': '팀 멤버가 아님'}, status=403)
+
+    # 세션에 team_id 저장
+    request.session['current_team_id'] = team_id
+    return Response({'success': True})

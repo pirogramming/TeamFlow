@@ -1,1 +1,143 @@
-<!-- 작업 관리 (작업 목록, 필터, 상태) -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}작업 관리{% endblock %}
+
+{% block content %}
+<div class="tasks-container">
+    <h2>{{ team.name }} 팀 작업 관리</h2>
+
+    <input type="hidden" id="team-id" value="{{ team.id }}">
+
+    <!-- 작업 생성 -->
+    <form id="taskForm">
+        <input type="text" name="name" placeholder="작업명" required>
+        <textarea name="description" placeholder="설명"></textarea>
+        <input type="date" name="due_date" required>
+
+        <select name="assignee" required>
+            <option value="">담당자 선택</option>
+            {% for member in team_members %}
+            <option value="{{ member.user.id }}">{{ member.user.first_name }}</option>
+            {% endfor %}
+        </select>
+
+        <select name="priority">
+            <option value="보통">보통</option>
+            <option value="중요">중요</option>
+            <option value="긴급">긴급</option>
+        </select>
+
+        <button type="submit">작업 추가</button>
+    </form>
+
+    <!-- 작업 목록 -->
+    <table>
+        <thead>
+            <tr>
+                <th>작업명</th>
+                <th>담당자</th>
+                <th>마감일</th>
+                <th>우선순위</th>
+                <th>상태</th>
+                <th>관리</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for task in tasks %}
+            <tr data-task-id="{{ task.id }}">
+                <td>{{ task.name }}</td>
+                <td>{{ task.assignee.first_name }}</td>
+                <td>{{ task.due_date }}</td>
+                <td>{{ task.priority }}</td>
+                <td>
+                    <select class="task-status">
+                        <option value="대기중" {% if task.status == '대기중' %}selected{% endif %}>대기중</option>
+                        <option value="진행중" {% if task.status == '진행중' %}selected{% endif %}>진행중</option>
+                        <option value="완료" {% if task.status == '완료' %}selected{% endif %}>완료</option>
+                    </select>
+                </td>
+                <td>
+                    <button class="btn-delete">삭제</button>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6">등록된 작업이 없습니다.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+const teamId = document.querySelector('#team-id').value;
+
+/* --- 작업 생성 --- */
+document.getElementById('taskForm').addEventListener('submit', async function (e) {
+    e.preventDefault();
+
+    const formData = new FormData(this);
+    const data = Object.fromEntries(formData.entries());
+
+    try {
+        await axios.post(`/api/dashboard/${teamId}/tasks/create/`, data, {
+            headers: { 'X-CSRFToken': csrftoken }
+        });
+        alert('작업이 생성되었습니다.');
+        location.reload();
+    } catch (error) {
+        console.error(error.response ? error.response.data : error);
+        alert('작업 생성 실패');
+    }
+});
+
+/* --- 상태 변경 --- */
+document.querySelectorAll('.task-status').forEach(select => {
+    select.addEventListener('change', async function () {
+        const taskRow = this.closest('tr');
+        const taskId = taskRow.dataset.taskId;
+
+        try {
+            await axios.patch(`/api/dashboard/${teamId}/tasks/update/`, {
+                id: taskId,
+                status: this.value
+            }, {
+                headers: { 'X-CSRFToken': csrftoken }
+            });
+            alert('상태가 업데이트되었습니다.');
+        } catch (error) {
+            console.error(error.response ? error.response.data : error);
+            alert('상태 업데이트 실패');
+        }
+    });
+});
+
+/* --- 삭제 --- */
+document.querySelectorAll('.btn-delete').forEach(button => {
+    button.addEventListener('click', async function () {
+        const taskRow = this.closest('tr');
+        const taskId = taskRow.dataset.taskId;
+
+        if (confirm('정말 삭제하시겠습니까?')) {
+            try {
+                await axios.delete(`/api/dashboard/${teamId}/tasks/delete/`, {
+                    data: { id: taskId },
+                    headers: { 'X-CSRFToken': csrftoken }
+                });
+                alert('작업이 삭제되었습니다.');
+                location.reload();
+            } catch (error) {
+                console.error(error.response ? error.response.data : error);
+                alert('삭제 실패');
+            }
+        }
+    });
+});
+</script>
+
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/main/tasks.css' %}">
+{% endblock %}

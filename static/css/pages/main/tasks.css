@@ -1,1 +1,98 @@
-/* 작업 관리 (작업 카드, 상태별 색상, 체크박스) */
+/* 작업 관리 (작업 카드, 상태별 색상, 체크박스)
+
+/* 전체 컨테이너 */
+.tasks-container {
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 20px;
+}
+
+/* 제목 */
+.tasks-container h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+/* 작업 생성 폼 */
+#taskForm {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 30px;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #fafafa;
+}
+
+#taskForm input[type="text"],
+#taskForm input[type="date"],
+#taskForm textarea,
+#taskForm select {
+    flex: 1 1 200px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+#taskForm textarea {
+    min-height: 50px;
+}
+
+#taskForm button {
+    padding: 8px 14px;
+    background-color: #4cafef;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+#taskForm button:hover {
+    background-color: #3a9dd8;
+}
+
+/* 테이블 */
+.tasks-container table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.tasks-container table th,
+.tasks-container table td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: center;
+}
+
+.tasks-container table th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+}
+
+/* 상태 셀렉트 박스 */
+.task-status {
+    padding: 5px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    font-size: 13px;
+}
+
+/* 삭제 버튼 */
+.btn-delete {
+    padding: 5px 10px;
+    background-color: #e74c3c;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.btn-delete:hover {
+    background-color: #c0392b;
+} 

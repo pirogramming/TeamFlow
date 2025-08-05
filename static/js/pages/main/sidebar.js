@@ -241,3 +241,18 @@ function showSidebarNotification(message, type = 'info') {
 
 // 전역 함수로 모바일 사이드바 토글 제공
 window.toggleMobileSidebar = toggleMobileSidebar;
+
+
+function updateSidebarLinks(teamId) {
+    // 작업
+    document.querySelector('a[href^="/api/dashboard/"][href*="/tasks/"]')
+        .setAttribute('href', `/api/dashboard/${teamId}/tasks/`);
+
+    // 일정
+    document.querySelector('a[href^="/api/dashboard/"][href*="/calendar/"]')
+        .setAttribute('href', `/api/dashboard/${teamId}/calendar/`);
+
+    // 자료
+    document.querySelector('a[href^="/api/dashboard/"][href*="/files/"]')
+        .setAttribute('href', `/api/dashboard/${teamId}/files/`);
+}

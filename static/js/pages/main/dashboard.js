@@ -57,67 +57,41 @@ async function initializeDashboard() {
  * 3. 팀 정보, 멤버 목록, 작업 현황, 마감일 등 종합 데이터 반환
  * 4. 헤더에서 프로젝트 변경 시 이 API가 다시 호출됨
  */
-async function loadDashboardData() {
-    try {
-        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
-        const response = await fetch('/api/dashboard/api/', {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': csrftoken
-            },
-            credentials: 'same-origin'
-        });
-        
-        if (!response.ok) {
-            throw new Error('대시보드 데이터 로드에 실패했습니다.');
-        }
-        
-        const data = await response.json();
-        console.log('대시보드 API 응답:', data); // 디버깅 로그 추가
-        return data;
-        
-    } catch (error) {
-        console.error('대시보드 데이터 로드 오류:', error);
-        // 에러 시 더미 데이터 반환
-        return {
-            user: {
-                name: '사용자 이름',
-                role: '사용자 역할'
-            },
-            team: {
-                name: '팀 이름',
-                description: '팀 설명'
-            },
-            total_progress: 0,
-            personal_progress: 0,
-            deadline_count: 0,
-            team_tasks: [],
-            personal_tasks: [],
-            team_members: []
-        };
-    }
+async function loadDashboardData(teamId = null) {
+    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+    const url = teamId
+        ? `/api/dashboard/api/?team_id=${teamId}` // 팀 선택 시 해당 ID 전달
+        : `/api/dashboard/api/`;                  // 기본: 세션 값 사용
+
+    const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrftoken
+        },
+        credentials: 'same-origin'
+    });
+
+    if (!response.ok) throw new Error('대시보드 데이터 로드 실패');
+    return await response.json();
 }
 
 // 대시보드 새로고침 (헤더에서 프로젝트 변경 시 호출)
-async function refreshDashboard() {
-    console.log('🔄 대시보드 새로고침 시작 (프로젝트 변경됨)');
+async function refreshDashboard(teamId = null) {
+    console.log('🔄 대시보드 새로고침 시작 (프로젝트 변경됨), teamId:', teamId); // 디버그
+
     try {
-        // 로딩 상태 표시
         showLoadingState();
-        
-        // 새로운 팀 데이터 로드
-        const data = await loadDashboardData();
-        console.log('🔄 새로운 팀 데이터:', data);
-        
-        // UI 업데이트
+
+        // teamId를 그대로 API 호출에 전달
+        const data = await loadDashboardData(teamId);
+
+        console.log('🔄 API 응답 데이터:', data);
+
         setupDashboardData(data);
-        
-        // 로딩 상태 숨기기
         hideLoadingState();
-        
+
         console.log('✅ 대시보드 새로고침 완료');
-        
     } catch (error) {
         console.error('❌ 대시보드 새로고침 오류:', error);
         showNotification('팀 정보 업데이트에 실패했습니다.', 'error');
@@ -430,9 +404,47 @@ function setupDashboardData(data) {
         renderTeamMembers(data.team_members);
     }
     
-    // 작업 목록 표시 (임시로 빈 배열)
-    renderTeamTasks(data.team_tasks || []);
-    renderPersonalTasks(data.personal_tasks || []);
+    // 작업 목록 표시
+    function renderTeamTasks(tasks = []) {
+    const teamTasksContainer = document.getElementById('team-tasks');
+    if (!teamTasksContainer) return;
+    
+    teamTasksContainer.innerHTML = tasks.length
+        ? tasks.map(task => `
+            <div class="task-item" data-task-id="${task.id}">
+                <div class="task-content">
+                    <h4 class="task-title">${task.name}</h4>
+                    <p class="task-meta">담당자: ${task.assignee_name || '미정'} • ${task.due_date || ''}</p>
+                    <span class="task-priority task-priority-${task.priority}">
+                        ${task.priority}
+                    </span>
+                    <span class="task-status">${task.status}</span>
+                </div>
+            </div>
+        `).join('')
+        : '<p>팀 작업이 없습니다.</p>';
+    }   
+
+    function renderPersonalTasks(tasks = []) {
+    const personalTasksContainer = document.getElementById('personal-tasks');
+    if (!personalTasksContainer) return;
+
+    personalTasksContainer.innerHTML = tasks.length
+        ? tasks.map(task => `
+            <div class="task-item" data-task-id="${task.id}">
+                <div class="task-content">
+                    <h4 class="task-title">${task.name}</h4>
+                    <p class="task-meta">${task.due_date || ''}</p>
+                    <span class="task-priority task-priority-${task.priority}">
+                        ${task.priority}
+                    </span>
+                    <span class="task-status">${task.status}</span>
+                </div>
+            </div>
+        `).join('')
+        : '<p>내 작업이 없습니다.</p>';
+    }
+
 }
 
 // 사용자 정보 업데이트
@@ -575,17 +587,34 @@ function renderProjectList(projects) {
 }
 
 // 프로젝트 선택
-function selectProject(projectId) {
-    console.log('프로젝트 선택됨:', projectId);
-    
-    // 드롭다운 닫기
-    const dropdownMenu = document.getElementById('project-dropdown-menu');
-    const dropdownButton = document.getElementById('project-dropdown');
-    
-    if (dropdownMenu) dropdownMenu.style.display = 'none';
-    if (dropdownButton) dropdownButton.classList.remove('active');
-    
-    // TODO: 선택된 프로젝트로 대시보드 데이터 로드
-    // 현재는 페이지 새로고침으로 처리
-    window.location.reload();
+async function selectProject(projectId) {
+    console.log('프로젝트 선택됨, projectId:', projectId); // 클릭 시 값 확인
+
+    if (!projectId) {
+        console.error('❌ projectId가 비어있음 - 드롭다운 data-project-id 확인 필요');
+        return;
+    }
+
+    try {
+        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+        // 세션에 선택된 team_id 저장
+        const response = await fetch('/api/dashboard/set-current-team/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken
+            },
+            body: JSON.stringify({ team_id: projectId })
+        });
+
+        const result = await response.json();
+        console.log('세션 저장 결과:', result);
+
+        // teamId 전달해서 새로고침
+        refreshDashboard(projectId);
+
+    } catch (error) {
+        console.error('팀 변경 중 오류:', error);
+    }
 }
