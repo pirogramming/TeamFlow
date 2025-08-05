@@ -1,5 +1,7 @@
 from django.urls import path
 from . import views
+from files import views as files_views
+from schedule import views as schedule_views
 
 urlpatterns = [
     # ========================================
@@ -11,4 +13,10 @@ urlpatterns = [
     # 예: /dashboard/1/ 처럼 팀 ID를 받는 URL
     path('', views.dashboard_router_view, name='dashboard_router'),
     path('<int:team_id>/', views.dashboard_view, name='dashboard'),
+
+    # 파일 페이지
+    path('<int:team_id>/files/', files_views.file_list_view, name='file_list'),
+
+    # 일정 페이지
+    path('<int:team_id>/calendar/', schedule_views.calendar_page_view, name='calendar_page'),
 ]
