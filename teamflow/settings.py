@@ -76,6 +76,8 @@ INSTALLED_APPS = [
     'dashboard',  
     'users',
     'tasks',
+    'files',
+    'schedule',
 ]
 
 # ========================================
@@ -274,4 +276,5 @@ SOCIALACCOUNT_QUERY_EMAIL = True  # 이메일 쿼리 활성화
 SOCIALACCOUNT_EMAIL_REQUIRED = False  # 이메일 필수 아님
 SOCIALACCOUNT_STORE_TOKENS = True  # 토큰 저장 활성화
 
-
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
