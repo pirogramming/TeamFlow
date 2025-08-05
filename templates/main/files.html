@@ -1,1 +1,52 @@
-<!-- 자료 관리 (파일 목록, 업로드) -->
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}자료실 - TeamFlow{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/pages/main/files.css' %}" />
+{% endblock %}
+
+{% block content %}
+<script id="team-data" type="application/json">
+  {
+    "teamId": "{{ team.id }}"
+  }
+</script>
+
+<div class="page-container">
+  <div class="view-header">
+    <h1>자료실</h1>
+  </div>
+
+  <!-- 파일 업로드 폼 -->
+  <div class="upload-container">
+    <h3>새 자료 업로드</h3>
+    <form id="file-upload-form">
+      {% csrf_token %}
+      <input type="file" id="file-input" name="file" required>
+      <button type="submit" class="btn btn-primary">업로드</button>
+    </form>
+  </div>
+
+  <!-- 파일 목록 -->
+  <div class="file-list-container">
+    <h3>파일 목록</h3>
+    <ul id="file-list">
+      {% for file in files %}
+        <li data-file-id="{{ file.id }}">
+          <a href="{{ file.file.url }}" target="_blank">{{ file.filename }}</a>
+          <span>(by {{ file.uploader.username }})</span>
+          <button class="delete-btn">삭제</button>
+        </li>
+      {% empty %}
+        <li id="no-files-message">업로드된 파일이 없습니다.</li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+  <script src="{% static 'js/pages/main/files.js' %}"></script>
+{% endblock %}

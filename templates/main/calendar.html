@@ -1,1 +1,64 @@
-<!-- 일정 관리 (월간 뷰, 일정 목록) -->
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}일정 관리 - TeamFlow{% endblock %}
+
+{% block extra_css %}
+  <!-- FullCalendar 라이브러리 CSS -->
+  <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/main.min.css' rel='stylesheet' />
+  <!-- 커스텀 CSS -->
+  <link rel="stylesheet" href="{% static 'css/pages/main/calendar.css' %}" />
+{% endblock %}
+
+{% block content %}
+{# Django 템플릿 변수를 JavaScript에서 사용할 수 있도록 데이터 전달 #}
+<script id="team-data" type="application/json">
+  {
+    "teamId": "{{ team.id }}"
+  }
+</script>
+
+<div class="page-container">
+  <!-- 1. FullCalendar 뷰 -->
+  <div id="calendar-view">
+    <div class="view-header">
+      <h1>일정 관리</h1>
+      <button id="go-to-scheduler-btn" class="btn">일정 조율하기</button>
+    </div>
+    <div id="calendar"></div>
+  </div>
+
+  <!-- 2. 일정 조율(When2Meet) 뷰 -->
+  <div id="scheduler-view" style="display: none;">
+    <div class="view-header">
+      <h1>일정 조율</h1>
+      <button id="back-to-calendar-btn" class="btn">달력으로 돌아가기</button>
+    </div>
+    <div id="when2meet-grid-container">
+      <p>드래그하여 가능한 시간을 선택하세요.</p>
+      <div id="when2meet-grid">
+        <!-- JS가 동적으로 채울 그리드 -->
+      </div>
+      <button id="save-vote-btn" class="btn btn-primary">내 시간 저장하기</button>
+    </div>
+    
+    <div class="meeting-form-container">
+      <h3>회의 일정 추가</h3>
+      <p>겹치는 시간대를 참고하여 회의를 만드세요.</p>
+      <form id="add-meeting-form">
+        <input type="text" id="meeting-title" placeholder="회의 제목" required>
+        <input type="datetime-local" id="meeting-start" required>
+        <input type="datetime-local" id="meeting-end" required>
+        <button type="submit" class="btn btn-primary">회의 추가</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+  <!-- FullCalendar 라이브러리 JS -->
+  <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js'></script>
+  <!-- 커스텀 JS -->
+  <script src="{% static 'js/pages/main/calendar.js' %}"></script>
+{% endblock %}
