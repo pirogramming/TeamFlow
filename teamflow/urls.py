@@ -51,6 +51,9 @@ urlpatterns = [
 
     # 파일 URL
     path('api/', include('files.urls')),
+
+    # 일정 URL
+    path('api/', include('schedule.urls')),
 ]
 
 # 개발 환경 static 파일 서빙

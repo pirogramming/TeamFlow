@@ -76,6 +76,7 @@ INSTALLED_APPS = [
     'dashboard',  
     'users',
     'files',
+    'schedule',
 ]
 
 # ========================================
