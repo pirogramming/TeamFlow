@@ -12,9 +12,8 @@ def landing_page_view(request):
 
 
 # ========================================
-# MGP: 대시보드 API 엔드포인트 추가
-# 백엔드 부분 대신 수정: 세션 기반 현재 팀 확인 로직 추가
-# ========================================
+# MGP: 대시보드 API 엔드포인트 수정
+# 백엔드 부분 대신 수정: Task 모델에 없는 priority 필드 제거, 올바른 필드명으로 수정
 class DashboardAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -60,21 +59,32 @@ class DashboardAPIView(APIView):
 
             # 5. 팀 작업 / 개인 작업 조회
             all_tasks = Task.objects.filter(team=team).order_by('-created_at')
-            personal_tasks = all_tasks.filter(assignee=request.user)
-            print(f"[7] 전체 작업 수: {all_tasks.count()}, 개인 작업 수: {personal_tasks.count()}")
+            team_tasks = all_tasks.filter(type='team')  # 팀 작업만
+            personal_tasks = all_tasks.filter(type='personal', assignee=request.user)  # 개인 작업 중 본인 것만
+            print(f"[7] 전체 작업 수: {all_tasks.count()}, 팀 작업 수: {team_tasks.count()}, 개인 작업 수: {personal_tasks.count()}")
 
             # 6. 진행률 계산
             total_tasks_count = all_tasks.count()
-            completed_tasks_count = all_tasks.filter(status='완료').count()
+            completed_tasks_count = all_tasks.filter(status='completed').count()
             total_progress = int((completed_tasks_count / total_tasks_count) * 100) if total_tasks_count > 0 else 0
 
             personal_tasks_count = personal_tasks.count()
-            personal_completed_count = personal_tasks.filter(status='완료').count()
+            personal_completed_count = personal_tasks.filter(status='completed').count()
             personal_progress = int((personal_completed_count / personal_tasks_count) * 100) if personal_tasks_count > 0 else 0
 
-            print(f"[8] 전체 진행률: {total_progress}%, 개인 진행률: {personal_progress}%")
+            # 7. 마감 임박 작업 수 계산 (팀 작업 + 개인 작업)
+            deadline_imminent_tasks = []
+            for task in team_tasks:
+                if task.is_deadline_imminent:
+                    deadline_imminent_tasks.append(task)
+            for task in personal_tasks:
+                if task.is_deadline_imminent:
+                    deadline_imminent_tasks.append(task)
+            deadline_imminent_count = len(deadline_imminent_tasks)
 
-            # 7. 응답 데이터 구성
+            print(f"[8] 전체 진행률: {total_progress}%, 개인 진행률: {personal_progress}%, 마감 임박: {deadline_imminent_count}개")
+
+            # 8. 응답 데이터 구성
             dashboard_data = {
                 'user': {
                     'name': request.user.first_name or '사용자',
@@ -91,8 +101,9 @@ class DashboardAPIView(APIView):
                 'team_members': list(team_members),
                 'total_progress': total_progress,
                 'personal_progress': personal_progress,
-                'team_tasks': list(all_tasks.values('id', 'name', 'priority', 'status', 'due_date')),
-                'personal_tasks': list(personal_tasks.values('id', 'name', 'priority', 'status', 'due_date')),
+                'deadline_imminent_count': deadline_imminent_count,
+                'team_tasks': list(team_tasks.values('id', 'name', 'status', 'due_date', 'type', 'assignee__first_name', 'assignee__username', 'description')),
+                'personal_tasks': list(personal_tasks.values('id', 'name', 'status', 'due_date', 'type', 'description')),
             }
 
             print(f"[9] 응답 데이터 준비 완료: team_id={team.id}, team_name={team.name}")
@@ -101,16 +112,92 @@ class DashboardAPIView(APIView):
         except Exception as e:
             print(f"[Error] DashboardAPIView 예외 발생: {e}")
             return Response({'error': str(e)}, status=500)
-
 # ========================================
 
 
 # ========================================
-# MGP: 대시보드 페이지 뷰 함수 추가 (프리뷰 제거 후 실제 페이지 연결)
+# MGP: 대시보드 페이지 뷰 수정
+# 백엔드 부분 대신 수정: 현재 팀 정보 가져오기 로직 추가, 팀 멤버 정보 포함, 올바른 작업 분류 및 진행률 계산
 @login_required
 def dashboard_page(request):
     """대시보드 페이지"""
-    return render(request, 'main/dashboard.html')
+    # 현재 팀 정보 가져오기
+    team_id = request.session.get('current_team_id')
+    if not team_id:
+        # 첫 번째 팀 선택
+        team_member = TeamMember.objects.filter(user=request.user).first()
+        if team_member:
+            team = team_member.team
+            request.session['current_team_id'] = team.id
+        else:
+            # 팀이 없는 경우 팀 생성/참여 페이지로 리다이렉트
+            return redirect('team_setup')
+    else:
+        team = get_object_or_404(Team, id=team_id)
+
+    # 팀 멤버 정보 가져오기 (현재 사용자 포함)
+    team_members = TeamMember.objects.filter(team=team).select_related('user', 'user__profile').values(
+        'user__first_name', 
+        'user__profile__major', 
+        'role'
+    )
+
+    # 작업 분류 명확화
+    all_tasks = Task.objects.filter(team=team).order_by('-created_at')
+    
+    # 팀 작업: type이 'team'인 모든 작업 (담당자 관계없이)
+    team_tasks = all_tasks.filter(type='team')
+    
+    # 개인 작업: type이 'personal'이면서 현재 사용자가 담당자인 작업
+    personal_tasks = all_tasks.filter(type='personal', assignee=request.user)
+
+    # 디버깅용 출력
+    print(f"현재 사용자 ID: {request.user.id}")
+    print(f"팀: {team.name} (ID: {team.id})")
+    print(f"전체 작업 수: {all_tasks.count()}")
+    print(f"팀 작업 수: {team_tasks.count()}")
+    print(f"개인 작업 수: {personal_tasks.count()}")
+    print("=== 팀 작업 목록 ===")
+    for task in team_tasks:
+        print(f"- {task.name} (담당자: {task.assignee.id if task.assignee else 'None'})")
+    print("=== 개인 작업 목록 ===")
+    for task in personal_tasks:
+        print(f"- {task.name} (담당자: {task.assignee.id})")
+
+    # 진행률 계산 (completed 상태 기준)
+    total_tasks_count = all_tasks.count()
+    completed_tasks_count = all_tasks.filter(status='completed').count()
+    total_progress = int((completed_tasks_count / total_tasks_count) * 100) if total_tasks_count > 0 else 0
+
+    personal_tasks_count = personal_tasks.count()
+    personal_completed_count = personal_tasks.filter(status='completed').count()
+    personal_progress = int((personal_completed_count / personal_tasks_count) * 100) if personal_tasks_count > 0 else 0
+
+    # 헤더 알림용 마감 임박 작업 수 계산 (팀 작업 + 개인 작업)
+    deadline_imminent_count = team_tasks.filter(due_date__isnull=False).count() + personal_tasks.filter(due_date__isnull=False).count()
+    # 실제로는 is_deadline_imminent 속성을 사용해야 함
+    deadline_imminent_tasks = []
+    for task in team_tasks:
+        if task.is_deadline_imminent:
+            deadline_imminent_tasks.append(task)
+    for task in personal_tasks:
+        if task.is_deadline_imminent:
+            deadline_imminent_tasks.append(task)
+    deadline_imminent_count = len(deadline_imminent_tasks)
+
+    return render(request, 'main/dashboard.html', {
+        'team': team,
+        'team_members': team_members,
+        'team_tasks': team_tasks,
+        'personal_tasks': personal_tasks,
+        'total_progress': total_progress,
+        'personal_progress': personal_progress,
+        'total_tasks_count': total_tasks_count,
+        'completed_tasks_count': completed_tasks_count,
+        'personal_tasks_count': personal_tasks_count,
+        'personal_completed_count': personal_completed_count,
+        'deadline_imminent_count': deadline_imminent_count,
+    })
 # ========================================
 
 

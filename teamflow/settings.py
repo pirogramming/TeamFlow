@@ -178,6 +178,12 @@ STATICFILES_DIRS = [
     BASE_DIR / 'static',
 ]
 
+# ========================================
+# MGP: Static 파일 설정 추가
+# 백엔드 부분 대신 수정: collectstatic 명령어 실행을 위한 STATIC_ROOT 설정 추가
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+# ========================================
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 

@@ -29,14 +29,6 @@
                         <div class="dropdown-items" id="project-list">
                             <!-- 프로젝트 목록이 동적으로 로드됩니다 -->
                         </div>
-                        <div class="dropdown-footer">
-                            <button class="dropdown-action" id="create-new-project">
-                                <svg fill="currentColor" viewBox="0 0 24 24" width="16" height="16">
-                                    <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
-                                </svg>
-                                새 프로젝트 만들기
-                            </button>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -51,11 +43,11 @@
                         <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
                     </svg>
                 </div>
-                <span class="notification-text" id="deadline-notification">마감 임박 3개</span>
+                <span class="notification-text" id="deadline-notification">마감 임박 0개</span>
             </div>
 
             <!-- 팀 생성 버튼 -->
-            <button class="action-button" id="create-team-btn">
+            <button class="action-button" id="create-team-btn" onclick="window.location.href='{% url 'team_create' %}'">
                 <svg fill="currentColor" viewBox="0 0 24 24" width="20" height="20">
                     <path d="M16 4c0-1.11.89-2 2-2s2 .89 2 2-.89 2-2 2-2-.89-2-2zm4 18v-6h2.5l-2.54-7.63A1.999 1.999 0 0 0 18.06 7c-.8 0-1.54.5-1.85 1.26l-1.45 3.63c-.25.65-.65 1.15-1.18 1.46C14.28 13.78 15 14.8 15 16v6h5z"/>
                 </svg>
@@ -63,7 +55,7 @@
             </button>
 
             <!-- 팀 참여 버튼 -->
-            <button class="action-button" id="join-team-btn">
+            <button class="action-button" id="join-team-btn" onclick="window.location.href='{% url 'team_join' %}'">
                 <svg fill="currentColor" viewBox="0 0 24 24" width="20" height="20">
                     <path d="M16 4c0-1.11.89-2 2-2s2 .89 2 2-.89 2-2 2-2-.89-2-2zm4 18v-6h2.5l-2.54-7.63A1.999 1.999 0 0 0 18.06 7c-.8 0-1.54.5-1.85 1.26l-1.45 3.63c-.25.65-.65 1.15-1.18 1.46C14.28 13.78 15 14.8 15 16v6h5z"/>
                 </svg>

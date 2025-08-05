@@ -5,8 +5,8 @@
         <!-- 상단 네비게이션 -->
         <nav class="sidebar-nav">
             <ul class="nav-list">
-                <!-- 대시보드 (현재 활성) -->
-                <li class="nav-item active">
+                <!-- 대시보드 -->
+                <li class="nav-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
                     <a href="/dashboard/" class="nav-link" id="dashboard-link">
                         <svg class="nav-icon" fill="currentColor" viewBox="0 0 24 24" width="20" height="20">
                             <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
@@ -16,8 +16,8 @@
                 </li>
 
                 <!-- 일정 -->
-                <li class="nav-item">
-                    <a href="{% url 'calendar_page' team.id %}" class="nav-link">
+                <li class="nav-item {% if request.resolver_match.url_name == 'calendar_page' %}active{% endif %}">
+                    <a href="{% if team %}{% url 'calendar_page' team.id %}{% else %}#{% endif %}" class="nav-link">
                         <svg class="nav-icon" fill="currentColor" viewBox="0 0 24 24" width="20" height="20">
                             <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/>
                         </svg>
@@ -26,8 +26,8 @@
                 </li>
 
                 <!-- 작업 -->
-                <li class="nav-item">
-                    <a href="/api/dashboard/{{ team.id }}/tasks/" class="nav-link">
+                <li class="nav-item {% if request.resolver_match.url_name == 'tasks-page' %}active{% endif %}">
+                    <a href="{% if team %}{% url 'tasks-page' team.id %}{% else %}#{% endif %}" class="nav-link">
                         <svg class="nav-icon" fill="currentColor" viewBox="0 0 24 24" width="20" height="20">
                             <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
                         </svg>
@@ -36,8 +36,8 @@
                 </li>
 
                 <!-- 자료 -->
-                <li class="nav-item">
-                    <a href="{% url 'file_list' team.id %}" class="nav-link">
+                <li class="nav-item {% if request.resolver_match.url_name == 'file_list' %}active{% endif %}">
+                    <a href="{% if team %}{% url 'file_list' team.id %}{% else %}#{% endif %}" class="nav-link">
                         <svg class="nav-icon" fill="currentColor" viewBox="0 0 24 24" width="20" height="20">
                             <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
                         </svg>
@@ -46,7 +46,7 @@
                 </li>
 
                 <!-- 역할 -->
-                <li class="nav-item">
+                <li class="nav-item {% if 'roles' in request.path %}active{% endif %}">
                     <a href="/roles/" class="nav-link">
                         <svg class="nav-icon" fill="currentColor" viewBox="0 0 24 24" width="20" height="20">
                             <path d="M16 4c0-1.11.89-2 2-2s2 .89 2 2-.89 2-2 2-2-.89-2-2zm4 18v-6h2.5l-2.54-7.63A1.999 1.999 0 0 0 18.06 7c-.8 0-1.54.5-1.85 1.26l-1.45 3.63c-.25.65-.65 1.15-1.18 1.46C14.28 13.78 15 14.8 15 16v6h5z"/>
@@ -56,7 +56,7 @@
                 </li>
 
                 <!-- 팀플 기록 -->
-                <li class="nav-item">
+                <li class="nav-item {% if 'team-log' in request.path %}active{% endif %}">
                     <a href="/team-log/" class="nav-link">
                         <svg class="nav-icon" fill="currentColor" viewBox="0 0 24 24" width="20" height="20">
                             <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
