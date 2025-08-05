@@ -89,7 +89,18 @@
                     </div>
                     <div class="card-content">
                         <div class="task-list" id="team-tasks">
-                            <!-- 팀 작업들이 동적으로 로드됩니다 -->
+                            {% for task in team_tasks %}
+                            <div class="task-item">
+                                <span class="task-name">{{ task.name }}</span>
+                                <span class="task-priority task-priority-{{ task.priority }}">
+                                    {{ task.get_priority_display }}
+                                </span>
+                                <span class="task-assignee">{{ task.assignee.first_name|default:task.assignee.username }}</span>
+                                <span class="task-status">{{ task.status }}</span>
+                            </div>
+                            {% empty %}
+                            <p>팀 작업이 없습니다.</p>
+                            {% endfor %}
                         </div>
                     </div>
                 </div>
@@ -102,8 +113,19 @@
                     </div>
                     <div class="card-content">
                         <div class="task-list" id="personal-tasks">
-                            <!-- 개인 작업들이 동적으로 로드됩니다 -->
+                            {% for task in personal_tasks %}
+                            <div class="task-item">
+                                <span class="task-name">{{ task.name }}</span>
+                                <span class="task-priority task-priority-{{ task.priority }}">
+                                    {{ task.get_priority_display }}
+                                </span>
+                                <span class="task-status">{{ task.status }}</span>
+                            </div>
+                            {% empty %}
+                            <p>내 작업이 없습니다.</p>
+                            {% endfor %}
                         </div>
+
                     </div>
                 </div>
             </div>

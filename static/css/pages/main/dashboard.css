@@ -387,6 +387,37 @@
     font-weight: 500;
 }
 
+/*task*/
+.task-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 10px;
+    border-bottom: 1px solid #eee;
+    font-size: 14px;
+}
+
+.task-item .task-priority {
+    font-weight: bold;
+    margin-left: 10px;
+}
+
+.task-item .task-status {
+    color: #666;
+    font-size: 13px;
+}
+
+.task-priority {
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+}
+
+/*.task-priority-낮음 { background-color: #dfe6e9; color: #2d3436; }*/
+.task-priority-보통 { background-color: #46f46f; color: white; }
+.task-priority-중요 { background-color: #fdcb6e; color: #2d3436; }
+.task-priority-긴급 { background-color: #d63031; color: white; }
+
+
 /* 반응형 디자인 */
 @media (max-width: 1024px) {
     .main-content {

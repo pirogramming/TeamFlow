@@ -75,6 +75,7 @@ INSTALLED_APPS = [
     'teams',
     'dashboard',  
     'users',
+    'tasks',
 ]
 
 # ========================================

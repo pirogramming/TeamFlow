@@ -15,6 +15,7 @@ urlpatterns = [
     path('api/teams/', include('teams.urls')),
     path('api/dashboard/', include('dashboard.urls')),
     path('api/auth/', include('users.urls')),
+    path('api/tasks/', include('tasks.urls')),
 
     # allauth 로그인/콜백
     path('accounts/', include('allauth.urls')),

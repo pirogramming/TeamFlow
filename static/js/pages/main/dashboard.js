@@ -430,9 +430,47 @@ function setupDashboardData(data) {
         renderTeamMembers(data.team_members);
     }
     
-    // 작업 목록 표시 (임시로 빈 배열)
-    renderTeamTasks(data.team_tasks || []);
-    renderPersonalTasks(data.personal_tasks || []);
+    // 작업 목록 표시
+    function renderTeamTasks(tasks = []) {
+    const teamTasksContainer = document.getElementById('team-tasks');
+    if (!teamTasksContainer) return;
+    
+    teamTasksContainer.innerHTML = tasks.length
+        ? tasks.map(task => `
+            <div class="task-item" data-task-id="${task.id}">
+                <div class="task-content">
+                    <h4 class="task-title">${task.name}</h4>
+                    <p class="task-meta">담당자: ${task.assignee_name || '미정'} • ${task.due_date || ''}</p>
+                    <span class="task-priority task-priority-${task.priority}">
+                        ${task.priority}
+                    </span>
+                    <span class="task-status">${task.status}</span>
+                </div>
+            </div>
+        `).join('')
+        : '<p>팀 작업이 없습니다.</p>';
+    }   
+
+    function renderPersonalTasks(tasks = []) {
+    const personalTasksContainer = document.getElementById('personal-tasks');
+    if (!personalTasksContainer) return;
+
+    personalTasksContainer.innerHTML = tasks.length
+        ? tasks.map(task => `
+            <div class="task-item" data-task-id="${task.id}">
+                <div class="task-content">
+                    <h4 class="task-title">${task.name}</h4>
+                    <p class="task-meta">${task.due_date || ''}</p>
+                    <span class="task-priority task-priority-${task.priority}">
+                        ${task.priority}
+                    </span>
+                    <span class="task-status">${task.status}</span>
+                </div>
+            </div>
+        `).join('')
+        : '<p>내 작업이 없습니다.</p>';
+    }
+
 }
 
 // 사용자 정보 업데이트
