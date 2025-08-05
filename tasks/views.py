@@ -5,20 +5,6 @@ from .models import Task
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-@api_view(['POST'])
-def set_current_team(request):
-    team_id = request.data.get('team_id')
-    if not team_id:
-        return Response({'error': 'team_id 누락'}, status=400)
-    
-    # 사용자가 해당 팀 멤버인지 확인
-    from teams.models import TeamMember
-    if not TeamMember.objects.filter(user=request.user, team_id=team_id).exists():
-        return Response({'error': '팀 멤버가 아님'}, status=403)
-
-    request.session['current_team_id'] = team_id
-    return Response({'success': True})
-
 def tasks_page(request, team_id):
     # 특정 팀 불러오기
     team = get_object_or_404(Team, id=team_id)

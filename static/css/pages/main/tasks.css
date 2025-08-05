@@ -1,4 +1,5 @@
-/* 작업 관리 (작업 카드, 상태별 색상, 체크박스) */
+/* 작업 관리 (작업 카드, 상태별 색상, 체크박스)
+
 /* 전체 컨테이너 */
 .tasks-container {
     max-width: 900px;
@@ -94,4 +95,4 @@
 
 .btn-delete:hover {
     background-color: #c0392b;
-}
+} 

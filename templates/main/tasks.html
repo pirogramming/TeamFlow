@@ -7,6 +7,8 @@
 <div class="tasks-container">
     <h2>{{ team.name }} 팀 작업 관리</h2>
 
+    <input type="hidden" id="team-id" value="{{ team.id }}">
+
     <!-- 작업 생성 -->
     <form id="taskForm">
         <input type="text" name="name" placeholder="작업명" required>
@@ -68,87 +70,68 @@
 
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script>
-/* --- CSRF 토큰 가져오기 --- */
-function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
+const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+const teamId = document.querySelector('#team-id').value;
+
+/* --- 작업 생성 --- */
+document.getElementById('taskForm').addEventListener('submit', async function (e) {
+    e.preventDefault();
+
+    const formData = new FormData(this);
+    const data = Object.fromEntries(formData.entries());
+
+    try {
+        await axios.post(`/api/dashboard/${teamId}/tasks/create/`, data, {
+            headers: { 'X-CSRFToken': csrftoken }
+        });
+        alert('작업이 생성되었습니다.');
+        location.reload();
+    } catch (error) {
+        console.error(error.response ? error.response.data : error);
+        alert('작업 생성 실패');
     }
-    return cookieValue;
-}
-const csrftoken = getCookie('csrftoken');
+});
 
-document.addEventListener('DOMContentLoaded', function () {
-    const form = document.getElementById('taskForm');
-    const teamId = "{{ team.id }}";
-
-    /* --- 작업 생성 --- */
-    form.addEventListener('submit', async function (e) {
-        e.preventDefault();
-
-        const formData = new FormData(form);
-        const data = Object.fromEntries(formData.entries());
+/* --- 상태 변경 --- */
+document.querySelectorAll('.task-status').forEach(select => {
+    select.addEventListener('change', async function () {
+        const taskRow = this.closest('tr');
+        const taskId = taskRow.dataset.taskId;
 
         try {
-            await axios.post(`/api/tasks/${teamId}/create`, data, {
+            await axios.patch(`/api/dashboard/${teamId}/tasks/update/`, {
+                id: taskId,
+                status: this.value
+            }, {
                 headers: { 'X-CSRFToken': csrftoken }
             });
-            alert('작업이 생성되었습니다.');
-            location.reload();
+            alert('상태가 업데이트되었습니다.');
         } catch (error) {
             console.error(error.response ? error.response.data : error);
-            alert('작업 생성 실패');
+            alert('상태 업데이트 실패');
         }
     });
+});
 
-    /* --- 작업 상태 변경 (PATCH) --- */
-    document.querySelectorAll('.task-status').forEach(select => {
-        select.addEventListener('change', async function () {
-            const taskRow = this.closest('tr');
-            const taskId = taskRow.dataset.taskId;
+/* --- 삭제 --- */
+document.querySelectorAll('.btn-delete').forEach(button => {
+    button.addEventListener('click', async function () {
+        const taskRow = this.closest('tr');
+        const taskId = taskRow.dataset.taskId;
 
+        if (confirm('정말 삭제하시겠습니까?')) {
             try {
-                await axios.patch(`/api/tasks/${teamId}/update`, {
-                    id: taskId,
-                    status: this.value
-                }, {
+                await axios.delete(`/api/dashboard/${teamId}/tasks/delete/`, {
+                    data: { id: taskId },
                     headers: { 'X-CSRFToken': csrftoken }
                 });
-                alert('상태가 업데이트되었습니다.');
+                alert('작업이 삭제되었습니다.');
+                location.reload();
             } catch (error) {
                 console.error(error.response ? error.response.data : error);
-                alert('상태 업데이트 실패');
+                alert('삭제 실패');
             }
-        });
-    });
-
-    /* --- 작업 삭제 (DELETE) --- */
-    document.querySelectorAll('.btn-delete').forEach(button => {
-        button.addEventListener('click', async function () {
-            const taskRow = this.closest('tr');
-            const taskId = taskRow.dataset.taskId;
-
-            if (confirm('정말 삭제하시겠습니까?')) {
-                try {
-                    await axios.delete(`/api/tasks/${teamId}/delete`, {
-                        data: { id: taskId },
-                        headers: { 'X-CSRFToken': csrftoken }
-                    });
-                    alert('작업이 삭제되었습니다.');
-                    location.reload();
-                } catch (error) {
-                    console.error(error.response ? error.response.data : error);
-                    alert('삭제 실패');
-                }
-            }
-        });
+        }
     });
 });
 </script>

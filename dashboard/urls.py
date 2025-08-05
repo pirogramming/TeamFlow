@@ -1,7 +1,8 @@
-from django.urls import path
+from django.urls import include, path
 from . import views
 from files import views as files_views
 from schedule import views as schedule_views
+from tasks import views as tasks_views
 
 urlpatterns = [
     # ========================================
@@ -14,6 +15,9 @@ urlpatterns = [
     path('', views.dashboard_router_view, name='dashboard_router'),
     path('<int:team_id>/', views.dashboard_view, name='dashboard'),
 
+    #작업 페이지
+    path('<int:team_id>/tasks/', include('tasks.urls')),
+    
     # 파일 페이지
     path('<int:team_id>/files/', files_views.file_list_view, name='file_list'),
 
