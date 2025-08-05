@@ -48,8 +48,15 @@ urlpatterns = [
 
     # 랜딩 페이지
     path('', dashboard.landing_page_view, name='landing_index'),
+
+    # 파일 URL
+    path('api/', include('files.urls')),
 ]
 
 # 개발 환경 static 파일 서빙
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
+# 미디어 파일 서빙 (파일 업로드 등)
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
