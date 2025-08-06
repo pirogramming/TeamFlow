@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+    <h2>팀플 기록</h2>
+    <ul id="team-log-list"></ul>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+    const response = await fetch('/api/dashboard/team_log/api/list/');
+    const logs = await response.json();
+
+    const container = document.getElementById('team-log-list');
+    container.innerHTML = logs.map(log => `
+        <li>
+            <a href="/api/dashboard/team_log/${log.team_id}/list/">
+                <strong>${log.title}</strong> - ${log.status}
+                <span style="color:gray">(${log.last_activity})</span>
+            </a>
+        </li>
+    `).join('');
+});
+</script>
+{% endblock %}

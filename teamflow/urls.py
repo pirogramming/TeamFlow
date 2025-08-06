@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from team_log import views as team_log_views
 from dashboard import views as dashboard
 # ========================================
 # MGP: 프론트엔드 페이지 URL 패턴 추가 (프리뷰 제거 후 실제 페이지 연결)
@@ -33,6 +34,7 @@ urlpatterns = [
     path('team/join/', teams.team_join_page, name='team_join'),
     path('dashboard/', dashboard.dashboard_page, name='dashboard'),
     path('api/dashboard/set-current-team/', set_current_team, name='set-current-team'),
+    path('api/dashboard/team_log/', include('team_log.urls')),
 
     # ========================================
     # MGP: 작업 관리 URL 패턴 추가
@@ -57,6 +59,7 @@ urlpatterns = [
 
     # 일정 URL
     path('api/', include('schedule.urls')),
+
 ]
 
 # 개발 환경 static 파일 서빙
