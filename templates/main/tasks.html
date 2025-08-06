@@ -34,7 +34,7 @@
                 {% for task in team_tasks %}
                 <div class="task-item" data-task-id="{{ task.id }}">
                     <div class="task-checkbox {% if task.status == 'completed' %}checked{% endif %}" 
-                         onclick="toggleTaskStatus({{ task.id }}, '{{ task.status }}')"></div>
+                         data-task-id="{{ task.id }}"></div>
                     <div class="task-content">
                         <div class="task-header">
                             <span class="task-name {% if task.status == 'completed' %}completed{% endif %}">{{ task.name }}</span>
@@ -85,7 +85,7 @@
                 {% for task in personal_tasks %}
                 <div class="task-item" data-task-id="{{ task.id }}">
                     <div class="task-checkbox {% if task.status == 'completed' %}checked{% endif %}" 
-                         onclick="toggleTaskStatus({{ task.id }}, '{{ task.status }}')"></div>
+                         data-task-id="{{ task.id }}"></div>
                     <div class="task-content">
                         <div class="task-header">
                             <span class="task-name {% if task.status == 'completed' %}completed{% endif %}">{{ task.name }}</span>

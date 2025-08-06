@@ -1,4 +1,6 @@
 // 작업 관리 JavaScript
+let currentTeamId;
+
 document.addEventListener('DOMContentLoaded', function() {
     // 전역 변수
     const taskModal = document.getElementById('task-modal');
@@ -10,8 +12,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const assigneeGroup = document.getElementById('assignee-group');
 
     // 현재 팀 ID 가져오기
-    const currentTeamId = window.location.pathname.split('/')[2]; // /teams/{team_id}/tasks/
-
+    currentTeamId = window.location.pathname.split('/')[3];  // /api/dashboard/{team_id}/tasks/
     // 탭 전환
     const tabs = document.querySelectorAll('.task-tab');
     const taskSections = document.querySelectorAll('.task-section');
@@ -103,7 +104,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const taskId = taskItem.dataset.taskId;
 
             try {
-                const response = await fetch(`/teams/${currentTeamId}/tasks/api/${taskId}/`, {
+                const response = await fetch(`/api/dashboard/${currentTeamId}/tasks/${taskId}/`, {
                     method: 'GET',
                     headers: {
                         'X-CSRFToken': getCsrfToken()
@@ -129,32 +130,34 @@ document.addEventListener('DOMContentLoaded', function() {
         if (e.target.classList.contains('task-checkbox')) {
             const taskItem = e.target.closest('.task-item');
             const taskId = taskItem.dataset.taskId;
-            const isChecked = e.target.classList.contains('checked');
+
+            // 현재 상태 확인 (체크 여부로 판단)
+            const isCompleted = e.target.classList.contains('checked');
+            const newStatus = isCompleted ? 'pending' : 'completed';
 
             try {
-                const response = await fetch(`/teams/${currentTeamId}/tasks/api/${taskId}/update/`, {
+                const response = await fetch(`/api/dashboard/${currentTeamId}/tasks/${taskId}/update/`, {
                     method: 'PATCH',
                     headers: {
                         'Content-Type': 'application/json',
                         'X-CSRFToken': getCsrfToken()
                     },
-                    body: JSON.stringify({
-                        status: isChecked ? 'pending' : 'completed'
-                    })
+                    body: JSON.stringify({ status: newStatus })
                 });
 
-                if (response.ok) {
-                    e.target.classList.toggle('checked');
-                    taskItem.classList.toggle('completed');
-                } else {
-                    throw new Error('작업 상태 업데이트 실패');
-                }
+                if (!response.ok) throw new Error('업데이트 실패');
+
+                // 상태 토글 UI 즉시 반영
+                e.target.classList.toggle('checked');
+                taskItem.querySelector('.task-name').classList.toggle('completed');
+
             } catch (error) {
-                console.error('작업 상태 업데이트 중 오류:', error);
-                showNotification('작업 상태 업데이트에 실패했습니다.', 'error');
+                console.error('체크박스 상태 업데이트 오류:', error);
+                showNotification('작업 상태 변경 실패', 'error');
             }
         }
     });
+
 
     // 작업 삭제
     document.addEventListener('click', async (e) => {
@@ -164,7 +167,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             if (confirm('이 작업을 삭제하시겠습니까?')) {
                 try {
-                    const response = await fetch(`/teams/${currentTeamId}/tasks/api/${taskId}/delete/`, {
+                    const response = await fetch(`/api/dashboard/${currentTeamId}/tasks/${taskId}/delete/`, {
                         method: 'DELETE',
                         headers: {
                             'X-CSRFToken': getCsrfToken()
@@ -207,8 +210,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
         try {
             const url = isEdit 
-                ? `/teams/${currentTeamId}/tasks/api/${taskId}/update/`
-                : `/teams/${currentTeamId}/tasks/api/create/`;
+                ? `/api/dashboard/${currentTeamId}/tasks/${taskId}/update/`
+                : `/api/dashboard/${currentTeamId}/tasks/create/`;
             
             const method = isEdit ? 'PATCH' : 'POST';
 
@@ -290,50 +293,97 @@ style.textContent = `
 `;
 document.head.appendChild(style);
 
-// 작업 상태 토글 (체크박스 클릭)
-async function toggleTaskStatus(taskId, currentStatus) {
+async function loadTasks() {
     try {
-        const newStatus = currentStatus === 'completed' ? 'pending' : 'completed';
-        
-        const response = await fetch(`/teams/${getCurrentTeamId()}/tasks/${taskId}/update/`, {
+        const response = await fetch(`/api/dashboard/${currentTeamId}/tasks/list/`, {
+            method: 'GET',
+            headers: {
+                'X-CSRFToken': getCsrfToken()
+            }
+        });
+
+        if (!response.ok) throw new Error('작업 불러오기 실패');
+
+        const data = await response.json();
+
+        renderTaskList('team', data.team_tasks);
+        renderTaskList('personal', data.personal_tasks);
+
+    } catch (error) {
+        console.error('작업 목록 갱신 오류:', error);
+        showNotification('작업 목록 갱신 실패', 'error');
+    }
+}
+
+function renderTaskList(type, tasks) {
+    const container = document.querySelector(`#${type}-tasks .task-list`);
+    container.innerHTML = ''; // 기존 목록 비우기
+
+    if (!tasks.length) {
+        container.innerHTML = `<div class="empty-state"><p>${type === 'team' ? '팀 작업이 없습니다.' : '개인 작업이 없습니다.'}</p></div>`;
+        return;
+    }
+
+    tasks.forEach(task => {
+        const taskItem = document.createElement('div');
+        taskItem.classList.add('task-item');
+        taskItem.dataset.taskId = task.id;
+
+        taskItem.innerHTML = `
+            <div class="task-checkbox ${task.status === 'completed' ? 'checked' : ''}" data-task-id="${task.id}"></div>
+            <div class="task-content">
+                <div class="task-header">
+                    <span class="task-name ${task.status === 'completed' ? 'completed' : ''}">${task.name}</span>
+                    <div class="task-meta">
+                        ${task.is_deadline_imminent ? '<span class="task-badge">마감 임박</span>' : ''}
+                    </div>
+                </div>
+                <div class="task-details">
+                    ${task.assignee ? `<span class="task-assignee">담당자: ${task.assignee.first_name || task.assignee.username}</span>` : ''}
+                    ${task.due_date ? `<span class="task-separator">•</span><span class="task-due-date">${task.due_date}</span>` : ''}
+                </div>
+                ${task.description ? `<div class="task-description">${task.description}</div>` : ''}
+            </div>
+            <div class="task-actions">
+                <button class="task-edit" onclick="editTask(${task.id})" title="수정">수정</button>
+                <button class="task-delete" onclick="deleteTask(${task.id})" title="삭제">삭제</button>
+            </div>
+        `;
+        container.appendChild(taskItem);
+    });
+}
+
+
+// 작업 상태 토글 (체크박스 클릭)
+document.addEventListener('click', async (e) => {
+    const checkbox = e.target.closest('.task-checkbox');
+    if (!checkbox) return;
+
+    const taskId = checkbox.dataset.taskId;
+    const isCompleted = checkbox.classList.contains('checked');
+    const newStatus = isCompleted ? 'pending' : 'completed';
+
+    try {
+        const response = await fetch(`/api/dashboard/${currentTeamId}/tasks/${taskId}/update/`, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRFToken': getCsrfToken()
             },
-            body: JSON.stringify({
-                status: newStatus
-            })
+            body: JSON.stringify({ status: newStatus })
         });
 
-        if (response.ok) {
-            // UI 즉시 업데이트
-            const taskItem = document.querySelector(`[data-task-id="${taskId}"]`);
-            const checkbox = taskItem.querySelector('.task-checkbox');
-            const taskName = taskItem.querySelector('.task-name');
-            
-            if (newStatus === 'completed') {
-                checkbox.classList.add('checked');
-                taskName.classList.add('completed');
-            } else {
-                checkbox.classList.remove('checked');
-                taskName.classList.remove('completed');
-            }
-            
-            // 마감 임박 카운트 업데이트를 위해 작업 목록 새로고침
-            setTimeout(() => {
-                loadTasks();
-            }, 300);
-            
-            showNotification(`작업이 ${newStatus === 'completed' ? '완료' : '미완료'}로 변경되었습니다.`, 'success');
-        } else {
-            throw new Error('작업 상태 변경에 실패했습니다.');
-        }
+        if (!response.ok) throw new Error('업데이트 실패');
+
+        // 서버 반영된 상태로 목록 다시 불러오기
+        loadTasks();
+
     } catch (error) {
-        console.error('작업 상태 변경 오류:', error);
-        showNotification('작업 상태 변경에 실패했습니다.', 'error');
+        console.error('체크박스 상태 업데이트 오류:', error);
+        showNotification('작업 상태 변경 실패', 'error');
     }
-}
+});
+
 
 // 작업 편집
 function editTask(taskId) {
@@ -350,7 +400,7 @@ async function deleteTask(taskId) {
     }
     
     try {
-        const response = await fetch(`/teams/${getCurrentTeamId()}/tasks/${taskId}/delete/`, {
+        const response = await fetch(`/api/dashboard/${currentTeamId}/tasks/${taskId}/delete/`, {
             method: 'DELETE',
             headers: {
                 'X-CSRFToken': getCsrfToken()
