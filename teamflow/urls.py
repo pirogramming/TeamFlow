@@ -60,6 +60,8 @@ urlpatterns = [
     # 일정 URL
     path('api/', include('schedule.urls')),
 
+    path('team-log/', team_log_views.team_log_page, name='team_log_page'),  # HTML 페이지
+
 ]
 
 # 개발 환경 static 파일 서빙

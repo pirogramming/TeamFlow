@@ -75,6 +75,9 @@ class TaskCreateView(generics.CreateAPIView):
         # 개인 작업인 경우 현재 사용자를 담당자로 설정
         if data.get('type') == 'personal':
             data['assignee'] = request.user.id
+        elif data.get('type') == 'team' and not data.get('assignee'):
+            data['assignee'] = None  # 담당자 미정 허용
+
         
         serializer = self.serializer_class(data=data)
         if serializer.is_valid():
