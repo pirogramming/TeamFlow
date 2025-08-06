@@ -4,6 +4,8 @@ from teams.models import Team
 from .models import Task
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rest_framework.decorators import api_view, permission_classes
+
 
 # ========================================
 # MGP: 작업 관리 페이지 뷰 수정
@@ -45,6 +47,20 @@ from django.shortcuts import get_object_or_404
 from .models import Task
 from teams.models import Team
 from .serializers import TaskSerializer
+
+#팀별 작업 리스트 반환하는 API 추가
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def TaskListAPIView(request, team_id):
+    team = get_object_or_404(Team, id=team_id)
+
+    team_tasks = Task.objects.filter(team=team, type='team')
+    personal_tasks = Task.objects.filter(team=team, type='personal', assignee=request.user)
+
+    return Response({
+        "team_tasks": TaskSerializer(team_tasks, many=True).data,
+        "personal_tasks": TaskSerializer(personal_tasks, many=True).data
+    })
 
 # 작업 생성
 class TaskCreateView(generics.CreateAPIView):

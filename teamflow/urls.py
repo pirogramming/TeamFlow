@@ -37,7 +37,7 @@ urlpatterns = [
     # ========================================
     # MGP: 작업 관리 URL 패턴 추가
     # 백엔드 부분 대신 수정: tasks 앱 URL 연결
-    path('teams/<int:team_id>/tasks/', include('tasks.urls')),
+    path('api/dashboard/<int:team_id>/tasks/', include('tasks.urls')),
     # ========================================
 
     # 로그인 후 리다이렉트
