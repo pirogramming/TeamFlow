@@ -49,17 +49,17 @@ document.addEventListener('DOMContentLoaded', function() {
             if (taskData) {
                 document.getElementById('task-name').value = taskData.name || '';
                 document.getElementById('task-type').value = taskData.type || 'team';
-                document.getElementById('task-due-date').value = taskData.due_date || '';
+                document.getElementById('task-due-date').value = taskData.due_date
+                    ? new Date(taskData.due_date).toISOString().split('T')[0]
+                    : '';
+
                 document.getElementById('task-description').value = taskData.description || '';
-                document.getElementById('task-details').value = taskData.details || '';
                 
-                // 담당자 선택 (다중 선택 처리)
-                if (taskData.assignees && Array.isArray(taskData.assignees)) {
-                    const assigneeCheckboxes = document.querySelectorAll('input[name="assignee"]');
-                    assigneeCheckboxes.forEach(checkbox => {
-                        checkbox.checked = taskData.assignees.includes(parseInt(checkbox.value));
-                    });
+                if (taskData.assignee) {
+                    const checkbox = document.querySelector(`input[name="assignee"][value="${taskData.assignee}"]`);
+                    if (checkbox) checkbox.checked = true;
                 }
+
             }
         }
         
@@ -111,7 +111,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 });
 
-                if (response.ok) {
+                if (response.status === 204 ||response.ok) {
                     const taskData = await response.json();
                     taskForm.setAttribute('data-task-id', taskId);
                     openModal(true, taskData);
@@ -174,12 +174,13 @@ document.addEventListener('DOMContentLoaded', function() {
                         }
                     });
 
-                    if (response.ok) {
+                    if (response.status === 204 || response.ok) {
                         taskItem.remove();
                         showNotification('작업이 삭제되었습니다.', 'success');
                     } else {
                         throw new Error('작업 삭제 실패');
                     }
+
                 } catch (error) {
                     console.error('작업 삭제 중 오류:', error);
                     showNotification('작업 삭제에 실패했습니다.', 'error');
@@ -197,16 +198,29 @@ document.addEventListener('DOMContentLoaded', function() {
         const isEdit = taskForm.hasAttribute('data-task-id');
         const taskId = taskForm.getAttribute('data-task-id');
 
-        // 다중 담당자 처리
         if (taskData.type === 'team') {
-            const assigneeCheckboxes = document.querySelectorAll('input[name="assignee"]');
-            const selectedAssignees = Array.from(assigneeCheckboxes).filter(checkbox => checkbox.checked).map(checkbox => parseInt(checkbox.value));
-            taskData.assignees = selectedAssignees;
-            delete taskData.assignee; // 단일 assignee 필드 제거
+            // 체크박스 전부 가져오기
+            const assigneeCheckboxes = document.querySelectorAll('input[name="assignee"]:checked');
+            const selectedOptions = Array.from(assigneeCheckboxes).map(cb => parseInt(cb.value));
+
+            // 여러 명 선택 시 → 여러 Task 생성
+            if (!isEdit && selectedOptions.length > 1) {
+                for (const assigneeId of selectedOptions) {
+                    const multiTaskData = { ...taskData, assignee: assigneeId };
+                    await createTask(multiTaskData);
+                }
+                closeModal();
+                showNotification('작업이 생성되었습니다.', 'success');
+                location.reload();
+                return;
+            }
+
+            // 한 명만 선택했을 때
+            taskData.assignee = selectedOptions[0] || null;
         } else {
             delete taskData.assignee;
-            delete taskData.assignees;
         }
+
 
         try {
             const url = isEdit 
@@ -224,7 +238,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 body: JSON.stringify(taskData)
             });
 
-            if (response.ok) {
+            if (response.status === 204 ||response.ok) {
                 const result = await response.json();
                 closeModal();
                 const message = isEdit ? '작업이 수정되었습니다.' : '새 작업이 추가되었습니다.';
@@ -233,14 +247,39 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 const errorData = await response.json();
                 console.error('서버 오류:', errorData);
-                throw new Error(isEdit ? '작업 수정 실패' : '작업 추가 실패');
+                showNotification(isEdit ? '작업 수정 실패' : '작업 추가 실패', 'error');
             }
+
         } catch (error) {
             console.error('작업 처리 중 오류:', error);
             const message = isEdit ? '작업 수정에 실패했습니다.' : '작업 추가에 실패했습니다.';
             showNotification(message, 'error');
         }
     });
+
+    // 작업 편집
+async function editTask(taskId) {
+    const taskForm = document.getElementById('task-form');
+    try {
+        const response = await fetch(`/api/dashboard/${currentTeamId}/tasks/${taskId}/`, {
+            method: 'GET',
+            headers: {
+                'X-CSRFToken': getCsrfToken()
+            }
+        });
+
+        if (!response.ok) throw new Error('작업 정보 가져오기 실패');
+
+        const taskData = await response.json();
+        taskForm.setAttribute('data-task-id', taskId);
+        openModal(true, taskData);
+
+    } catch (error) {
+        console.error('작업 편집 오류:', error);
+        showNotification('작업 정보를 가져오는데 실패했습니다.', 'error');
+    }
+}
+
 });
 
 // CSRF 토큰 가져오기
@@ -339,14 +378,29 @@ function renderTaskList(type, tasks) {
                     </div>
                 </div>
                 <div class="task-details">
-                    ${task.assignee ? `<span class="task-assignee">담당자: ${task.assignee.first_name || task.assignee.username}</span>` : ''}
-                    ${task.due_date ? `<span class="task-separator">•</span><span class="task-due-date">${task.due_date}</span>` : ''}
+                    <span class="task-assignee">
+                        담당자: ${task.assignee_name ? task.assignee_name : '미정'}
+                    </span>
+                    ${task.due_date 
+                        ? `<span class="task-separator">•</span><span class="task-due-date">${task.due_date}</span>` 
+                        : ''}
                 </div>
+
                 ${task.description ? `<div class="task-description">${task.description}</div>` : ''}
             </div>
             <div class="task-actions">
-                <button class="task-edit" onclick="editTask(${task.id})" title="수정">수정</button>
-                <button class="task-delete" onclick="deleteTask(${task.id})" title="삭제">삭제</button>
+                <button class="task-edit" onclick="editTask(${task.id})" title="수정">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="16" height="16">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                    </svg>
+                </button>
+                <button class="task-delete" onclick="deleteTask(${task.id})" title="삭제">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="16" height="16">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                    </svg>
+                </button>
             </div>
         `;
         container.appendChild(taskItem);
@@ -384,13 +438,18 @@ document.addEventListener('click', async (e) => {
     }
 });
 
-
-// 작업 편집
-function editTask(taskId) {
-    // 작업 편집 모달을 열고 데이터를 로드하는 로직
-    console.log('작업 편집:', taskId);
-    // TODO: 작업 편집 모달 구현
-    showNotification('작업 편집 기능은 준비 중입니다.', 'info');
+// 작업 생성
+async function createTask(data) {
+    const response = await fetch(`/api/dashboard/${currentTeamId}/tasks/create/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCsrfToken()
+        },
+        body: JSON.stringify(data)
+    });
+    if (!response.ok) throw new Error('작업 생성 실패');
+    return await response.json();
 }
 
 // 작업 삭제
@@ -398,7 +457,7 @@ async function deleteTask(taskId) {
     if (!confirm('정말로 이 작업을 삭제하시겠습니까?')) {
         return;
     }
-    
+
     try {
         const response = await fetch(`/api/dashboard/${currentTeamId}/tasks/${taskId}/delete/`, {
             method: 'DELETE',
@@ -407,20 +466,18 @@ async function deleteTask(taskId) {
             }
         });
 
-        if (response.ok) {
-            // UI에서 즉시 제거
+        if (response.status === 204 || response.ok) {
             const taskItem = document.querySelector(`[data-task-id="${taskId}"]`);
-            taskItem.remove();
-            
+            if (taskItem) taskItem.remove();
+
             showNotification('작업이 삭제되었습니다.', 'success');
-            
-            // 작업 목록 새로고침
-            setTimeout(() => {
-                loadTasks();
-            }, 300);
+
+            // 리스트 새로고침
+            setTimeout(() => loadTasks(), 300);
         } else {
-            throw new Error('작업 삭제에 실패했습니다.');
+            throw new Error('작업 삭제 실패');
         }
+
     } catch (error) {
         console.error('작업 삭제 오류:', error);
         showNotification('작업 삭제에 실패했습니다.', 'error');
