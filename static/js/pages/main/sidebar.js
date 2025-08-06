@@ -255,4 +255,10 @@ function updateSidebarLinks(teamId) {
     // 자료
     document.querySelector('a[href^="/api/dashboard/"][href*="/files/"]')
         .setAttribute('href', `/api/dashboard/${teamId}/files/`);
+
+    // 팀 기록
+    const teamLogLink = document.querySelector('a[href="/team-log/"]');
+    if (teamLogLink) {
+        teamLogLink.setAttribute('href', `/team-log/${teamId}/`);
+    }
 }

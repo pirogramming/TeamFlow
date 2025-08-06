@@ -78,6 +78,7 @@ INSTALLED_APPS = [
     'tasks',
     'files',
     'schedule',
+    'team_log',
 ]
 
 # ========================================
