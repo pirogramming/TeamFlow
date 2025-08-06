@@ -1,19 +1,22 @@
-{% extends "base.html" %}
-{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>팀 설정 - TeamFlow</title>
+    
+    <!-- CSRF Token -->
+    <meta name="csrf-token" content="{{ csrf_token }}" />
+    
+    <!-- CSS -->
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/common/reset.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/common/variables.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/common/typography.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/pages/team-setup.css' %}" />
+</head>
 
-{% block title %}
-팀 설정 - TeamFlow
-{% endblock %}
-
-{% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/pages/team-setup.css' %}" />
-{% endblock %}
-
-{% block body_class %}
-auth-page team-setup-page
-{% endblock %}
-
-{% block content %}
+<body class="auth-page team-setup-page">
 <!-- 
     팀 설정 선택 페이지
     
@@ -165,9 +168,8 @@ auth-page team-setup-page
     }
   }
 </script>
-{% endblock %}
 
-{% block extra_js %}
-
+<!-- JavaScript -->
 <script src="{% static 'js/pages/team-setup.js' %}"></script>
-{% endblock %}
+</body>
+</html>

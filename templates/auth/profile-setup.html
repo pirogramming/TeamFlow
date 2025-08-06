@@ -1,8 +1,22 @@
-{% extends "base.html" %} {% load static %} {% block title %}프로필 설정 -
-TeamFlow{% endblock %} {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/pages/auth/profile-setup.css' %}" />
-{% endblock %} {% block body_class %}auth-page profile-setup-page{% endblock %}
-{% block content %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>프로필 설정 - TeamFlow</title>
+    
+    <!-- CSRF Token -->
+    <meta name="csrf-token" content="{{ csrf_token }}" />
+    
+    <!-- CSS -->
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/common/reset.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/common/variables.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/common/typography.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/pages/auth/profile-setup.css' %}" />
+</head>
+
+<body class="auth-page profile-setup-page">
 <!-- 
     사용자 정보 입력 페이지
     
@@ -125,7 +139,8 @@ TeamFlow{% endblock %} {% block extra_css %}
     }
   }
 </script>
-{% endblock %} 
-{% block extra_js %}
+
+<!-- JavaScript -->
 <script src="{% static 'js/pages/auth/profile-setup.js' %}?v=5"></script>
-{% endblock %}
+</body>
+</html>
