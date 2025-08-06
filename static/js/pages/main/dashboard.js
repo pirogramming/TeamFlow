@@ -8,6 +8,30 @@ document.addEventListener('DOMContentLoaded', function() {
     setupEventListeners();
 });
 
+// 유틸리티 함수들
+function checkDeadlineImminent(dueDate) {
+    if (!dueDate) return false;
+    
+    const today = new Date();
+    const due = new Date(dueDate);
+    const diffTime = due - today;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    // 오늘이나 내일까지 마감인 경우 마감 임박
+    return diffDays <= 1 && diffDays >= 0;
+}
+
+function formatDate(dateString) {
+    if (!dateString) return '';
+    
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    
+    return `${year}-${month}-${day}`;
+}
+
 // 대시보드 초기화
 async function initializeDashboard() {
     try {
@@ -57,67 +81,45 @@ async function initializeDashboard() {
  * 3. 팀 정보, 멤버 목록, 작업 현황, 마감일 등 종합 데이터 반환
  * 4. 헤더에서 프로젝트 변경 시 이 API가 다시 호출됨
  */
-async function loadDashboardData() {
-    try {
-        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
-        const response = await fetch('/api/dashboard/api/', {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': csrftoken
-            },
-            credentials: 'same-origin'
-        });
-        
-        if (!response.ok) {
-            throw new Error('대시보드 데이터 로드에 실패했습니다.');
-        }
-        
-        const data = await response.json();
-        console.log('대시보드 API 응답:', data); // 디버깅 로그 추가
-        return data;
-        
-    } catch (error) {
-        console.error('대시보드 데이터 로드 오류:', error);
-        // 에러 시 더미 데이터 반환
-        return {
-            user: {
-                name: '사용자 이름',
-                role: '사용자 역할'
-            },
-            team: {
-                name: '팀 이름',
-                description: '팀 설명'
-            },
-            total_progress: 0,
-            personal_progress: 0,
-            deadline_count: 0,
-            team_tasks: [],
-            personal_tasks: [],
-            team_members: []
-        };
-    }
+async function loadDashboardData(teamId = null) {
+    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+    const url = teamId
+        ? `/api/dashboard/api/?team_id=${teamId}` // 팀 선택 시 해당 ID 전달
+        : `/api/dashboard/api/`;                  // 기본: 세션 값 사용
+
+    const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrftoken
+        },
+        credentials: 'same-origin'
+    });
+
+    if (!response.ok) throw new Error('대시보드 데이터 로드 실패');
+    return await response.json();
 }
 
 // 대시보드 새로고침 (헤더에서 프로젝트 변경 시 호출)
-async function refreshDashboard() {
-    console.log('🔄 대시보드 새로고침 시작 (프로젝트 변경됨)');
+async function refreshDashboard(teamId = null) {
+    console.log('🔄 대시보드 새로고침 시작 (프로젝트 변경됨), teamId:', teamId); // 디버그
+
     try {
-        // 로딩 상태 표시
         showLoadingState();
-        
-        // 새로운 팀 데이터 로드
-        const data = await loadDashboardData();
-        console.log('🔄 새로운 팀 데이터:', data);
-        
-        // UI 업데이트
+
+        // teamId를 그대로 API 호출에 전달
+        const data = await loadDashboardData(teamId);
+
+        console.log('🔄 API 응답 데이터:', data);
+
+        if (teamId) {
+            window.location.href = `/api/dashboard/${teamId}/`;
+        }
+
         setupDashboardData(data);
-        
-        // 로딩 상태 숨기기
         hideLoadingState();
-        
+
         console.log('✅ 대시보드 새로고침 완료');
-        
     } catch (error) {
         console.error('❌ 대시보드 새로고침 오류:', error);
         showNotification('팀 정보 업데이트에 실패했습니다.', 'error');
@@ -143,17 +145,57 @@ function setupDummyData() {
 
 // 진행률 바 업데이트
 function updateProgressBars(totalProgress, personalProgress) {
-    const overallProgressBar = document.querySelector('.overall-progress-bar');
-    const personalProgressBar = document.querySelector('.personal-progress-bar');
+    // 전체 진행률
+    const overallProgressElement = document.getElementById('overall-progress');
+    const overallProgressFill = document.getElementById('overall-progress-fill');
+    const overallProgressText = document.getElementById('overall-progress-text');
     
-    if (overallProgressBar) {
-        overallProgressBar.style.width = `${totalProgress}%`;
-        overallProgressBar.setAttribute('aria-valuenow', totalProgress);
+    if (overallProgressElement) {
+        overallProgressElement.textContent = `${totalProgress}%`;
+    }
+    if (overallProgressFill) {
+        overallProgressFill.style.width = `${totalProgress}%`;
     }
     
-    if (personalProgressBar) {
-        personalProgressBar.style.width = `${personalProgress}%`;
-        personalProgressBar.setAttribute('aria-valuenow', personalProgress);
+    // 개인 진행률
+    const personalProgressElement = document.getElementById('personal-progress');
+    const personalProgressFill = document.getElementById('personal-progress-fill');
+    const personalProgressText = document.getElementById('personal-progress-text');
+    
+    if (personalProgressElement) {
+        personalProgressElement.textContent = `${personalProgress}%`;
+    }
+    if (personalProgressFill) {
+        personalProgressFill.style.width = `${personalProgress}%`;
+    }
+}
+
+// 헤더 알림 업데이트
+function updateHeaderNotifications(deadlineCount) {
+    console.log(`updateHeaderNotifications 호출됨: deadlineCount = ${deadlineCount}`);
+    const deadlineNotification = document.getElementById('deadline-notification');
+    console.log('deadline-notification 요소:', deadlineNotification);
+    
+    if (deadlineNotification) {
+        const newText = `마감 임박 ${deadlineCount}개`;
+        deadlineNotification.textContent = newText;
+        console.log(`헤더 알림 업데이트 완료: ${newText}`);
+    } else {
+        console.error('deadline-notification 요소를 찾을 수 없습니다.');
+    }
+}
+
+// 대시보드 마감 임박 카운트 업데이트
+function updateDeadlineCount(deadlineCount) {
+    console.log(`updateDeadlineCount 호출됨: deadlineCount = ${deadlineCount}`);
+    const deadlineCountElement = document.getElementById('deadline-count');
+    console.log('deadline-count 요소:', deadlineCountElement);
+    
+    if (deadlineCountElement) {
+        deadlineCountElement.textContent = deadlineCount;
+        console.log(`대시보드 마감 임박 카운트 업데이트 완료: ${deadlineCount}`);
+    } else {
+        console.error('deadline-count 요소를 찾을 수 없습니다.');
     }
 }
 
@@ -162,16 +204,39 @@ function renderTeamTasks(tasks = []) {
     const teamTasksContainer = document.getElementById('team-tasks');
     if (!teamTasksContainer) return;
     
-    teamTasksContainer.innerHTML = tasks.map(task => `
-        <div class="task-item" data-task-id="${task.id || Math.random()}">
-            <div class="task-checkbox ${task.completed ? 'checked' : ''}" onclick="toggleTask(this, ${task.completed})"></div>
-            <div class="task-content">
-                <h4 class="task-title">${task.title}</h4>
-                <p class="task-meta">담당자: ${task.assignee} • ${task.dueDate}</p>
+    if (tasks.length === 0) {
+        teamTasksContainer.innerHTML = '<p>팀 작업이 없습니다.</p>';
+        return;
+    }
+    
+    teamTasksContainer.innerHTML = tasks.map(task => {
+        // 마감 임박 여부 계산
+        const isDeadlineImminent = checkDeadlineImminent(task.due_date);
+        
+        // 담당자 정보
+        const assigneeName = task.assignee__first_name || task.assignee__username || '미정';
+        
+        // 마감일 포맷
+        const dueDate = task.due_date ? formatDate(task.due_date) : '';
+        
+        return `
+            <div class="task-item" data-task-id="${task.id}">
+                <div class="task-content">
+                    <div class="task-header">
+                        <span class="task-name">${task.name}</span>
+                        <div class="task-meta">
+                            ${isDeadlineImminent ? '<span class="task-badge-urgent">마감 임박</span>' : ''}
+                        </div>
+                    </div>
+                    <div class="task-details">
+                        <span class="task-assignee">담당자: ${assigneeName}</span>
+                        ${dueDate ? `<span class="task-separator">•</span><span class="task-due-date">${dueDate}</span>` : ''}
+                    </div>
+                    ${task.description ? `<div class="task-description">${task.description}</div>` : ''}
+                </div>
             </div>
-            ${task.urgent ? '<span class="task-tag">긴급</span>' : ''}
-        </div>
-    `).join('');
+        `;
+    }).join('');
 }
 
 // 개인 작업 목록 렌더링
@@ -179,16 +244,35 @@ function renderPersonalTasks(tasks = []) {
     const personalTasksContainer = document.getElementById('personal-tasks');
     if (!personalTasksContainer) return;
     
-    personalTasksContainer.innerHTML = tasks.map(task => `
-        <div class="task-item" data-task-id="${task.id || Math.random()}">
-            <div class="task-checkbox ${task.completed ? 'checked' : ''}" onclick="toggleTask(this, ${task.completed})"></div>
-            <div class="task-content">
-                <h4 class="task-title">${task.title}</h4>
-                <p class="task-meta">${task.dueDate}</p>
+    if (tasks.length === 0) {
+        personalTasksContainer.innerHTML = '<p>개인 작업이 없습니다.</p>';
+        return;
+    }
+    
+    personalTasksContainer.innerHTML = tasks.map(task => {
+        // 마감 임박 여부 계산
+        const isDeadlineImminent = checkDeadlineImminent(task.due_date);
+        
+        // 마감일 포맷
+        const dueDate = task.due_date ? formatDate(task.due_date) : '';
+        
+        return `
+            <div class="task-item" data-task-id="${task.id}">
+                <div class="task-content">
+                    <div class="task-header">
+                        <span class="task-name">${task.name}</span>
+                        <div class="task-meta">
+                            ${isDeadlineImminent ? '<span class="task-badge-urgent">마감 임박</span>' : ''}
+                        </div>
+                    </div>
+                    <div class="task-details">
+                        ${dueDate ? `<span class="task-due-date">${dueDate}</span>` : ''}
+                    </div>
+                    ${task.description ? `<div class="task-description">${task.description}</div>` : ''}
+                </div>
             </div>
-            ${task.urgent ? '<span class="task-tag">긴급</span>' : ''}
-        </div>
-    `).join('');
+        `;
+    }).join('');
 }
 
 // 팀원 목록 렌더링
@@ -259,8 +343,8 @@ function setupEventListeners() {
 
 // 프로젝트 드롭다운 핸들러
 function handleProjectDropdown() {
-    // TODO: 프로젝트 선택 모달 또는 드롭다운 메뉴 구현
-    showNotification('프로젝트 선택 기능은 준비 중입니다.', 'info');
+    // 헤더에서 프로젝트 드롭다운을 처리하므로 여기서는 아무것도 하지 않음
+    console.log('프로젝트 드롭다운은 헤더에서 처리됩니다.');
 }
 
 // 팀 생성 핸들러
@@ -410,6 +494,8 @@ async function copyInviteCode() {
 
 // 실제 데이터로 UI 구성
 function setupDashboardData(data) {
+    console.log('대시보드 데이터 설정:', data);
+    
     // 사용자 정보 표시
     updateUserInfo(data.user);
     
@@ -425,14 +511,26 @@ function setupDashboardData(data) {
     // 진행률 업데이트
     updateProgressBars(data.total_progress, data.personal_progress);
     
+    // 헤더 알림 업데이트 (마감 임박 작업 수)
+    console.log('대시보드 데이터에서 deadline_imminent_count:', data.deadline_imminent_count);
+    updateHeaderNotifications(data.deadline_imminent_count || 0);
+    
+    // 대시보드 마감 임박 카운트 업데이트
+    updateDeadlineCount(data.deadline_imminent_count || 0);
+    
     // 팀 멤버 표시 (데이터가 있는 경우에만)
     if (data.team_members && Array.isArray(data.team_members)) {
         renderTeamMembers(data.team_members);
     }
     
-    // 작업 목록 표시 (임시로 빈 배열)
-    renderTeamTasks(data.team_tasks || []);
-    renderPersonalTasks(data.personal_tasks || []);
+    // 작업 목록 표시
+    if (data.team_tasks) {
+        renderTeamTasks(data.team_tasks);
+    }
+    
+    if (data.personal_tasks) {
+        renderPersonalTasks(data.personal_tasks);
+    }
 }
 
 // 사용자 정보 업데이트
@@ -519,32 +617,44 @@ async function loadProjectList() {
     if (!projectList) return;
     
     try {
-        // 현재는 더미 데이터 사용 (나중에 API로 변경)
-        const projects = [
-            {
-                id: 1,
-                name: '웹 개발 프로젝트',
-                status: '진행중',
-                isActive: true
+        const response = await fetch('/api/teams/list/', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCsrfToken()
             },
-            {
-                id: 2,
-                name: '모바일 앱 개발',
-                status: '진행중',
-                isActive: false
-            },
-            {
-                id: 3,
-                name: '신세 신잉플',
-                status: '진행중',
-                isActive: false
+            credentials: 'same-origin'
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            if (data.success && data.teams) {
+                // API 응답에서 받은 실제 팀 목록으로 변환
+                const projects = data.teams.map(team => ({
+                    id: team.id,
+                    name: team.name,
+                    status: '진행중',
+                    isActive: false // 현재 선택된 팀은 별도로 처리
+                }));
+                
+                // 현재 선택된 팀 표시
+                const currentTeamId = document.querySelector('[name=current-team-id]')?.value;
+                if (currentTeamId) {
+                    projects.forEach(project => {
+                        project.isActive = project.id.toString() === currentTeamId;
+                    });
+                }
+                
+                renderProjectList(projects);
+            } else {
+                projectList.innerHTML = '<div class="dropdown-item no-projects"><span>참여한 팀이 없습니다</span></div>';
             }
-        ];
-        
-        renderProjectList(projects);
-        
+        } else {
+            throw new Error('팀 목록 로드 실패');
+        }
     } catch (error) {
         console.error('프로젝트 목록 로드 오류:', error);
+        projectList.innerHTML = '<div class="dropdown-item no-projects"><span>팀 목록을 불러올 수 없습니다</span></div>';
     }
 }
 
@@ -575,17 +685,34 @@ function renderProjectList(projects) {
 }
 
 // 프로젝트 선택
-function selectProject(projectId) {
-    console.log('프로젝트 선택됨:', projectId);
-    
-    // 드롭다운 닫기
-    const dropdownMenu = document.getElementById('project-dropdown-menu');
-    const dropdownButton = document.getElementById('project-dropdown');
-    
-    if (dropdownMenu) dropdownMenu.style.display = 'none';
-    if (dropdownButton) dropdownButton.classList.remove('active');
-    
-    // TODO: 선택된 프로젝트로 대시보드 데이터 로드
-    // 현재는 페이지 새로고침으로 처리
-    window.location.reload();
+async function selectProject(projectId) {
+    console.log('프로젝트 선택됨, projectId:', projectId); // 클릭 시 값 확인
+
+    if (!projectId) {
+        console.error('❌ projectId가 비어있음 - 드롭다운 data-project-id 확인 필요');
+        return;
+    }
+
+    try {
+        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+        // 세션에 선택된 team_id 저장
+        const response = await fetch('/api/dashboard/set-current-team/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken
+            },
+            body: JSON.stringify({ team_id: projectId })
+        });
+
+        const result = await response.json();
+        console.log('세션 저장 결과:', result);
+
+        // teamId 전달해서 새로고침
+        refreshDashboard(projectId);
+
+    } catch (error) {
+        console.error('팀 변경 중 오류:', error);
+    }
 }

@@ -5,160 +5,194 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/pages/main/dashboard.css' %}">
-<link rel="stylesheet" href="{% static 'css/pages/main/header.css' %}">
-<link rel="stylesheet" href="{% static 'css/pages/main/sidebar.css' %}">
-<link rel="stylesheet" href="{% static 'css/pages/main/footer.css' %}">
 {% endblock %}
 
 {% block content %}
 <!-- CSRF 토큰 (JavaScript에서 사용) -->
 {% csrf_token %}
 
-<!-- 헤더 -->
-{% include 'includes/header.html' %}
+<div class="page-container">
+    <div class="dashboard-container">
+        <!-- 메인 콘텐츠 -->
+        <main class="main-content">
+            <div class="dashboard-content">
 
-<div class="dashboard-container">
-    <!-- 사이드바 -->
-    {% include 'includes/sidebar.html' %}
-    
-    <!-- 메인 콘텐츠 -->
-    <main class="main-content">
-        <div class="dashboard-content">
-
-            <!-- 상단 요약 카드들 -->
-            <div class="summary-cards">
-                <!-- 전체 진행률 -->
-                <div class="summary-card">
-                    <div class="card-header">
-                        <h3 class="card-title">전체 진행률</h3>
-                    </div>
-                    <div class="card-content">
-                        <div class="progress-display">
-                            <span class="progress-percentage" id="overall-progress">33%</span>
-                            <div class="progress-bar">
-                                <div class="progress-fill" id="overall-progress-fill" style="width: 33%"></div>
+                <!-- 상단 요약 카드들 -->
+                <div class="summary-cards">
+                    <!-- 전체 진행률 -->
+                    <div class="summary-card">
+                        <div class="card-header">
+                            <h3 class="card-title">전체 진행률</h3>
+                        </div>
+                        <div class="card-content">
+                            <div class="progress-display">
+                                <span class="progress-percentage" id="overall-progress">{{ total_progress }}%</span>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="overall-progress-fill" style="width: {{ total_progress }}%"></div>
+                                </div>
+                                <span class="progress-text" id="overall-progress-text">{{ completed_tasks_count }}/{{ total_tasks_count }}</span>
                             </div>
-                            <span class="progress-text" id="overall-progress-text">2/6</span>
+                        </div>
+                    </div>
+
+                    <!-- 개인 완료율 -->
+                    <div class="summary-card">
+                        <div class="card-header">
+                            <h3 class="card-title">개인 완료율</h3>
+                        </div>
+                        <div class="card-content">
+                            <div class="progress-display">
+                                <span class="progress-percentage" id="personal-progress">{{ personal_progress }}%</span>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="personal-progress-fill" style="width: {{ personal_progress }}%"></div>
+                                </div>
+                                <span class="progress-text" id="personal-progress-text">{{ personal_completed_count }}/{{ personal_tasks_count }}</span>
+                            </div>
+                            <p class="progress-description">내가 담당한 작업</p>
+                        </div>
+                    </div>
+
+                    <!-- 마감 임박 -->
+                    <div class="summary-card">
+                        <div class="card-header">
+                            <h3 class="card-title">마감 임박</h3>
+                        </div>
+                        <div class="card-content">
+                            <div class="deadline-display">
+                                <div class="deadline-icon">
+                                    <svg fill="currentColor" viewBox="0 0 24 24" width="24" height="24">
+                                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                                    </svg>
+                                </div>
+                                <span class="deadline-count" id="deadline-count">{{ deadline_imminent_count }}</span>
+                                <span class="deadline-text">개 작업</span>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- 개인 완료율 -->
-                <div class="summary-card">
-                    <div class="card-header">
-                        <h3 class="card-title">개인 완료율</h3>
-                    </div>
-                    <div class="card-content">
-                        <div class="progress-display">
-                            <span class="progress-percentage" id="personal-progress">50%</span>
-                            <div class="progress-bar">
-                                <div class="progress-fill" id="personal-progress-fill" style="width: 50%"></div>
-                            </div>
-                            <span class="progress-text" id="personal-progress-text">1/2</span>
+                <!-- 작업 목록 -->
+                <div class="tasks-section">
+                    <!-- 팀 작업 -->
+                    <div class="tasks-card">
+                        <div class="card-header">
+                            <h3 class="card-title">팀 작업</h3>
+                            <p class="card-subtitle">팀의 최근 작업 현황</p>
                         </div>
-                        <p class="progress-description">내가 담당한 작업</p>
+                        <div class="card-content">
+                            <div class="task-list" id="team-tasks">
+                                {% for task in team_tasks %}
+                                <div class="task-item">
+                                    <div class="task-content">
+                                        <div class="task-header">
+                                            <span class="task-name">{{ task.name }}</span>
+                                            <div class="task-meta">
+                                                {% if task.is_deadline_imminent %}
+                                                <span class="task-badge-urgent">마감 임박</span>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        <div class="task-details">
+                                            <span class="task-assignee">
+                                                담당자: {% if task.assignee %}{{ task.assignee.first_name|default:task.assignee.username }}{% else %}미정{% endif %}
+                                            </span>
+                                            {% if task.due_date %}
+                                            <span class="task-separator">•</span>
+                                            <span class="task-due-date">{{ task.due_date|date:"Y-m-d" }}</span>
+                                            {% endif %}
+                                        </div>
+                                        {% if task.description %}
+                                        <div class="task-description">{{ task.description }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {% empty %}
+                                <p>팀 작업이 없습니다.</p>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 개인 작업 -->
+                    <div class="tasks-card">
+                        <div class="card-header">
+                            <h3 class="card-title">개인 작업</h3>
+                            <p class="card-subtitle">나의 개인 작업 현황</p>
+                        </div>
+                        <div class="card-content">
+                            <div class="task-list" id="personal-tasks">
+                                {% for task in personal_tasks %}
+                                <div class="task-item">
+                                    <div class="task-content">
+                                        <div class="task-header">
+                                            <span class="task-name">{{ task.name }}</span>
+                                            <div class="task-meta">
+                                                {% if task.is_deadline_imminent %}
+                                                <span class="task-badge-urgent">마감 임박</span>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        <div class="task-details">
+                                            {% if task.due_date %}
+                                            <span class="task-due-date">{{ task.due_date|date:"Y-m-d" }}</span>
+                                            {% endif %}
+                                        </div>
+                                        {% if task.description %}
+                                        <div class="task-description">{{ task.description }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {% empty %}
+                                <p>개인 작업이 없습니다.</p>
+                                {% endfor %}
+                            </div>
+
+                        </div>
                     </div>
                 </div>
 
-                <!-- 마감 임박 -->
-                <div class="summary-card">
-                    <div class="card-header">
-                        <h3 class="card-title">마감 임박</h3>
-                    </div>
-                    <div class="card-content">
-                        <div class="deadline-display">
-                            <div class="deadline-icon">
-                                <svg fill="currentColor" viewBox="0 0 24 24" width="24" height="24">
-                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                                </svg>
+                <!-- 팀 현황 -->
+                <div class="team-status-section">
+                    <div class="team-status-card">
+                        <div class="card-header">
+                            <h3 class="card-title">팀 현황</h3>
+                            <div class="invite-code-inline">
+                                <span class="invite-label">초대 코드:</span>
+                                <input type="text" id="invite-code-input" class="invite-code-input-small" readonly value="{{ team.invite_code|default:'------' }}">
+                                <button class="copy-button-small" id="copy-invite-code" title="복사">
+                                    <svg fill="currentColor" viewBox="0 0 24 24" width="14" height="14">
+                                        <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+                                    </svg>
+                                </button>
                             </div>
-                            <span class="deadline-count" id="deadline-count">3</span>
-                            <span class="deadline-text">개 작업</span>
+                        </div>
+                        <div class="card-content">
+                            <div class="team-members" id="team-members">
+                                {% for member in team_members %}
+                                <div class="team-member">
+                                    <div class="member-avatar">
+                                        <span class="avatar-text">{{ member.name|first }}</span>
+                                    </div>
+                                    <div class="member-info">
+                                        <span class="member-name">{{ member.name }}</span>
+                                        <span class="member-major">{{ member.major|default:"전공 미정" }}</span>
+                                        <span class="member-role">{{ member.role|default:"역할 미정" }}</span>
+                                    </div>
+                                </div>
+                                {% empty %}
+                                <p>팀원 정보가 없습니다.</p>
+                                {% endfor %}
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-
-            <!-- 작업 목록 -->
-            <div class="tasks-section">
-                <!-- 팀 작업 -->
-                <div class="tasks-card">
-                    <div class="card-header">
-                        <h3 class="card-title">팀 작업</h3>
-                        <p class="card-subtitle">팀의 최근 작업 현황</p>
-                    </div>
-                    <div class="card-content">
-                        <div class="task-list" id="team-tasks">
-                            <!-- 팀 작업들이 동적으로 로드됩니다 -->
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 개인 작업 -->
-                <div class="tasks-card">
-                    <div class="card-header">
-                        <h3 class="card-title">개인 작업</h3>
-                        <p class="card-subtitle">나의 개인 작업 현황</p>
-                    </div>
-                    <div class="card-content">
-                        <div class="task-list" id="personal-tasks">
-                            <!-- 개인 작업들이 동적으로 로드됩니다 -->
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 팀 현황 -->
-            <div class="team-status-section">
-                <div class="team-status-card">
-                    <div class="card-header">
-                        <h3 class="card-title">팀 현황</h3>
-                        <div class="invite-code-inline">
-                            <span class="invite-label">초대 코드:</span>
-                            <input type="text" id="invite-code-input" class="invite-code-input-small" readonly value="------">
-                            <button class="copy-button-small" id="copy-invite-code" title="복사">
-                                <svg fill="currentColor" viewBox="0 0 24 24" width="14" height="14">
-                                    <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="card-content">
-                        <div class="team-members" id="team-members">
-                            <!-- 팀원들이 동적으로 로드됩니다 -->
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </main>
+        </main>
+    </div>
 </div>
-
-<!-- 프로필 수정 모달 -->
-<div id="profile-modal" class="modal hidden">
-  <div class="modal-content">
-    <h2>내 프로필</h2>
-    <form id="profile-form">
-      <label>이름</label>
-      <input type="text" id="first_name">
-      <label>전공</label>
-      <input type="text" id="major">
-      <label>세부전공</label>
-      <input type="text" id="specialization">
-      <button type="submit">저장</button>
-      <button type="button" id="close-modal">닫기</button>
-    </form>
-  </div>
-</div>
-
-
-<!-- 푸터 -->
-{% include 'includes/footer.html' %}
 {% endblock %}
 
 {% block extra_js %}
 
 <script src="{% static 'js/pages/main/dashboard.js' %}"></script>
-<script src="{% static 'js/pages/main/header.js' %}"></script>
-<script src="{% static 'js/pages/main/sidebar.js' %}"></script>
 {% endblock %}

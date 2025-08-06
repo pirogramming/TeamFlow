@@ -1,0 +1,89 @@
+/* 기본 레이아웃 */
+.page-container {
+    padding: 20px;
+    font-family: Arial, sans-serif;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.view-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+
+.btn {
+    padding: 8px 16px;
+    border: 1px solid #ccc;
+    background-color: #f0f0f0;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    color: white;
+    border-color: #007bff;
+}
+
+/* When2Meet 그리드 스타일 */
+#when2meet-grid-container {
+    margin-bottom: 30px;
+}
+
+#when2meet-grid {
+    display: grid;
+    grid-template-columns: 60px repeat(7, 1fr); /* 시간 열 + 요일 열 */
+    border: 1px solid #ddd;
+    user-select: none; /* 드래그 시 텍스트 선택 방지 */
+}
+
+.grid-header, .time-label, .grid-cell {
+    border: 1px solid #eee;
+    padding: 8px;
+    text-align: center;
+    font-size: 12px;
+}
+
+.grid-header {
+    background-color: #f9f9f9;
+    font-weight: bold;
+}
+
+.time-label {
+    background-color: #f9f9f9;
+}
+
+.grid-cell {
+    height: 20px;
+    background-color: #f1f1f1; /* 기본 색상 */
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.grid-cell.selected {
+    background-color: #28a745 !important; /* 내가 선택한 시간 (우선순위 높임) */
+}
+
+/* 회의 추가 폼 스타일 */
+.meeting-form-container {
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+}
+.meeting-form-container form {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.meeting-form-container input {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}

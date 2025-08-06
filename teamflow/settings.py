@@ -75,6 +75,10 @@ INSTALLED_APPS = [
     'teams',
     'dashboard',  
     'users',
+    'tasks',
+    'files',
+    'schedule',
+    'team_log',
 ]
 
 # ========================================
@@ -175,6 +179,12 @@ STATICFILES_DIRS = [
     BASE_DIR / 'static',
 ]
 
+# ========================================
+# MGP: Static 파일 설정 추가
+# 백엔드 부분 대신 수정: collectstatic 명령어 실행을 위한 STATIC_ROOT 설정 추가
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+# ========================================
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
@@ -273,4 +283,5 @@ SOCIALACCOUNT_QUERY_EMAIL = True  # 이메일 쿼리 활성화
 SOCIALACCOUNT_EMAIL_REQUIRED = False  # 이메일 필수 아님
 SOCIALACCOUNT_STORE_TOKENS = True  # 토큰 저장 활성화
 
-
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'

@@ -1,1 +1,136 @@
-<!-- 작업 관리 (작업 목록, 필터, 상태) -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/main/tasks.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    <div class="tasks-container">
+        <!-- 헤더 -->
+        <div class="tasks-header">
+            <h1>작업 관리</h1>
+            <button id="add-task-btn" class="btn-primary">
+                <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg>
+                새 작업 추가
+            </button>
+        </div>
+
+        <!-- 탭 -->
+        <div class="task-tabs">
+            <button class="task-tab active" data-tab="team">팀 작업</button>
+            <button class="task-tab" data-tab="personal">개인 작업</button>
+        </div>
+
+        <!-- 팀 작업 목록 -->
+        <div id="team-tasks" class="task-section">
+            <h2 class="task-section-title">팀 작업 목록</h2>
+            <p class="task-section-subtitle">팀원들과 함께 진행하는 작업들</p>
+
+            <div class="task-list" id="team-tasks">
+                {% for task in team_tasks %}
+                <div class="task-item" data-task-id="{{ task.id }}">
+                    <div class="task-checkbox {% if task.status == 'completed' %}checked{% endif %}" 
+                         data-task-id="{{ task.id }}"></div>
+                    <div class="task-content">
+                        <div class="task-header">
+                            <span class="task-name {% if task.status == 'completed' %}completed{% endif %}">{{ task.name }}</span>
+                            <div class="task-meta">
+                                {% if task.is_deadline_imminent %}
+                                <span class="task-badge">마감 임박</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="task-details">
+                            <span class="task-assignee">담당자: {% if task.assignee %}{{ task.assignee.first_name|default:task.assignee.username }}{% else %}미정{% endif %}</span>
+                            {% if task.due_date %}
+                            <span class="task-separator">•</span>
+                            <span class="task-due-date">{{ task.due_date|date:"Y-m-d" }}</span>
+                            {% endif %}
+                        </div>
+                        {% if task.description %}
+                        <div class="task-description">{{ task.description }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="task-actions">
+                        <button class="task-edit" onclick="editTask({{ task.id }})" title="수정">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="16" height="16">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                            </svg>
+                        </button>
+                        <button class="task-delete" onclick="deleteTask({{ task.id }})" title="삭제">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="16" height="16">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="empty-state">
+                    <p>팀 작업이 없습니다.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- 개인 작업 목록 -->
+        <div id="personal-tasks" class="task-section hidden">
+            <h2 class="task-section-title">개인 작업 목록</h2>
+            <p class="task-section-subtitle">나만의 개인 작업들</p>
+
+            <div class="task-list" id="personal-tasks">
+                {% for task in personal_tasks %}
+                <div class="task-item" data-task-id="{{ task.id }}">
+                    <div class="task-checkbox {% if task.status == 'completed' %}checked{% endif %}" 
+                         data-task-id="{{ task.id }}"></div>
+                    <div class="task-content">
+                        <div class="task-header">
+                            <span class="task-name {% if task.status == 'completed' %}completed{% endif %}">{{ task.name }}</span>
+                            <div class="task-meta">
+                                {% if task.is_deadline_imminent %}
+                                <span class="task-badge">마감 임박</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="task-details">
+                            {% if task.due_date %}
+                            <span class="task-due-date">{{ task.due_date|date:"Y-m-d" }}</span>
+                            {% endif %}
+                        </div>
+                        {% if task.description %}
+                        <div class="task-description">{{ task.description }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="task-actions">
+                        <button class="task-edit" onclick="editTask({{ task.id }})" title="수정">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="16" height="16">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                            </svg>
+                        </button>
+                        <button class="task-delete" onclick="deleteTask({{ task.id }})" title="삭제">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="16" height="16">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="empty-state">
+                    <p>개인 작업이 없습니다.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 작업 추가/수정 모달 -->
+{% include 'includes/modals/task-modal.html' %}
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/pages/main/tasks.js' %}"></script>
+{% endblock %}
