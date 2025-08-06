@@ -10,6 +10,12 @@ from teams import views as teams
 from dashboard.views import set_current_team # type: ignore
 # ========================================
 
+# ========================================
+# MGP: 작업 관리 URL 패턴 추가
+# 백엔드 부분 대신 수정: tasks 앱 URL 연결
+from tasks import views as tasks
+# ========================================
+
 urlpatterns = [
     path('admin/', admin.site.urls),
 
@@ -20,32 +26,27 @@ urlpatterns = [
     # allauth 로그인/콜백
     path('accounts/', include('allauth.urls')),
 
-    # ========================================
-    # MGP: 실제 페이지들 URL 패턴 (프리뷰 제거 후 실제 페이지 연결)
+    # 실제 페이지들 URL 패턴
     path('auth/profile-setup/', users.profile_setup_page, name='profile-setup'),
     path('team-setup/', teams.team_setup_page, name='team-setup'),
     path('team/create/', teams.team_create_page, name='team_create'),
     path('team/join/', teams.team_join_page, name='team_join'),
     path('dashboard/', dashboard.dashboard_page, name='dashboard'),
     path('api/dashboard/set-current-team/', set_current_team, name='set-current-team'),
-    # ========================================
 
     # ========================================
-    # MGP: 로그인 후 리다이렉트 URL 패턴 추가
-    # 백엔드 팀원이 해결해야 할 부분 대신 해결: 로그인 후 리다이렉트 로직 수정
+    # MGP: 작업 관리 URL 패턴 추가
+    # 백엔드 부분 대신 수정: tasks 앱 URL 연결
+    path('teams/<int:team_id>/tasks/', include('tasks.urls')),
     # ========================================
+
+    # 로그인 후 리다이렉트
     path('api/auth/after-login/', users.after_login_redirect, name='after_login_redirect'),
 
-    # ========================================
-    # MGP: 커스텀 Google 로그인 URL 추가
-    # 백엔드 팀원이 해결해야 할 부분 대신 해결: 소셜 로그인 후 리다이렉트 로직
-    # ========================================
+    # 커스텀 Google 로그인
     path('auth/google-login/', users.custom_google_login, name='custom_google_login'),
 
-    # ========================================
-    # MGP: 로그아웃 URL 추가
-    # 백엔드 팀원이 해결해야 할 부분 대신 해결: 로그인/로그아웃 로직
-    # ========================================
+    # 로그아웃
     path('auth/logout/', users.logout_view, name='logout'),
 
     # 랜딩 페이지
