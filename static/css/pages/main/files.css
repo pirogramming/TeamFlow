@@ -1,62 +1,407 @@
+/* 자료실 페이지 스타일 - Design Guide 준수 */
+
 .page-container {
-    padding: 20px;
-    font-family: Arial, sans-serif;
-    max-width: 900px;
+    padding: 2rem;
+    max-width: 1400px;
     margin: 0 auto;
-    min-height: calc(100vh - 200px); /* 푸터가 아래 고정되도록 최소 높이 설정 */
+    background-color: #f7f7f7;
+    min-height: calc(100vh - 64px); /* 헤더 높이 제외 */
     display: flex;
     flex-direction: column;
 }
 
 .view-header {
-    margin-bottom: 20px;
-    border-bottom: 1px solid #eee;
-    padding-bottom: 10px;
-}
-
-.upload-container {
-    margin-bottom: 30px;
-    padding: 20px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-}
-
-.file-list-container {
-    flex: 1; /* 남은 공간을 모두 차지 */
-    min-height: 400px; /* 최소 높이 설정 */
-}
-
-.file-list-container ul {
-    list-style: none;
-    padding: 0;
-    min-height: 300px; /* 최소 높이 설정 */
-}
-
-.file-list-container li {
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    padding: 10px;
-    border-bottom: 1px solid #eee;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #e1e5e9;
 }
 
-.file-list-container li a {
-    flex-grow: 1;
-    text-decoration: none;
-    color: #007bff;
+.view-header h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0;
 }
 
-.file-list-container li span {
-    font-size: 12px;
-    color: #888;
-    margin: 0 10px;
-}
-
-.delete-btn {
-    background-color: #dc3545;
+/* 파일 업로드 버튼 */
+.btn-upload {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background: #2383e2;
     color: white;
     border: none;
-    padding: 4px 8px;
-    border-radius: 4px;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-decoration: none;
     cursor: pointer;
-    font-size: 12px;
+    transition: all 0.2s ease;
+    font-family: inherit;
+}
+
+.btn-upload:hover {
+    background: #1a6bc9;
+    transform: translateY(-1px);
+}
+
+/* 파일 업로드 섹션 */
+.upload-container {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e1e5e9;
+}
+
+.upload-container h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0 0 1rem 0;
+}
+
+.upload-area {
+    border: 2px dashed #d1d5db;
+    border-radius: 8px;
+    padding: 2rem;
+    text-align: center;
+    background-color: #f9fafb;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.upload-area:hover,
+.upload-area.dragover {
+    border-color: #2383e2;
+    background-color: #eff6ff;
+}
+
+.upload-area-icon {
+    width: 48px;
+    height: 48px;
+    margin: 0 auto 1rem;
+    color: #9ca3af;
+}
+
+.upload-area-text {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #374151;
+    margin: 0 0 0.5rem 0;
+}
+
+.upload-area-subtext {
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin: 0;
+}
+
+.upload-form {
+    margin-top: 1rem;
+}
+
+.file-input-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.file-input {
+    position: absolute;
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+}
+
+.file-input-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background: #2383e2;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.file-input-button:hover {
+    background: #1a6bc9;
+}
+
+/* 파일 목록 섹션 */
+.file-list-container {
+    flex: 1;
+    min-height: 400px;
+}
+
+.file-list-container h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0 0 1.5rem 0;
+}
+
+.files-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.5rem;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* 파일 카드 */
+.file-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e1e5e9;
+    transition: all 0.2s ease;
+    animation: fadeIn 0.15s ease-out;
+}
+
+.file-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+}
+
+.file-card-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.file-icon {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #2383e2, #1a6bc9);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+.file-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.file-name {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0 0 0.25rem 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.file-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    color: #6b7280;
+}
+
+.file-size {
+    font-weight: 500;
+}
+
+.file-date::before {
+    content: "•";
+    margin-right: 0.25rem;
+}
+
+.file-uploader::before {
+    content: "•";
+    margin-right: 0.25rem;
+}
+
+.file-actions {
+    display: flex;
+    gap: 0.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid #f1f3f4;
+}
+
+.btn-download {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    background: #2383e2;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.btn-download:hover {
+    background: #1a6bc9;
+    color: white;
+}
+
+.btn-delete {
+    padding: 0.75rem;
+    background: #fef2f2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-delete:hover {
+    background: #fee2e2;
+    border-color: #fca5a5;
+}
+
+/* 빈 상태 */
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: #666;
+}
+
+.empty-state-icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 1rem;
+    opacity: 0.4;
+    color: #9ca3af;
+}
+
+.empty-state h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #666;
+    margin: 0 0 0.5rem 0;
+}
+
+.empty-state p {
+    font-size: 0.875rem;
+    color: #999;
+    margin: 0;
+}
+
+/* 반응형 스타일 */
+@media (max-width: 768px) {
+    .page-container {
+        padding: 1rem;
+    }
+    
+    .view-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    
+    .view-header h1 {
+        font-size: 1.5rem;
+    }
+    
+    .upload-container {
+        padding: 1.5rem;
+    }
+    
+    .upload-area {
+        padding: 1.5rem;
+    }
+    
+    .files-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .file-card {
+        padding: 1rem;
+    }
+    
+    .file-actions {
+        flex-direction: column;
+    }
+    
+    .btn-download {
+        flex: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .upload-area {
+        padding: 1rem;
+    }
+    
+    .upload-area-icon {
+        width: 32px;
+        height: 32px;
+    }
+    
+    .file-card-header {
+        gap: 0.75rem;
+    }
+    
+    .file-icon {
+        width: 32px;
+        height: 32px;
+        font-size: 0.75rem;
+    }
+    
+    .file-name {
+        font-size: 0.875rem;
+    }
+    
+    .file-meta {
+        font-size: 0.625rem;
+    }
+}
+
+/* 애니메이션 */
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 접근성 */
+@media (prefers-reduced-motion: reduce) {
+    .file-card {
+        animation: none;
+        transition: none;
+    }
+    
+    .file-card:hover,
+    .btn-upload:hover,
+    .btn-download:hover {
+        transform: none;
+    }
 }

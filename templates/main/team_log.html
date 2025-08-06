@@ -1,24 +1,76 @@
 {% extends "base.html" %}
+{% load static %}
+
+{% block title %}팀플 기록 - TeamFlow{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/pages/main/team_log.css' %}" />
+{% endblock %}
+
 {% block content %}
-<div class="container">
-    <h2>팀플 기록</h2>
-    <ul id="team-log-list"></ul>
-</div>
-
-<script>
-document.addEventListener('DOMContentLoaded', async () => {
-    const response = await fetch('/api/dashboard/team_log/api/list/');
-    const logs = await response.json();
-
-    const container = document.getElementById('team-log-list');
-    container.innerHTML = logs.map(log => `
-        <li>
-            <a href="/api/dashboard/team_log/${log.team_id}/list/">
-                <strong>${log.title}</strong> - ${log.status}
-                <span style="color:gray">(${log.last_activity})</span>
-            </a>
-        </li>
-    `).join('');
-});
+{# Django 템플릿 변수를 JavaScript에서 사용할 수 있도록 데이터 전달 #}
+<script id="team-data" type="application/json">
+  {
+    "teamId": "{{ team.id|default:'' }}"
+  }
 </script>
+
+<div class="page-container">
+  <!-- 페이지 헤더 -->
+  <div class="view-header">
+    <h1>팀플 기록</h1>
+  </div>
+
+  <!-- 팀 프로젝트 목록 -->
+  <div id="team-projects-container">
+    <!-- 로딩 스켈레톤 -->
+    <div id="loading-skeleton" class="team-projects-grid">
+      <div class="skeleton-card loading-skeleton">
+        <div class="skeleton-line medium"></div>
+        <div class="skeleton-line short"></div>
+        <div class="skeleton-line"></div>
+        <div class="skeleton-line medium"></div>
+      </div>
+      <div class="skeleton-card loading-skeleton">
+        <div class="skeleton-line medium"></div>
+        <div class="skeleton-line short"></div>
+        <div class="skeleton-line"></div>
+        <div class="skeleton-line medium"></div>
+      </div>
+      <div class="skeleton-card loading-skeleton">
+        <div class="skeleton-line medium"></div>
+        <div class="skeleton-line short"></div>
+        <div class="skeleton-line"></div>
+        <div class="skeleton-line medium"></div>
+      </div>
+    </div>
+
+    <!-- 실제 프로젝트 카드들이 여기에 동적으로 추가됩니다 -->
+    <div id="team-projects-grid" class="team-projects-grid" style="display: none;">
+      <!-- JavaScript로 동적 렌더링 -->
+    </div>
+
+    <!-- 빈 상태 -->
+    <div id="empty-state" class="empty-state" style="display: none;">
+      <svg class="empty-state-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+      </svg>
+      <h3>참여 중인 팀 프로젝트가 없습니다</h3>
+      <p>새로운 팀을 만들거나 기존 팀에 참여해보세요</p>
+    </div>
+
+    <!-- 에러 상태 -->
+    <div id="error-state" class="empty-state" style="display: none;">
+      <svg class="empty-state-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+      </svg>
+      <h3>데이터를 불러올 수 없습니다</h3>
+      <p>페이지를 새로고침하거나 잠시 후 다시 시도해주세요</p>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+  <script src="{% static 'js/pages/main/team_log.js' %}"></script>
 {% endblock %}

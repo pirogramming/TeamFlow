@@ -1,88 +1,601 @@
+/* 일정 관리 페이지 스타일 - Design Guide 준수 */
+
 /* 기본 레이아웃 */
 .page-container {
-    padding: 20px;
-    font-family: Arial, sans-serif;
-    max-width: 1200px;
+    padding: 2rem;
+    max-width: 1400px;
     margin: 0 auto;
+    background-color: #f7f7f7;
+    min-height: calc(100vh - 64px); /* 헤더 높이 제외 */
 }
 
-.view-header {
+/* 페이지 헤더 */
+.page-header {
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.page-header h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0;
+}
+
+/* 탭 네비게이션 - 왼쪽 정렬 작은 크기 */
+.tab-navigation {
+    display: inline-flex;
+    background: #f3f4f6;
+    border-radius: 8px;
+    padding: 0.25rem;
+    margin-bottom: 2rem;
+    margin-left: 0;
+}
+
+.tab-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.5rem 1rem;
+    border: none;
+    background: transparent;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #6b7280;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.tab-btn:hover {
+    color: #374151;
+}
+
+.tab-btn.active {
+    background: white;
+    color: #1f2937;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.tab-btn svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* 탭 컨텐츠 */
+.tab-content {
+    position: relative;
+}
+
+.tab-panel {
+    display: none;
+    animation: fadeIn 0.15s ease-out;
+}
+
+.tab-panel.active {
+    display: block;
+}
+
+.tab-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
-    border-bottom: 1px solid #eee;
-    padding-bottom: 10px;
+    margin-bottom: 1.5rem;
+    padding: 1.5rem;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e1e5e9;
 }
 
+.tab-header h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0;
+    white-space: nowrap;
+    margin-right: 1rem;
+}
+
+/* 버튼 스타일 - Design Guide 준수 */
 .btn {
-    padding: 8px 16px;
-    border: 1px solid #ccc;
-    background-color: #f0f0f0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border: 1px solid #d1d5db;
+    background-color: white;
+    color: #374151;
     cursor: pointer;
-    border-radius: 4px;
-    font-size: 14px;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    font-family: inherit;
+}
+
+.btn:hover {
+    background-color: #f9fafb;
+    border-color: #9ca3af;
 }
 
 .btn-primary {
-    background-color: #007bff;
+    background: #2383e2;
     color: white;
-    border-color: #007bff;
+    border-color: #2383e2;
+}
+
+.btn-primary:hover {
+    background: #1a6bc9;
+    border-color: #1a6bc9;
+    transform: translateY(-1px);
+}
+
+/* 일정 조율 섹션 */
+#when2meet-grid-container {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e1e5e9;
+}
+
+#when2meet-grid-container > p {
+    font-size: 0.875rem;
+    color: #666;
+    margin: 0 0 1rem 0;
+    text-align: center;
 }
 
 /* When2Meet 그리드 스타일 */
-#when2meet-grid-container {
-    margin-bottom: 30px;
-}
-
 #when2meet-grid {
     display: grid;
-    grid-template-columns: 60px repeat(7, 1fr); /* 시간 열 + 요일 열 */
-    border: 1px solid #ddd;
+    grid-template-columns: 80px repeat(7, 1fr); /* 시간 열 + 요일 열 */
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #e1e5e9;
     user-select: none; /* 드래그 시 텍스트 선택 방지 */
 }
 
 .grid-header, .time-label, .grid-cell {
-    border: 1px solid #eee;
-    padding: 8px;
+    border-right: 1px solid #e1e5e9;
+    border-bottom: 1px solid #e1e5e9;
+    padding: 0.75rem 0.5rem;
     text-align: center;
-    font-size: 12px;
+    font-size: 0.75rem;
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .grid-header {
-    background-color: #f9f9f9;
-    font-weight: bold;
+    background-color: #f8f9fa;
+    font-weight: 600;
+    color: #374151;
+    border-bottom: 2px solid #e1e5e9;
 }
 
 .time-label {
-    background-color: #f9f9f9;
+    background-color: #f8f9fa;
+    font-weight: 500;
+    color: #6b7280;
+    border-right: 2px solid #e1e5e9;
 }
 
 .grid-cell {
-    background-color: #f1f1f1; /* 기본 색상 */
+    background-color: #ffffff;
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.grid-cell:hover {
+    background-color: #f0f9ff;
 }
 
 .grid-cell.selected {
-    background-color: #28a745 !important; /* 내가 선택한 시간 (우선순위 높임) */
+    background-color: #2383e2 !important;
+    color: white;
+    font-weight: 500;
 }
+
+/* 팀원별 가용성 표시 */
+.grid-cell[data-availability="1"] { background-color: #fef2f2; }
+.grid-cell[data-availability="2"] { background-color: #fef3c7; }
+.grid-cell[data-availability="3"] { background-color: #d1fae5; }
+.grid-cell[data-availability="4"] { background-color: #10b981; color: white; }
 
 /* 회의 추가 폼 스타일 */
 .meeting-form-container {
-    padding: 20px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    background-color: #f9f9f9;
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    border: 1px solid #e1e5e9;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
+
+.meeting-form-container h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0 0 0.5rem 0;
+}
+
+.meeting-form-container p {
+    font-size: 0.875rem;
+    color: #666;
+    margin: 0 0 1rem 0;
+}
+
 .meeting-form-container form {
     display: flex;
-    gap: 10px;
-    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-items: end;
 }
 
 .meeting-form-container input {
-    padding: 8px;
-    border: 1px solid #ccc;
+    padding: 0.75rem 1rem;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    color: #1f2937;
+    background: white;
+    transition: all 0.2s ease;
+    font-family: inherit;
+    min-width: 120px;
+}
+
+.meeting-form-container input:focus {
+    outline: none;
+    border-color: #2383e2;
+    box-shadow: 0 0 0 3px rgba(35, 131, 226, 0.1);
+}
+
+.meeting-form-container input::placeholder {
+    color: #9ca3af;
+}
+
+/* FullCalendar 커스텀 스타일 */
+#calendar {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e1e5e9;
+}
+
+/* FullCalendar 헤더 버튼 스타일 */
+.fc .fc-button-primary {
+    background-color: #2383e2;
+    border-color: #2383e2;
+    color: white;
+    border-radius: 6px;
+    padding: 0.5rem 1rem;
+    font-weight: 500;
+    font-size: 0.875rem;
+}
+
+.fc .fc-button-primary:not(:disabled):active,
+.fc .fc-button-primary:not(:disabled).fc-button-active {
+    background-color: #1a6bc9;
+    border-color: #1a6bc9;
+}
+
+.fc .fc-button-primary:hover {
+    background-color: #1a6bc9;
+    border-color: #1a6bc9;
+}
+
+.fc .fc-button-primary:disabled {
+    background-color: #9ca3af;
+    border-color: #9ca3af;
+}
+
+/* FullCalendar 제목 스타일 */
+.fc .fc-toolbar-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #1a1a1a;
+}
+
+/* FullCalendar 이벤트 스타일 */
+.fc-event {
+    background-color: #2383e2;
+    border-color: #2383e2;
     border-radius: 4px;
+    padding: 2px 4px;
+}
+
+.fc-event:hover {
+    background-color: #1a6bc9;
+    border-color: #1a6bc9;
+}
+
+/* FullCalendar 날짜 셀 스타일 */
+.fc .fc-daygrid-day.fc-day-today {
+    background-color: #eff6ff;
+}
+
+.fc .fc-col-header-cell {
+    background-color: #f8f9fa;
+    font-weight: 600;
+    color: #374151;
+}
+
+/* 일정 저장 버튼 특별 스타일 */
+#save-vote-btn {
+    background: linear-gradient(135deg, #2383e2, #1a6bc9);
+    border: none;
+    color: white;
+    font-weight: 600;
+    padding: 0.75rem 1.5rem; /* .btn과 동일한 패딩으로 조정 */
+    box-shadow: 0 2px 4px rgba(35, 131, 226, 0.2);
+}
+
+#save-vote-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(35, 131, 226, 0.3);
+}
+
+/* 모달 스타일 */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s ease;
+}
+
+.modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-container {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    max-width: 500px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    transform: scale(0.95);
+    transition: transform 0.2s ease;
+}
+
+.modal-overlay.active .modal-container {
+    transform: scale(1);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    border-bottom: 1px solid #e1e5e9;
+}
+
+.modal-header h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0;
+}
+
+.modal-close-btn {
+    padding: 0.5rem;
+    border: none;
+    background: transparent;
+    color: #6b7280;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.modal-close-btn:hover {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+.modal-form {
+    padding: 1.5rem;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 0.5rem;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    color: #1f2937;
+    background: white;
+    transition: all 0.2s ease;
+    font-family: inherit;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #2383e2;
+    box-shadow: 0 0 0 3px rgba(35, 131, 226, 0.1);
+}
+
+.modal-actions {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: flex-end;
+    padding-top: 1rem;
+    border-top: 1px solid #f1f3f4;
+}
+
+.btn-secondary {
+    background: #f3f4f6;
+    color: #374151;
+    border: 1px solid #d1d5db;
+}
+
+.btn-secondary:hover {
+    background: #e5e7eb;
+    border-color: #9ca3af;
+}
+
+/* 툴팁 스타일 */
+.tooltip {
+    position: absolute;
+    background: #1f2937;
+    color: white;
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    pointer-events: none;
+    z-index: 50;
+    opacity: 0;
+    transform: translateY(-5px);
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.tooltip.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 4px solid transparent;
+    border-top-color: #1f2937;
+}
+
+/* When2Meet 그리드 개선 - hover 기능 */
+.grid-cell[data-users]:hover {
+    cursor: pointer;
+    transform: scale(1.05);
+    z-index: 10;
+    position: relative;
+}
+
+/* 반응형 스타일 */
+@media (max-width: 768px) {
+    .page-container {
+        padding: 1rem;
+    }
+    
+    .tab-navigation {
+        padding: 0.2rem;
+    }
+    
+    .tab-btn {
+        padding: 0.4rem 0.75rem;
+        font-size: 0.75rem;
+        gap: 0.25rem;
+    }
+    
+    .tab-btn svg {
+        width: 14px;
+        height: 14px;
+    }
+    
+    .tab-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+        padding: 1rem;
+    }
+    
+    .tab-header h2 {
+        font-size: 1.125rem;
+    }
+    
+    #when2meet-grid {
+        grid-template-columns: 60px repeat(7, 1fr);
+        font-size: 0.625rem;
+    }
+    
+    .grid-header, .time-label, .grid-cell {
+        padding: 0.5rem 0.25rem;
+        min-height: 32px;
+    }
+    
+    #calendar {
+        padding: 1rem;
+    }
+    
+    .fc .fc-toolbar {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .fc .fc-toolbar-title {
+        font-size: 1.25rem;
+    }
+    
+    .modal-container {
+        margin: 1rem;
+        width: calc(100% - 2rem);
+    }
+    
+    .modal-header {
+        padding: 1rem;
+    }
+    
+    .modal-form {
+        padding: 1rem;
+    }
+    
+    .modal-actions {
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 480px) {
+    #when2meet-grid {
+        grid-template-columns: 50px repeat(7, 1fr);
+    }
+    
+    .grid-header, .time-label, .grid-cell {
+        padding: 0.25rem;
+        font-size: 0.5rem;
+        min-height: 28px;
+    }
+}
+
+/* 접근성 */
+@media (prefers-reduced-motion: reduce) {
+    .btn, .grid-cell, #save-vote-btn {
+        transition: none;
+    }
+    
+    .btn-primary:hover, #save-vote-btn:hover {
+        transform: none;
+    }
 }

@@ -163,25 +163,30 @@ def schedule_mediate_view(request, team_id):
     """
     GET /api/teams/{team_id}/schedule/mediate
     When2Meet 그리드에 필요한 데이터와 가장 많이 겹치는 시간대, 그리고 이번 주 날짜를 계산하여 JSON으로 반환합니다.
+    hover 기능을 위해 각 시간대별 사용자 이름 목록도 포함합니다.
     """
     poll, _ = SchedulePoll.objects.get_or_create(team_id=team_id, is_active=True)
     votes = Vote.objects.filter(poll=poll)
     
-    availability_counts = defaultdict(int)
+    # 시간대별 카운트와 사용자 목록을 함께 저장
+    availability_data = defaultdict(lambda: {'count': 0, 'users': []})
+    
     for vote in votes:
         if isinstance(vote.available_slots, dict):
             for day, slots in vote.available_slots.items():
                 for slot in slots:
-                    availability_counts[f"{day}-{slot}"] += 1
+                    slot_key = f"{day}-{slot}"
+                    availability_data[slot_key]['count'] += 1
+                    availability_data[slot_key]['users'].append(vote.voter.username)
     
     # 1. 가장 많이 겹치는 시간대를 찾는 로직
     best_slots = []
-    if availability_counts:
-        max_votes = max(availability_counts.values())
+    if availability_data:
+        max_votes = max(data['count'] for data in availability_data.values())
         if max_votes > 0:
             best_slots = [
-                slot for slot, count in availability_counts.items() 
-                if count == max_votes
+                slot for slot, data in availability_data.items() 
+                if data['count'] == max_votes
             ]
 
     # 2. 이번 주 날짜(월~일)를 계산하는 로직
@@ -195,7 +200,7 @@ def schedule_mediate_view(request, team_id):
     return JsonResponse({
         'poll_id': poll.id,
         'team_members_count': poll.team.members.count(),
-        'availability': availability_counts,
+        'availability': availability_data,  # 이제 count와 users 모두 포함
         'my_vote': my_slots,
         'best_slots': best_slots,     # 최적 시간대 정보 추가
         'week_dates': week_dates,     # 주간 날짜 정보 추가
