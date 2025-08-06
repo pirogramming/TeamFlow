@@ -59,7 +59,6 @@
 }
 
 .grid-cell {
-    height: 20px;
     background-color: #f1f1f1; /* 기본 색상 */
     cursor: pointer;
     transition: background-color 0.2s;
