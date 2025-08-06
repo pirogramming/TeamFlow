@@ -1,20 +1,27 @@
-<!-- TeamFlow 노션 스타일 랜딩 페이지 -->
-{% extends "base.html" %}
-{% load static socialaccount %}
-
-{% block title %}TeamFlow - AI로 시작하는 가장 스마트한 팀플 관리{% endblock %}
-
-{% block og_title %}TeamFlow - AI로 시작하는 가장 스마트한 팀플 관리{% endblock %}
-
-{% block og_description %}AI 역할분담부터 실시간 진행률까지, 대학생 팀 프로젝트의 모든 것을 한 곳에서. 복잡한 툴은 이제 그만, TeamFlow는 오직 팀플에만 집중합니다.{% endblock %}
-
-{% block extra_css %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TeamFlow - AI로 시작하는 가장 스마트한 팀플 관리</title>
+    
+    <!-- Meta Tags -->
+    <meta property="og:title" content="TeamFlow - AI로 시작하는 가장 스마트한 팀플 관리">
+    <meta property="og:description" content="AI 역할분담부터 실시간 진행률까지, 대학생 팀 프로젝트의 모든 것을 한 곳에서. 복잡한 툴은 이제 그만, TeamFlow는 오직 팀플에만 집중합니다.">
+    <meta name="description" content="AI 역할분담부터 실시간 진행률까지, 대학생 팀 프로젝트의 모든 것을 한 곳에서. 복잡한 툴은 이제 그만, TeamFlow는 오직 팀플에만 집중합니다.">
+    
+    <!-- CSRF Token -->
+    <meta name="csrf-token" content="{{ csrf_token }}" />
+    
+    <!-- CSS -->
+    {% load static socialaccount %}
+    <link rel="stylesheet" href="{% static 'css/common/reset.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/common/variables.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/common/typography.css' %}" />
     <link rel="stylesheet" href="{% static 'css/pages/landing.css' %}" />
-{% endblock %}
+</head>
 
-{% block body_class %}landing-page notion-style{% endblock %}
-
-{% block content %}
+<body class="landing-page notion-style">
     <!-- 
         TeamFlow 노션 스타일 랜딩 페이지
         
@@ -695,8 +702,8 @@
             }
         }
     </script>
-{% endblock %}
-
-{% block extra_js %}
+    
+    <!-- JavaScript -->
     <script src="{% static 'js/pages/landing.js' %}"></script>
-{% endblock %}
+</body>
+</html>
