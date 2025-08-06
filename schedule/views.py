@@ -5,10 +5,12 @@ from django.http import JsonResponse, HttpResponseForbidden
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
+from collections import defaultdict
+from datetime import date, timedelta 
 
 from teams.models import Team
 from .models import Meeting, SchedulePoll, Vote
-# from tasks.models import Task # 나중에 Task 모델 임포트
+from tasks.models import Task 
 
 # ===================================================================
 # 페이지 렌더링 뷰
@@ -41,7 +43,7 @@ def schedule_list_view(request, team_id):
         return HttpResponseForbidden("팀 멤버가 아닙니다.")
 
     meetings = Meeting.objects.filter(team_id=team_id)
-    # tasks = Task.objects.filter(team_id=team_id) # 나중에 Task 기능 추가 시
+    tasks = Task.objects.filter(team_id=team_id) # 나중에 Task 기능 추가 시
 
     events = []
     for meeting in meetings:
@@ -155,3 +157,46 @@ def save_vote_view(request, team_id):
         defaults={'available_slots': available_slots}
     )
     return JsonResponse({'success': True, 'message': '시간이 저장되었습니다.'})
+
+@login_required
+def schedule_mediate_view(request, team_id):
+    """
+    GET /api/teams/{team_id}/schedule/mediate
+    When2Meet 그리드에 필요한 데이터와 가장 많이 겹치는 시간대, 그리고 이번 주 날짜를 계산하여 JSON으로 반환합니다.
+    """
+    poll, _ = SchedulePoll.objects.get_or_create(team_id=team_id, is_active=True)
+    votes = Vote.objects.filter(poll=poll)
+    
+    availability_counts = defaultdict(int)
+    for vote in votes:
+        if isinstance(vote.available_slots, dict):
+            for day, slots in vote.available_slots.items():
+                for slot in slots:
+                    availability_counts[f"{day}-{slot}"] += 1
+    
+    # 1. 가장 많이 겹치는 시간대를 찾는 로직
+    best_slots = []
+    if availability_counts:
+        max_votes = max(availability_counts.values())
+        if max_votes > 0:
+            best_slots = [
+                slot for slot, count in availability_counts.items() 
+                if count == max_votes
+            ]
+
+    # 2. 이번 주 날짜(월~일)를 계산하는 로직
+    today = date.today()
+    start_of_week = today - timedelta(days=today.weekday()) # 이번 주 월요일
+    week_dates = [(start_of_week + timedelta(days=i)).strftime('%m/%d') for i in range(7)]
+
+    my_vote = Vote.objects.filter(poll=poll, voter=request.user).first()
+    my_slots = my_vote.available_slots if my_vote else {}
+
+    return JsonResponse({
+        'poll_id': poll.id,
+        'team_members_count': poll.team.members.count(),
+        'availability': availability_counts,
+        'my_vote': my_slots,
+        'best_slots': best_slots,     # 최적 시간대 정보 추가
+        'week_dates': week_dates,     # 주간 날짜 정보 추가
+    })
