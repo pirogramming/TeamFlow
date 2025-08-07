@@ -290,5 +290,8 @@ MEDIA_ROOT = BASE_DIR / 'media'
 env = environ.Env()
 environ.Env.read_env()
 
-# CLOVA
-CLOVA_API_KEY = env("CLOVA_API_KEY")
+# ========================================
+# MGP: CLOVA API 키 설정 제거
+# 환경변수 의존성 제거하여 roles/clova_ai.py에서 직접 관리하도록 변경
+# CLOVA_API_KEY = env("CLOVA_API_KEY")  # 제거됨
+# ========================================

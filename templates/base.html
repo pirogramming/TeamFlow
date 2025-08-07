@@ -49,9 +49,9 @@
       {% if messages %}
         {% for message in messages %}
         <div class="notification notification-{{ message.tags }}" data-auto-hide="true">
-          <span class="notification-text">{{ message }}</span>
+        <span class="notification-text">{{ message }}</span>
           <button class="notification-close" type="button" aria-label="닫기">&times;</button>
-        </div>
+      </div>
         {% endfor %}
       {% endif %}
     </div>
