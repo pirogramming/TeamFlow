@@ -1,1 +1,59 @@
 <!-- 역할 관리 (AI 추천, 역할 할당) -->
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<h2>AI 역할 추천</h2>
+
+<form id="ai-form">
+  <label>전공:
+    <input type="text" id="major" value="컴퓨터공학과">
+  </label><br><br>
+
+  <label>성향 (쉼표로 구분):
+    <input type="text" id="traits" value="분석적, 꼼꼼함">
+  </label><br><br>
+
+  <label>선호 작업 (쉼표로 구분):
+    <input type="text" id="preferences" value="기획, 개발">
+  </label><br><br>
+
+  <button type="submit">AI 추천</button>
+</form>
+
+<h3>추천 결과:</h3>
+<div id="result-box">-</div>
+
+<script>
+  document.getElementById("ai-form").addEventListener("submit", async function (e) {
+    e.preventDefault();
+
+    const major = document.getElementById("major").value;
+    const traits = document.getElementById("traits").value.split(",").map(s => s.trim());
+    const preferences = document.getElementById("preferences").value.split(",").map(s => s.trim());
+
+    const payload = {
+      major: major,
+      traits: traits,
+      preferences: preferences,
+    };
+
+    const response = await fetch("{% url 'ai-recommend-role' %}", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": getCSRFToken(),
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await response.json();
+    document.getElementById("result-box").innerText = data.recommended_role || "추천 실패";
+  });
+
+  function getCSRFToken() {
+    const cookieValue = document.cookie.split('; ').find(row => row.startsWith('csrftoken='));
+    return cookieValue ? cookieValue.split('=')[1] : '';
+  }
+</script>
+{% endblock %}

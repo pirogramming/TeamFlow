@@ -62,6 +62,9 @@ urlpatterns = [
 
     path('team-log/', team_log_views.team_log_page, name='team_log_page'),  # HTML 페이지
 
+    path('', include('roles.urls')),
+
+
 ]
 
 # 개발 환경 static 파일 서빙
