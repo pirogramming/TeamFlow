@@ -221,7 +221,7 @@ function renderTeamTasks(tasks = []) {
         
         return `
             <div class="task-item" data-task-id="${task.id}">
-                <div class="task-content">
+            <div class="task-content">
                     <div class="task-header">
                         <span class="task-name">${task.name}</span>
                         <div class="task-meta">
@@ -258,7 +258,7 @@ function renderPersonalTasks(tasks = []) {
         
         return `
             <div class="task-item" data-task-id="${task.id}">
-                <div class="task-content">
+            <div class="task-content">
                     <div class="task-header">
                         <span class="task-name">${task.name}</span>
                         <div class="task-meta">
@@ -633,7 +633,7 @@ async function loadProjectList() {
                 const projects = data.teams.map(team => ({
                     id: team.id,
                     name: team.name,
-                    status: '진행중',
+                status: '진행중',
                     isActive: false // 현재 선택된 팀은 별도로 처리
                 }));
                 
@@ -644,8 +644,8 @@ async function loadProjectList() {
                         project.isActive = project.id.toString() === currentTeamId;
                     });
                 }
-                
-                renderProjectList(projects);
+        
+        renderProjectList(projects);
             } else {
                 projectList.innerHTML = '<div class="dropdown-item no-projects"><span>참여한 팀이 없습니다</span></div>';
             }
