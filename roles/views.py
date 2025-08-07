@@ -22,21 +22,32 @@ def register_roles(request, team_id):
 @csrf_exempt
 def recommend_role_api(request):
     if request.method == "POST":
-        data = json.loads(request.body)
-        major = data.get("major")
-        traits = data.get("traits", [])
-        preferences = data.get("preferences", [])
-
-        prompt = make_prompt(major, traits, preferences)
-        clova_response = call_clova_recommendation(prompt)
-
         try:
-            content = clova_response['result']['message']['content']
-        except:
-            return JsonResponse({"error": "AI 응답 파싱 실패"}, status=500)
+            data = json.loads(request.body)
+            major = data.get("major")
+            traits = data.get("traits", [])
+            preferences = data.get("preferences", [])
 
-        return JsonResponse({"recommended_role": content})
-    
+            prompt = make_prompt(major, traits, preferences)
+            print("🟢 프롬프트:", prompt)
+
+            clova_response = call_clova_recommendation(prompt)
+            print("📦 응답 전체:", json.dumps(clova_response, indent=2, ensure_ascii=False))
+
+            # ✅ result 키가 있는지 확인
+            if "result" not in clova_response:
+                return JsonResponse({"error": "Clova 응답 실패", "detail": clova_response}, status=500)
+
+            content = clova_response["result"]["output"]
+            return JsonResponse({"recommended_role": content})
+
+        except Exception as e:
+            import traceback
+            print("❌ 에러 발생:", e)
+            traceback.print_exc()
+            return JsonResponse({"error": str(e)}, status=500)
+
+
 def roles_page(request, team_id):
     team = get_object_or_404(Team, id=team_id)
     return render(request, 'main/roles.html', {
