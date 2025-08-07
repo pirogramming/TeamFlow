@@ -10,36 +10,38 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const uploadForm = document.getElementById('file-upload-form');
     const fileInput = document.getElementById('file-input');
-    const fileInputButton = document.querySelector('.file-input-button');
-    const uploadArea = document.getElementById('upload-area');
+    const uploadBtn = document.getElementById('upload-btn');
     const fileList = document.getElementById('file-list');
 
-    // 드래그 앤 드롭 초기화
-    initializeDragAndDrop();
-    
-    // 파일 입력 버튼 클릭 이벤트
-    if (fileInputButton) {
-        fileInputButton.addEventListener('click', () => fileInput.click());
+    // 업로드 버튼 클릭 시 파일 선택창 열기
+    if (uploadBtn) {
+        uploadBtn.addEventListener('click', () => fileInput.click());
     }
     
-    // --- 파일 업로드 로직 ---
-    uploadForm.addEventListener('submit', async function(e) {
-        e.preventDefault();
-        
-        if (fileInput.files.length === 0) {
-            showErrorMessage('업로드할 파일을 선택해주세요.');
+    // 파일 선택 시 즉시 업로드
+    fileInput.addEventListener('change', function(e) {
+        const files = e.target.files;
+        if (files.length > 0) {
+            const file = files[0];
+            
+            // 파일 크기 제한 (50MB)
+            if (file.size > 50 * 1024 * 1024) {
+                showErrorMessage('파일 크기가 50MB를 초과할 수 없습니다.');
+                fileInput.value = ''; // 파일 선택 초기화
             return;
         }
 
-        await uploadFile(fileInput.files[0]);
+            uploadFile(file);
+        }
     });
+
 
     // --- 파일 삭제 로직 ---
     if (fileList) {
         fileList.addEventListener('click', function(e) {
             if (e.target.closest('.btn-delete')) {
                 if (confirm('정말로 이 파일을 삭제하시겠습니까?')) {
-                    const listItem = e.target.closest('.file-card');
+                    const listItem = e.target.closest('.file-item');
                     const fileId = listItem.dataset.fileId;
                     deleteFile(fileId, listItem);
                 }
@@ -47,56 +49,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    /**
-     * 드래그 앤 드롭 초기화
-     */
-    function initializeDragAndDrop() {
-        if (!uploadArea) return;
 
-        // 드래그 이벤트 방지
-        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-            uploadArea.addEventListener(eventName, preventDefaults, false);
-            document.body.addEventListener(eventName, preventDefaults, false);
-        });
-
-        // 시각적 피드백
-        ['dragenter', 'dragover'].forEach(eventName => {
-            uploadArea.addEventListener(eventName, highlight, false);
-        });
-
-        ['dragleave', 'drop'].forEach(eventName => {
-            uploadArea.addEventListener(eventName, unhighlight, false);
-        });
-
-        // 파일 드롭 처리
-        uploadArea.addEventListener('drop', handleDrop, false);
-        
-        // 클릭으로 파일 선택
-        uploadArea.addEventListener('click', () => fileInput.click());
-    }
-
-    function preventDefaults(e) {
-        e.preventDefault();
-        e.stopPropagation();
-    }
-
-    function highlight() {
-        uploadArea.classList.add('dragover');
-    }
-
-    function unhighlight() {
-        uploadArea.classList.remove('dragover');
-    }
-
-    function handleDrop(e) {
-        const dt = e.dataTransfer;
-        const files = dt.files;
-        
-        if (files.length > 0) {
-            fileInput.files = files;
-            uploadFile(files[0]);
-        }
-    }
 
     /**
      * 파일 업로드 처리
@@ -121,12 +74,13 @@ document.addEventListener('DOMContentLoaded', function() {
             if (result.success) {
                 showSuccessMessage('파일이 업로드되었습니다.');
                 addFileToList(result.data);
-                uploadForm.reset();
             } else {
                 showErrorMessage('업로드 실패: ' + result.error);
             }
         } catch (error) {
             showErrorMessage('오류 발생: ' + error.message);
+        } finally {
+            fileInput.value = ''; // 항상 파일 input 초기화
         }
     }
 
@@ -161,7 +115,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     /**
-     * 파일 목록에 새 파일 카드 추가
+     * 파일 목록에 새 파일 아이템 추가
      */
     function addFileToList(fileData) {
         // 빈 상태 메시지 제거
@@ -170,40 +124,43 @@ document.addEventListener('DOMContentLoaded', function() {
             emptyState.remove();
         }
         
-        // 파일 그리드가 없으면 생성
+        // 파일 리스트가 없으면 생성
         let currentFileList = document.getElementById('file-list');
         if (!currentFileList) {
             const fileListContainer = document.querySelector('.file-list-container');
             fileListContainer.innerHTML = `
-                <h3>업로드된 파일</h3>
-                <ul id="file-list" class="files-grid"></ul>
+                <h3>공유 파일</h3>
+                <div id="file-list" class="file-list"></div>
             `;
             currentFileList = document.getElementById('file-list');
         }
 
         const fileExtension = getFileExtension(fileData.filename);
-        const fileIcon = getFileIcon(fileExtension);
         const fileSize = formatFileSize(fileData.file_size || 0);
 
-        const li = document.createElement('li');
-        li.className = 'file-card';
-        li.dataset.fileId = fileData.id;
-        li.innerHTML = `
-            <div class="file-card-header">
-              <div class="file-icon">${fileIcon}</div>
+        const fileItem = document.createElement('div');
+        fileItem.className = 'file-item';
+        fileItem.dataset.fileId = fileData.id;
+        
+        // 파일 아이콘 생성
+        const iconSvg = fileExtension === 'pdf' ? 
+            `<svg width="24" height="24" fill="#E53E3E" viewBox="0 0 24 24">
+                <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z" />
+            </svg>` :
+            `<svg width="24" height="24" fill="#4299E1" viewBox="0 0 24 24">
+                <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z" />
+            </svg>`;
+        
+        fileItem.innerHTML = `
+            <div class="file-icon">${iconSvg}</div>
               <div class="file-info">
-                <h4 class="file-name" title="${escapeHtml(fileData.filename)}">${escapeHtml(fileData.filename)}</h4>
-                <div class="file-meta">
-                  <span class="file-size">${fileSize}</span>
-                  <span class="file-date">방금 전</span>
-                  <span class="file-uploader">${escapeHtml(fileData.uploader_name)}</span>
-                </div>
-              </div>
+                <div class="file-name">${escapeHtml(fileData.filename)}</div>
+                <div class="file-meta">${fileSize} • 방금 전 • ${escapeHtml(fileData.uploader_name)}</div>
             </div>
             <div class="file-actions">
-              <a href="/api/files/${fileData.id}/download" class="btn-download">
+                <a href="/api/files/${fileData.id}/download" class="btn-download" title="다운로드">
                 <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3M3 17V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
                 </svg>
                 다운로드
               </a>
@@ -215,7 +172,7 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
         `;
         
-        currentFileList.prepend(li);
+        currentFileList.prepend(fileItem);
     }
 
     /**
@@ -225,17 +182,7 @@ document.addEventListener('DOMContentLoaded', function() {
         return filename.split('.').pop().toLowerCase();
     }
 
-    function getFileIcon(extension) {
-        const iconMap = {
-            'pdf': 'PDF',
-            'doc': 'DOC', 'docx': 'DOC',
-            'ppt': 'PPT', 'pptx': 'PPT',
-            'xls': 'XLS', 'xlsx': 'XLS',
-            'jpg': 'IMG', 'jpeg': 'IMG', 'png': 'IMG', 'gif': 'IMG',
-            'zip': 'ZIP', 'rar': 'ZIP'
-        };
-        return iconMap[extension] || 'FILE';
-    }
+
 
     function formatFileSize(bytes) {
         if (bytes === 0) return '0 Bytes';
@@ -254,13 +201,13 @@ document.addEventListener('DOMContentLoaded', function() {
     function showEmptyState() {
         const fileListContainer = document.querySelector('.file-list-container');
         fileListContainer.innerHTML = `
-            <h3>업로드된 파일</h3>
+            <h3>공유 파일</h3>
             <div class="empty-state">
                 <svg class="empty-state-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                 </svg>
                 <h3>업로드된 파일이 없습니다</h3>
-                <p>첫 번째 파일을 업로드해보세요</p>
+                <p>파일 업로드 버튼을 클릭하여 첫 번째 파일을 업로드해보세요</p>
             </div>
         `;
     }
@@ -273,6 +220,8 @@ document.addEventListener('DOMContentLoaded', function() {
     function showErrorMessage(message) {
         alert(message);
     }
+
+
 
     /**
      * CSRF 토큰 헬퍼 함수

@@ -4,7 +4,7 @@
 .dashboard-container {
     display: flex;
     min-height: 100vh;
-    background-color: #f7f7f7;
+    background-color: #F8F9FA;
 }
 
 .main-content {
@@ -12,7 +12,7 @@
     padding: 2rem 2rem 2rem 1rem; /* 왼쪽 패딩 줄이기 */
     margin-left: 280px; /* 사이드바 너비만큼 여백 */
     margin-top: 64px; /* 헤더 높이만큼 여백 */
-    background-color: #f7f7f7;
+    background-color: #F8F9FA;
 }
 
 .dashboard-content {
