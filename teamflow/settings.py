@@ -79,6 +79,7 @@ INSTALLED_APPS = [
     'files',
     'schedule',
     'team_log',
+    'roles',
 ]
 
 # ========================================
@@ -285,3 +286,9 @@ SOCIALACCOUNT_STORE_TOKENS = True  # 토큰 저장 활성화
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+env = environ.Env()
+environ.Env.read_env()
+
+# CLOVA
+CLOVA_API_KEY = env("CLOVA_API_KEY")
