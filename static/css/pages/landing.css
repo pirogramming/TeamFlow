@@ -116,7 +116,12 @@
   display: flex;
   align-items: center;
   padding: 6rem 0;
-  background: linear-gradient(135deg, #F8F9FA 0%, #FFFFFF 100%);
+  background: 
+    linear-gradient(135deg, rgba(248, 249, 250, 0.9) 0%, rgba(255, 255, 255, 0.85) 100%),
+    url('/static/images/characters/character4.png');
+  background-size: cover;
+  background-position: center right;
+  background-repeat: no-repeat;
   position: relative;
 }
 
@@ -125,16 +130,19 @@
   width: 100%;
   margin: 0 auto;
   padding: 0 2rem;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 5rem;
+  display: flex;
   align-items: center;
+  justify-content: flex-start;
+  min-height: 80vh;
 }
 
 .hero-content {
   display: flex;
   flex-direction: column;
   gap: 2rem;
+  max-width: 600px;
+  z-index: 2;
+  position: relative;
 }
 
 .hero-badge {

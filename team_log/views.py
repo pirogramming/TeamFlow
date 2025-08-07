@@ -19,15 +19,24 @@ def team_log_detail_page(request, team_id):
 
 # ---------- API ----------
 def all_team_logs_api(request):
+    # TODO: 현재는 모든 팀을 반환하고 있음 - 사용자가 속한 팀만 반환하도록 수정 필요
+    # teams = Team.objects.filter(members=request.user)
     teams = Team.objects.all().values('id', 'name', 'created_at')
 
     result = []
     for t in teams:
+        # TODO: 프론트엔드에서 필요한 추가 데이터:
+        # 1. 팀원 정보 (이름 리스트)
+        # 2. 진행률 데이터 (완료된 작업 수, 전체 작업 수)
+        # 3. 실제 진행 상태 계산
         result.append({
             "team_id": t['id'],
             "title": t['name'],
-            "status": "진행중",
+            "status": "진행중",  # TODO: Task 완료율 기반으로 계산 필요
             "last_activity": format_date(t['created_at']),
+            # TODO: 아래 필드들 추가 필요
+            # "members": [팀원 이름 리스트],
+            # "progress": {"completed": 완료작업수, "total": 전체작업수, "percentage": 진행율}
         })
 
     return JsonResponse(result, safe=False)
