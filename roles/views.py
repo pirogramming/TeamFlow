@@ -138,19 +138,39 @@ def recommend_role_api(request):
             traits = data.get("traits", [])
             preferences = data.get("preferences", [])
 
+            # 현재 팀 ID를 세션에서 가져옵니다.
+            current_team_id = request.session.get('current_team_id')
+            if not current_team_id:
+                return JsonResponse({"error": "현재 팀 정보가 없습니다. 먼저 팀 페이지에 접속해주세요."}, status=400)
+
+            team = get_object_or_404(Team, id=current_team_id)
+
+            # 현재 팀에 등록된 역할들의 이름을 가져옵니다.
+            # 이 역할들을 AI에게 추천 가능한 역할 종류로 전달합니다.
+            available_role_names = list(Role.objects.filter(team=team).values_list('name', flat=True))
+            if not available_role_names:
+                return JsonResponse({"error": "현재 팀에 등록된 역할이 없습니다. 먼저 역할을 생성해주세요."}, status=400)
+
+            # clova_ai.py의 make_prompt 함수를 사용하여 기본 프롬프트를 생성합니다.
             prompt = make_prompt(major, traits, preferences)
-            print("🟢 프롬프트:", prompt)
 
-            clova_response = call_clova_recommendation(prompt)
-            print("📦 응답 전체:", json.dumps(clova_response, indent=2, ensure_ascii=False))
+            print("🟢 사용자 프롬프트:", prompt)
+            print("🟢 AI에게 전달할 추천 가능 역할 종류:", available_role_names)
 
-            # ✅ result 키가 있는지 확인
-            if "result" not in clova_response:
-                return JsonResponse({"error": "Clova 응답 실패", "detail": clova_response}, status=500)
+            # ✅ clova_ai.py의 call_clova_recommendation 함수를 호출합니다.
+            # 이 함수는 (추천 역할, 추천 이유) 튜플을 반환합니다.
+            recommended_role, reason = call_clova_recommendation(prompt, available_role_names)
 
-            content = clova_response["result"]["output"]
-            return JsonResponse({"recommended_role": content})
+            if recommended_role and reason:
+                return JsonResponse({
+                    "recommended_role": recommended_role,
+                    "reason": reason
+                })
+            else:
+                return JsonResponse({"error": "Clova 응답에서 추천 역할을 파싱할 수 없거나 유효한 내용이 없습니다.", "detail": "AI 응답 형식을 확인하세요."}, status=500)
 
+        except json.JSONDecodeError:
+            return JsonResponse({'error': '잘못된 요청 형식입니다.'}, status=400)
         except Exception as e:
             import traceback
             print("❌ 에러 발생:", e)
