@@ -15,6 +15,7 @@ def team_log_page(request):
     return render(request, 'main/team_log.html')
 
 def team_log_detail_page(request, team_id):
+    request.session['current_team_id'] = team_id  # 현재 팀 ID를 세션에 저장
     return render(request, 'main/team_log_detail.html', {'team_id': team_id})
 
 # ---------- API ----------
