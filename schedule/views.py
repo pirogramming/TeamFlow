@@ -22,6 +22,7 @@ def calendar_page_view(request, team_id):
     일정 관리(FullCalendar) 메인 HTML 페이지를 렌더링합니다.
     """
     team = get_object_or_404(Team, id=team_id)
+    request.session['current_team_id'] = team.id  # 현재 팀 ID를 세션에 저장
     context = {
         'team': team,
     }

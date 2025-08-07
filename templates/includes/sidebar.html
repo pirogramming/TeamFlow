@@ -2,6 +2,12 @@
 <!-- 사이드바 메뉴 (네비게이션 링크) -->
 <aside class="sidebar">
     <div class="sidebar-container">
+        <!-- 로고 섹션 -->
+        <div class="sidebar-logo">
+            <h1 class="logo">TeamFlow</h1>
+            <div class="logo-subtitle">미니로그</div>
+        </div>
+        
         <!-- 상단 네비게이션 -->
         <nav class="sidebar-nav">
             <ul class="nav-list">
@@ -9,7 +15,7 @@
                 <li class="nav-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
                     <a href="/dashboard/" class="nav-link" id="dashboard-link">
                         <svg class="nav-icon" fill="currentColor" viewBox="0 0 24 24" width="20" height="20">
-                            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                            <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>
                         </svg>
                         <span class="nav-text">대시보드</span>
                     </a>
@@ -19,7 +25,7 @@
                 <li class="nav-item {% if request.resolver_match.url_name == 'calendar_page' %}active{% endif %}">
                     <a href="{% if team %}{% url 'calendar_page' team.id %}{% else %}#{% endif %}" class="nav-link">
                         <svg class="nav-icon" fill="currentColor" viewBox="0 0 24 24" width="20" height="20">
-                            <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/>
+                            <path d="M9 11H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm2-7h-1V2h-2v2H8V2H6v2H5c-1.1 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z"/>
                         </svg>
                         <span class="nav-text">일정</span>
                     </a>
@@ -29,7 +35,7 @@
                 <li class="nav-item {% if request.resolver_match.url_name == 'tasks-page' %}active{% endif %}">
                     <a href="{% if team %}{% url 'tasks-page' team.id %}{% else %}#{% endif %}" class="nav-link">
                         <svg class="nav-icon" fill="currentColor" viewBox="0 0 24 24" width="20" height="20">
-                            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7l-2-2 1.41-1.41L10 17.17l7.59-7.59L19 11l-9 9z"/>
                         </svg>
                         <span class="nav-text">작업</span>
                     </a>
@@ -39,7 +45,7 @@
                 <li class="nav-item {% if request.resolver_match.url_name == 'file_list' %}active{% endif %}">
                     <a href="{% if team %}{% url 'file_list' team.id %}{% else %}#{% endif %}" class="nav-link">
                         <svg class="nav-icon" fill="currentColor" viewBox="0 0 24 24" width="20" height="20">
-                            <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+                            <path d="M10 4H4c-1.11 0-2 .89-2 2v12c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2h-8l-2-2z"/>
                         </svg>
                         <span class="nav-text">자료</span>
                     </a>
@@ -49,7 +55,7 @@
                 <li class="nav-item {% if 'roles' in request.path %}active{% endif %}">
                     <a href="/roles/" class="nav-link">
                         <svg class="nav-icon" fill="currentColor" viewBox="0 0 24 24" width="20" height="20">
-                            <path d="M16 4c0-1.11.89-2 2-2s2 .89 2 2-.89 2-2 2-2-.89-2-2zm4 18v-6h2.5l-2.54-7.63A1.999 1.999 0 0 0 18.06 7c-.8 0-1.54.5-1.85 1.26l-1.45 3.63c-.25.65-.65 1.15-1.18 1.46C14.28 13.78 15 14.8 15 16v6h5z"/>
+                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
                         </svg>
                         <span class="nav-text">역할</span>
                     </a>
@@ -59,7 +65,7 @@
                 <li class="nav-item {% if 'team-log' in request.path %}active{% endif %}">
                     <a href="/api/dashboard/team_log/list/" class="nav-link">
                         <svg class="nav-icon" fill="currentColor" viewBox="0 0 24 24" width="20" height="20">
-                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                            <path d="M13 3a9 9 0 0 0-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42A8.954 8.954 0 0 0 13 21a9 9 0 0 0 0-18zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/>
                         </svg>
                         <span class="nav-text">팀플 기록</span>
                     </a>
@@ -75,12 +81,12 @@
                     <div class="profile-avatar">
                         <div class="avatar-placeholder" id="user-avatar">
                             <!-- 사용자 이름의 첫 글자 표시 -->
-                            <span class="avatar-text" id="avatar-text"></span>
+                            <span class="avatar-text" id="avatar-text">{{ user_display_name|first|upper|default:"U" }}</span>
                         </div>
                     </div>
                     <div class="profile-info">
-                        <span class="profile-name" id="user-name">김철수</span>
-                        <span class="profile-role" id="user-role">미정</span>
+                        <span class="profile-name" id="user-name">{{ user_display_name|default:"사용자" }}</span>
+                        <span class="profile-role" id="user-role">{{ team_role|default:"미정" }}</span>
                     </div>
                     <div class="profile-arrow">
                         <svg fill="currentColor" viewBox="0 0 24 24" width="16" height="16">

@@ -101,7 +101,7 @@ class DashboardAPIView(APIView):
                 'team_members': list(team_members),
                 'total_progress': total_progress,
                 'personal_progress': personal_progress,
-                'deadline_imminent_count': deadline_imminent_count,
+        
                 'team_tasks': list(team_tasks.values('id', 'name', 'status', 'due_date', 'type', 'assignee__first_name', 'assignee__username', 'description')),
                 'personal_tasks': list(personal_tasks.values('id', 'name', 'status', 'due_date', 'type', 'description')),
             }
@@ -173,17 +173,7 @@ def dashboard_page(request):
     personal_completed_count = personal_tasks.filter(status='completed').count()
     personal_progress = int((personal_completed_count / personal_tasks_count) * 100) if personal_tasks_count > 0 else 0
 
-    # 헤더 알림용 마감 임박 작업 수 계산 (팀 작업 + 개인 작업)
-    deadline_imminent_count = team_tasks.filter(due_date__isnull=False).count() + personal_tasks.filter(due_date__isnull=False).count()
-    # 실제로는 is_deadline_imminent 속성을 사용해야 함
-    deadline_imminent_tasks = []
-    for task in team_tasks:
-        if task.is_deadline_imminent:
-            deadline_imminent_tasks.append(task)
-    for task in personal_tasks:
-        if task.is_deadline_imminent:
-            deadline_imminent_tasks.append(task)
-    deadline_imminent_count = len(deadline_imminent_tasks)
+    # deadline_imminent_count는 context processor에서 전역적으로 처리
 
     return render(request, 'main/dashboard.html', {
         'team': team,
@@ -196,7 +186,7 @@ def dashboard_page(request):
         'completed_tasks_count': completed_tasks_count,
         'personal_tasks_count': personal_tasks_count,
         'personal_completed_count': personal_completed_count,
-        'deadline_imminent_count': deadline_imminent_count,
+
     })
 # ========================================
 

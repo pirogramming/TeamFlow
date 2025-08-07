@@ -15,6 +15,7 @@ def file_list_view(request, team_id):
     특정 팀의 파일 목록 페이지를 보여주는 뷰
     """
     team = get_object_or_404(Team, id=team_id)
+    request.session['current_team_id'] = team.id  # 현재 팀 ID를 세션에 저장
     files = File.objects.filter(team=team).order_by('-uploaded_at') # 최신순으로 정렬
     
     context = {
