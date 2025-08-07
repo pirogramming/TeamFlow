@@ -17,72 +17,48 @@
 <div class="page-container">
   <div class="view-header">
     <h1>자료 관리</h1>
-    {% if files %}
-    <a href="{% url 'files_batch_download' team.id %}" class="btn-upload">
-      <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
-      </svg>
-      전체 다운로드
-    </a>
-    {% endif %}
-  </div>
-
-  <!-- 파일 업로드 섹션 -->
-  <div class="upload-container">
-    <h3>파일 업로드</h3>
-    <div class="upload-area" id="upload-area">
-      <svg class="upload-area-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
-      </svg>
-      <p class="upload-area-text">파일을 드래그하여 업로드하세요</p>
-      <p class="upload-area-subtext">또는 클릭하여 파일을 선택하세요 (최대 50MB)</p>
-    </div>
-    <form id="file-upload-form" class="upload-form">
-      {% csrf_token %}
-      <div class="file-input-wrapper">
-        <input type="file" id="file-input" name="file" class="file-input" required>
-        <button type="button" class="file-input-button">
+    <div class="header-actions">
+      <form id="file-upload-form" class="upload-form">
+        {% csrf_token %}
+        <input type="file" id="file-input" name="file" class="file-input" style="display: none;" accept="*/*">
+        <button type="button" class="btn-upload" id="upload-btn">
           <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
           </svg>
-          파일 선택
+          파일 업로드
         </button>
-      </div>
-      <button type="submit" class="btn-upload" style="margin-left: 0.75rem;">업로드</button>
-    </form>
+      </form>
+    </div>
   </div>
 
   <!-- 파일 목록 -->
   <div class="file-list-container">
-    <h3>업로드된 파일</h3>
+    <h3>공유 파일</h3>
     {% if files %}
-      <ul id="file-list" class="files-grid">
+      <div class="file-list" id="file-list">
         {% for file in files %}
-          <li class="file-card" data-file-id="{{ file.id }}">
-            <div class="file-card-header">
-              <div class="file-icon">
-                {% if file.filename|slice:"-4:" == ".pdf" %}PDF
-                {% elif file.filename|slice:"-4:" == ".doc" or file.filename|slice:"-5:" == ".docx" %}DOC
-                {% elif file.filename|slice:"-4:" == ".ppt" or file.filename|slice:"-5:" == ".pptx" %}PPT
-                {% elif file.filename|slice:"-4:" == ".xls" or file.filename|slice:"-5:" == ".xlsx" %}XLS
-                {% elif file.filename|slice:"-4:" == ".jpg" or file.filename|slice:"-4:" == ".png" or file.filename|slice:"-4:" == ".gif" %}IMG
-                {% elif file.filename|slice:"-4:" == ".zip" or file.filename|slice:"-4:" == ".rar" %}ZIP
-                {% else %}FILE
-                {% endif %}
-              </div>
-              <div class="file-info">
-                <h4 class="file-name" title="{{ file.filename }}">{{ file.filename }}</h4>
-                <div class="file-meta">
-                  <span class="file-size">{{ file.file.size|filesizeformat }}</span>
-                  <span class="file-date">{{ file.uploaded_at|date:"m월 d일" }}</span>
-                  <span class="file-uploader">{{ file.uploader.username }}</span>
-                </div>
+          <div class="file-item" data-file-id="{{ file.id }}">
+            <div class="file-icon">
+              {% if file.filename|slice:"-4:" == ".pdf" %}
+                <svg width="24" height="24" fill="#E53E3E" viewBox="0 0 24 24">
+                  <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z" />
+                </svg>
+              {% else %}
+                <svg width="24" height="24" fill="#4299E1" viewBox="0 0 24 24">
+                  <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z" />
+                </svg>
+              {% endif %}
+            </div>
+            <div class="file-info">
+              <div class="file-name">{{ file.filename }}</div>
+              <div class="file-meta">
+                {{ file.file.size|filesizeformat }} • {{ file.uploaded_at|date:"Y-m-d" }} • {{ file.uploader.username }}
               </div>
             </div>
             <div class="file-actions">
-              <a href="{% url 'file_download' file.id %}" class="btn-download">
+              <a href="{% url 'file_download' file.id %}" class="btn-download" title="다운로드">
                 <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3M3 17V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
                 </svg>
                 다운로드
               </a>
@@ -92,9 +68,9 @@
                 </svg>
               </button>
             </div>
-          </li>
+          </div>
         {% endfor %}
-      </ul>
+      </div>
     {% else %}
       <div class="empty-state">
         <svg class="empty-state-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">

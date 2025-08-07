@@ -93,7 +93,10 @@ def create_role_api(request, team_id):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
 
-# 역할 삭제 API
+# ========================================
+# MGP: 역할 삭제 API 추가
+# 역할 삭제 시 할당된 팀원들의 역할 할당도 함께 해제하는 로직 구현
+# ========================================
 @login_required
 @csrf_exempt
 @require_http_methods(["DELETE"])
@@ -124,37 +127,40 @@ def delete_role_api(request, team_id, role_id):
         print(f"[역할 삭제 오류] {str(e)}")
         return JsonResponse({'error': str(e)}, status=500)
 
-# AI 역할 추천 API (확장)
+# AI 역할 추천 API (dev 브랜치 로직 유지)
 @csrf_exempt
 @require_http_methods(["POST"])
 def recommend_role_api(request):
-    try:
-        data = json.loads(request.body)
-        major = data.get("major", "")
-        traits = data.get("traits", [])
-        preferences = data.get("preferences", [])
-        preferred_roles = data.get("preferred_roles", [])  # 선호 역할 추가
-
-        if not major:
-            return JsonResponse({"error": "전공을 입력해주세요."}, status=400)
-
-        # 프롬프트 생성 (선호 역할 포함)
-        prompt = make_enhanced_prompt(major, traits, preferences, preferred_roles)
-        clova_response = call_clova_recommendation(prompt)
-
+    if request.method == "POST":
         try:
-            content = clova_response['result']['message']['content']
-        except:
-            return JsonResponse({"error": "AI 응답 파싱 실패"}, status=500)
+            data = json.loads(request.body)
+            major = data.get("major")
+            traits = data.get("traits", [])
+            preferences = data.get("preferences", [])
 
-        return JsonResponse({"recommended_role": content})
-    
-    except json.JSONDecodeError:
-        return JsonResponse({"error": "잘못된 요청 형식입니다."}, status=400)
-    except Exception as e:
-        return JsonResponse({"error": str(e)}, status=500)
+            prompt = make_prompt(major, traits, preferences)
+            print("🟢 프롬프트:", prompt)
 
-# 역할 할당 API
+            clova_response = call_clova_recommendation(prompt)
+            print("📦 응답 전체:", json.dumps(clova_response, indent=2, ensure_ascii=False))
+
+            # ✅ result 키가 있는지 확인
+            if "result" not in clova_response:
+                return JsonResponse({"error": "Clova 응답 실패", "detail": clova_response}, status=500)
+
+            content = clova_response["result"]["output"]
+            return JsonResponse({"recommended_role": content})
+
+        except Exception as e:
+            import traceback
+            print("❌ 에러 발생:", e)
+            traceback.print_exc()
+            return JsonResponse({"error": str(e)}, status=500)
+
+# ========================================
+# MGP: 역할 할당 API 추가
+# 팀원에게 역할을 할당하거나 업데이트하는 기능 구현
+# ========================================
 @login_required
 @csrf_exempt
 @require_http_methods(["POST", "PATCH"])
@@ -198,7 +204,10 @@ def assign_role_api(request, team_id):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
 
-# 개선된 프롬프트 생성 함수
+# ========================================
+# MGP: 개선된 프롬프트 생성 함수 추가
+# 선호 역할을 포함한 더 상세한 AI 추천을 위한 프롬프트 생성
+# ========================================
 def make_enhanced_prompt(major, traits, preferences, preferred_roles):
     traits_str = ", ".join(traits) if traits else "없음"
     prefs_str = ", ".join(preferences) if preferences else "없음"
