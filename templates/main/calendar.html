@@ -113,6 +113,23 @@
   <div id="hover-tooltip" class="tooltip">
     <div class="tooltip-content"></div>
   </div>
+
+  <div id="event-detail-modal" class="modal-overlay">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3 id="modal-title">일정 상세 정보</h3>
+        <button id="close-detail-modal-btn" class="modal-close-btn">&times;</button>
+      </div>
+      <div class="modal-content">
+        <div id="modal-body">
+          <!-- JS가 동적으로 채울 내용 -->
+        </div>
+        <div class="modal-actions">
+          <button id="delete-event-btn" class="btn btn-danger">삭제</button>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}
 
