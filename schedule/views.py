@@ -45,7 +45,8 @@ def schedule_list_view(request, team_id):
 
     meetings = Meeting.objects.filter(team_id=team_id)
     tasks = Task.objects.filter(team_id=team_id) # 나중에 Task 기능 추가 시
-
+    today = date.today()
+    
     events = []
     for meeting in meetings:
         events.append({
@@ -56,9 +57,29 @@ def schedule_list_view(request, team_id):
             'color': '#3498db', # 회의는 파란색 계열로 표시
             'type': 'meeting'
         })
+    for task in tasks:
+        # 마감일이 없는 Task는 건너뜁니다.
+        if task.due_date < today:
+            color = '#000000' # 검은색
+        # 마감일이 오늘로부터 2일 이내이면 빨간색
+        elif (task.due_date - today).days <= 2:
+            color = '#e74c3c' # 빨간색
+        # 개인 할 일이면 초록색
+        elif task.type == 'personal':
+            color = '#2ecc71' # 초록색
+        # 팀 할 일이면 노란색
+        elif task.type == 'team':
+            color = '#f1c40f' # 노란색
+        
+        events.append({
+            'id': task.id, # 과제 수정을 위해 id 추가
+            'title': task.name,
+            'start': task.due_date.isoformat(), # 과제는 하루 종일 일정
+            'allDay': True, # 하루 종일 일정으로 표시
+            'color': color,
+            'type': 'task'
+        })
     
-    # for task in tasks:
-    #     events.append({ ... }) # 과제는 다른 색으로 표시
 
     return JsonResponse(events, safe=False)
 

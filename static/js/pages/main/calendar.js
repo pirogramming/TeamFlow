@@ -90,7 +90,7 @@ document.addEventListener('DOMContentLoaded', function() {
             headerToolbar: { 
                 left: 'prev,next today', 
                 center: 'title', 
-                right: 'dayGridMonth,timeGridWeek,listWeek' 
+                right: 'dayGridMonth' 
             },
             events: `/api/teams/${teamId}/schedule/detail`,
             editable: true,
@@ -235,7 +235,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const timeSlots = [];
         
         // 9:00 ~ 21:00 시간 슬롯 생성
-        for (let hour = 9; hour <= 21; hour++) {
+        for (let hour = 0; hour <= 24; hour++) {
             timeSlots.push(`${hour.toString().padStart(2, '0')}00`);
         }
 
