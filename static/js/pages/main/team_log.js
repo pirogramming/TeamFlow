@@ -4,6 +4,59 @@
  */
 
 document.addEventListener('DOMContentLoaded', function() {
+    // ===== 공용 유틸: 로컬 숨김(본인 PC 전용) =====
+    const TeamLogLocalHide = (() => {
+        const HIDE_KEY_PREFIX = 'teamlog_hidden_'; // team별로 구분
+
+        function getHiddenSet(teamId){
+            const raw = localStorage.getItem(HIDE_KEY_PREFIX + teamId);
+            return new Set(raw ? JSON.parse(raw) : []);
+        }
+        function saveHiddenSet(teamId, set){
+            localStorage.setItem(HIDE_KEY_PREFIX + teamId, JSON.stringify([...set]));
+        }
+        function hideLocally(teamId, logClientId){
+            const s = getHiddenSet(teamId);
+            s.add(logClientId);
+            saveHiddenSet(teamId, s);
+            // 이 페이지에선 로그 렌더가 없으니 noop. 상세페이지에선 render() 호출
+        }
+        function filterLogs(teamId, logs){
+            const hidden = getHiddenSet(teamId);
+            // 로그 객체에 client_id가 있어야 함(상세 페이지에서 생성/부여)
+            return logs.filter(l => !hidden.has(l.client_id));
+        }
+        return { getHiddenSet, saveHiddenSet, hideLocally, filterLogs };
+    })();
+
+    // 전역 노출(상세 페이지에서도 쓰게)
+    window.TeamLogLocalHide = TeamLogLocalHide;
+
+    // ===== 탭 해시 제거 (탭이 있을 때만 동작; 없으면 조용히 패스) =====
+    (function initTabWithoutHash(){
+        const tabs = document.querySelectorAll('.tab[data-tab], .tab[href^="#"]');
+        if (!tabs.length) return;
+
+        tabs.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                // a[href="#..."]면 기본 해시 이동 막기
+                if (btn.tagName === 'A' && btn.getAttribute('href')?.startsWith('#')) {
+                    e.preventDefault();
+                }
+                const tab = btn.dataset.tab || btn.getAttribute('href')?.replace('#','') || '';
+                if (!tab) return;
+
+                // TODO: 실제 탭 컨텐츠 전환 로직 호출 (예: showTab(tab))
+                // showTab(tab);
+
+                const url = new URL(window.location);
+                url.searchParams.set('tab', tab);
+                history.pushState({}, '', url); // # 안 붙음
+            });
+        });
+    })();
+
+
     // DOM 요소 참조
     const loadingSkeleton = document.getElementById('loading-skeleton');
     const teamProjectsGrid = document.getElementById('team-projects-grid');
@@ -66,6 +119,11 @@ document.addEventListener('DOMContentLoaded', function() {
         const mockTeamMembers = generateMockTeamMembers(project.team_id);
         const progressPercentage = calculateProgressPercentage(project);
 
+        // /api/dashboard/{teamid} 로 이동
+        // 백엔드에서 내려주는 project.dashboard_url이 우선, 없으면 폴백
+        const dashboardUrl = project.dashboard_url || `/api/dashboard/${project.team_id}/`;
+
+
         return `
             <div class="project-card">
                 <div class="project-card-header">
@@ -109,7 +167,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
 
                 <div class="project-card-actions">
-                    <a href="/api/dashboard/team_log/${project.team_id}/list/" class="btn-primary">
+                    <a href="${dashboardUrl}" class="btn-primary">
                         <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         </svg>
