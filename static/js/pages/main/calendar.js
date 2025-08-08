@@ -30,7 +30,15 @@ document.addEventListener('DOMContentLoaded', function() {
     const when2meetGrid = document.getElementById('when2meet-grid');
     const saveVoteBtn = document.getElementById('save-vote-btn');
     const tooltip = document.getElementById('hover-tooltip');
-    
+    // modal 관련 요소
+    const detailModal = document.getElementById('event-detail-modal');
+    const closeDetailModalBtn = document.getElementById('close-detail-modal-btn');
+    const deleteEventBtn = document.getElementById('delete-event-btn');
+    const modalBody = document.getElementById('modal-body');
+    const modalTitle = document.getElementById('modal-title');
+    let currentEventId = null;
+    let currentEventType = null;
+
     // 상태 변수
     let calendar = null;
     let isMouseDown = false;
@@ -97,8 +105,29 @@ document.addEventListener('DOMContentLoaded', function() {
             timeZone: 'local',
             height: 'auto',
             eventClick: function(info) {
-                // 일정 클릭 시 수정/삭제 기능 (나중에 구현 가능)
-                console.log('일정 클릭:', info.event.title);
+                const event = info.event;
+                currentEventId = event.id; // meeting_1 또는 task_1 형태
+                currentEventType = event.extendedProps.type;
+
+                modalTitle.textContent = event.title;
+                
+                let contentHTML = '';
+                if (currentEventType === 'task') {
+                    contentHTML = `
+                        <p><strong>상태:</strong> ${event.extendedProps.status}</p>
+                        <p><strong>담당자:</strong> ${event.extendedProps.assignee}</p>
+                        <p><strong>마감일:</strong> ${new Date(event.start).toLocaleDateString()}</p>
+                        <p><strong>설명:</strong> ${event.extendedProps.description || '없음'}</p>
+                    `;
+                } else { // meeting
+                    contentHTML = `
+                        <p><strong>시작:</strong> ${new Date(event.start).toLocaleString()}</p>
+                        <p><strong>종료:</strong> ${new Date(event.end).toLocaleString()}</p>
+                        <p><strong>설명:</strong> ${event.extendedProps.description || '팀 회의입니다.'}</p>
+                    `;
+                }
+                modalBody.innerHTML = contentHTML;
+                detailModal.classList.add('active');
             }
         });
 
@@ -109,6 +138,52 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('❌ FullCalendar 렌더링 오류:', error);
             calendarEl.innerHTML = '<p style="color: red; text-align: center; padding: 2rem;">캘린더를 불러올 수 없습니다.</p>';
         }
+
+        // ✨ 모달 닫기 이벤트
+        closeDetailModalBtn.addEventListener('click', () => detailModal.classList.remove('active'));
+        detailModal.addEventListener('click', (e) => {
+            if (e.target === detailModal) {
+                detailModal.classList.remove('active');
+            }
+        });
+
+        // ✨ 삭제 버튼 클릭 이벤트
+        deleteEventBtn.addEventListener('click', async () => {
+            if (!currentEventId || !currentEventType) return;
+
+            if (confirm('정말로 이 일정을 삭제하시겠습니까?')) {
+                const [type, id] = currentEventId.split('_');
+                let deleteUrl = '';
+                
+                // 타입에 따라 다른 삭제 API 호출
+                if (type === 'task') {
+                    // '/api/dashboard/' -> '/api/teams/'로 변경
+                    deleteUrl = `/api/teams/${teamId}/tasks/${id}/delete/`;
+                } else if (type === 'meeting') {
+                    // 이 URL은 이미 올바릅니다.
+                    deleteUrl = `/api/teams/${teamId}/schedule/${id}/delete`;
+                }
+
+                try {
+                    const response = await fetch(deleteUrl, {
+                        method: 'DELETE', // tasks/views.py의 TaskDeleteView는 DELETE를 사용
+                        headers: { 'X-CSRFToken': getCookie('csrftoken') }
+                    });
+
+                    if (response.ok) {
+                        showToast('일정이 삭제되었습니다.', 'success');
+                        detailModal.classList.remove('active');
+                        calendar.refetchEvents();
+                    } else {
+                        const result = await response.json();
+                        showToast(`삭제 실패: ${result.error || '알 수 없는 오류'}`, 'error');
+                    }
+                } catch (error) {
+                    console.error('삭제 오류:', error);
+                    showToast('오류가 발생했습니다.', 'error');
+                }
+            }
+        });
     }
 
     /**

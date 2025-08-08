@@ -77,7 +77,12 @@ def schedule_list_view(request, team_id):
             'start': task.due_date.isoformat(), # 과제는 하루 종일 일정
             'allDay': True, # 하루 종일 일정으로 표시
             'color': color,
-            'type': 'task'
+            'extendedProps': {
+                'type': 'task',
+                'description': task.description,
+                'assignee': task.assignee.username if task.assignee else '미지정',
+                'status': task.get_status_display(), # 'pending' -> '대기중'
+            }
         })
     
 
