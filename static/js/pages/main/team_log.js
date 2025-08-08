@@ -90,7 +90,9 @@ document.addEventListener('DOMContentLoaded', function() {
      * 백엔드에서 팀 프로젝트 목록 가져오기
      */
     async function fetchTeamProjects() {
-        const response = await fetch('/api/dashboard/team_log/api/list/');
+        const response = await fetch('/api/dashboard/team_log/api/list/', {
+            credentials: 'same-origin'
+        });
         
         if (!response.ok) {
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -112,24 +114,26 @@ document.addEventListener('DOMContentLoaded', function() {
      * 개별 프로젝트 카드 HTML 생성
      */
     function createProjectCard(project) {
-        const statusClass = project.status === '완료' ? 'status-completed' : 'status-active';
-        const statusText = project.status === '완료' ? '완료' : '진행중';
-        
-        // 가상의 팀원 데이터 (실제로는 백엔드에서 제공해야 함)
-        const mockTeamMembers = generateMockTeamMembers(project.team_id);
-        const progressPercentage = calculateProgressPercentage(project);
+        const teamMembers = project.team_members || { names: [], totalTasks: 0, completedTasks: 0 };
+        const totalTasks = Number(teamMembers.totalTasks) || 0;
+        const completedTasks = Number(teamMembers.completedTasks) || 0;
+        const progressPercentage = (typeof project.progress_percentage === 'number')
+            ? project.progress_percentage
+            : (totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0);
+
+        const isCompleted = totalTasks > 0 && completedTasks >= totalTasks;
+        const statusClass = isCompleted ? 'status-completed' : 'status-active';
+        const statusText = isCompleted ? '완료' : '진행중';
 
         // /api/dashboard/{teamid} 로 이동
         // 백엔드에서 내려주는 project.dashboard_url이 우선, 없으면 폴백
         const dashboardUrl = project.dashboard_url || `/api/dashboard/${project.team_id}/`;
-
 
         return `
             <div class="project-card">
                 <div class="project-card-header">
                     <div>
                         <h3 class="project-title">${escapeHtml(project.title)}</h3>
-                        <p class="project-description">${formatProjectPeriod(project.last_activity)}</p>
                     </div>
                     <span class="project-status ${statusClass}">${statusText}</span>
                 </div>
@@ -139,10 +143,10 @@ document.addEventListener('DOMContentLoaded', function() {
                         <svg class="members-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
                         </svg>
-                        팀원 ${mockTeamMembers.names.length}명
+                        팀원 ${teamMembers.names.length}명
                     </div>
                     <div class="team-members-list">
-                        ${renderTeamMembersList(mockTeamMembers)}
+                        ${renderTeamMembersList(teamMembers)}
                     </div>
                 </div>
 
@@ -156,11 +160,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                     <div class="detailed-progress">
                         <div class="progress-item">
-                            <p class="progress-number completed">${mockTeamMembers.completedTasks}</p>
+                            <p class="progress-number completed">${completedTasks}</p>
                             <p class="progress-item-label">완료 작업</p>
                         </div>
                         <div class="progress-item">
-                            <p class="progress-number in-progress">${mockTeamMembers.totalTasks}</p>
+                            <p class="progress-number in-progress">${totalTasks}</p>
                             <p class="progress-item-label">전체 작업</p>
                         </div>
                     </div>
@@ -186,32 +190,7 @@ document.addEventListener('DOMContentLoaded', function() {
         return names.join(', ');
     }
 
-    /**
-     * 진행률 계산 (임시 로직)
-     */
-    function calculateProgressPercentage(project) {
-        // 실제로는 백엔드에서 계산된 값을 받아야 함
-        const mockProgress = Math.floor(Math.random() * 101);
-        return mockProgress;
-    }
-
-    /**
-     * 가상 팀원 데이터 생성 (실제로는 백엔드에서 제공)
-     */
-    function generateMockTeamMembers(teamId) {
-        const memberNames = ['김철수', '이영희', '박민수', '최지은', '정현우'];
-        const teamSize = Math.floor(Math.random() * 4) + 2; // 2-5명
-        const selectedNames = memberNames.slice(0, teamSize);
-        
-        const totalTasks = Math.floor(Math.random() * 15) + 5; // 5-20개
-        const completedTasks = Math.floor(totalTasks * (Math.random() * 0.8 + 0.1)); // 10-90%
-
-        return {
-            names: selectedNames,
-            totalTasks,
-            completedTasks
-        };
-    }
+    
 
     /**
      * 프로젝트 기간 포맷팅
