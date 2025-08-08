@@ -10,3 +10,4 @@ djangorestframework-simplejwt
 google-auth
 python-dotenv
 django-environ
+openai
