@@ -9,24 +9,53 @@ function readTeamIdFromPath() {
   return null;
 }
 
-let currentTeamId = readTeamIdFromPath(); // 진입 시 URL을 우선 사용
+// PATCH: 전역 단일 소스
+window.currentTeamId ??= null;
+window.currentTeamId = readTeamIdFromPath() ?? window.currentTeamId;
 
-
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() { // PATCH: async
+    // 헤더 초기화 전에 URL 없으면 세션에서 보완
+    await resolveInitialTeamId(); // PATCH
     // 헤더 초기화
-    initializeHeader();
-    
+    await initializeHeader();
     // 이벤트 리스너 등록
     setupHeaderEventListeners();
 });
+
+// PATCH: URL 없으면 세션으로 현재 팀 해석
+async function resolveInitialTeamId() {
+    const fromUrl = readTeamIdFromPath();
+    if (fromUrl) {
+        window.currentTeamId = fromUrl;
+        await ensureSessionTeam(fromUrl);
+        return fromUrl;
+    }
+    try {
+        const r = await fetch('/api/teams/current/', {
+            method: 'GET',
+            credentials: 'same-origin',
+            headers: { 'X-CSRFToken': getCsrfToken(), 'Content-Type': 'application/json' }
+        });
+        if (r.ok) {
+            const j = await r.json();
+            if (j?.success && j?.team?.id) {
+                window.currentTeamId = j.team.id;
+                return window.currentTeamId;
+            }
+        }
+    } catch (e) {
+        console.warn('resolveInitialTeamId error:', e);
+    }
+    return null;
+}
 
 // 헤더 초기화
 async function initializeHeader() {
     console.log('헤더 초기화 시작');
 
     // 1) URL team_id를 세션 current_team_id로 반영
-    if (currentTeamId) {
-        await ensureSessionTeam(currentTeamId);
+    if (window.currentTeamId) { // PATCH
+        await ensureSessionTeam(window.currentTeamId); // PATCH
     }
 
     // 2) 팀 목록 먼저 로드(드롭다운 옵션 생성)
@@ -34,6 +63,11 @@ async function initializeHeader() {
 
     // 3) 현재 프로젝트(헤더 타이틀) 로드
     await loadCurrentProject();
+
+    // PATCH: 현재 팀 하이라이트
+    if (window.currentTeamId) {
+        markActiveProjectItem(window.currentTeamId);
+    }
 
     console.log('헤더 초기화 완료');
 }
@@ -167,7 +201,7 @@ function updateCurrentProject(teamData) {
     const currentProjectName = document.getElementById('current-project-name');
     console.log('프로젝트 이름 요소:', currentProjectName);
     
-    if (currentProjectName && teamData.name) {
+    if (currentProjectName && teamData?.name) { // PATCH: 안전 가드
         console.log('프로젝트 이름 업데이트:', teamData.name);
         currentProjectName.textContent = teamData.name;
         console.log('업데이트 후 텍스트:', currentProjectName.textContent);
@@ -230,8 +264,8 @@ function updateProjectList(teams) {
     console.log('프로젝트 목록 업데이트 완료');
 
     //현재 팀 하이라이트
-    if (currentTeamId) {
-        markActiveProjectItem(currentTeamId);
+    if (window.currentTeamId) { // PATCH
+        markActiveProjectItem(window.currentTeamId); // PATCH
     }
 }
 
@@ -246,7 +280,7 @@ function markActiveProjectItem(teamId) {
  * 🔗 백엔드 API 연결점 - 헤더에서 프로젝트 변경
  * POST /api/teams/current/  → 세션 변경 후, 해당 팀 대시보드로 이동
  */
-async function selectProject(teamId, teamName) {
+async function selectProject(teamId, teamName) { // PATCH: 전면 보강
     try {
         const response = await fetch('/api/teams/current/', {
             method: 'POST',
@@ -258,29 +292,42 @@ async function selectProject(teamId, teamName) {
             body: JSON.stringify({ team_id: teamId })
         });
         
-        if (response.ok) {
-            const data = await response.json();
-            if (data.success) {
-                updateCurrentProject({ name: teamName });
-                hideProjectDropdown();
-                showHeaderNotification(`프로젝트가 "${teamName}"으로 변경되었습니다.`, 'success');
-                // 팀 전환 전역 이벤트 발행
-                window.dispatchEvent(new CustomEvent('team:changed', { detail: { teamId, teamName } }));
-
-                
-                // 대시보드 새로고침 (만약 대시보드 페이지에 있다면)
-                if (typeof refreshDashboard === 'function') {
-                    console.log('🔄 헤더에서 대시보드 새로고침 요청, teamId:', teamId);
-                    refreshDashboard(teamId); // teamId 전달
-                } else if (typeof loadDashboardData === 'function') {
-                    console.log('⚠️ refreshDashboard 없음, loadDashboardData 사용');
-                    loadDashboardData(teamId); // teamId 전달
-                }
-
-            }
-        } else {
+        if (!response.ok) {
             showHeaderNotification('프로젝트 변경에 실패했습니다.', 'error');
+            return;
         }
+        const data = await response.json();
+        if (!data.success) {
+            showHeaderNotification('프로젝트 변경에 실패했습니다.', 'error');
+            return;
+        }
+
+        // 전역 상태/하이라이트/타이틀 동기화
+        window.currentTeamId = teamId;
+        markActiveProjectItem(teamId);
+        await loadCurrentProject();
+
+        hideProjectDropdown();
+        showHeaderNotification(`프로젝트가 "${teamName}"으로 변경되었습니다.`, 'success');
+
+        // 팀 전환 전역 이벤트 발행
+        window.dispatchEvent(new CustomEvent('team:changed', { detail: { teamId, teamName } }));
+
+        // 대시보드 외 페이지에서는 리로드로 반영
+        if (!location.pathname.startsWith('/api/dashboard/')) {
+            location.reload();
+            return;
+        }
+
+        // 대시보드 새로고침 (만약 대시보드 페이지에 있다면)
+        if (typeof refreshDashboard === 'function') {
+            console.log('🔄 헤더에서 대시보드 새로고침 요청, teamId:', teamId);
+            refreshDashboard(teamId); // teamId 전달
+        } else if (typeof loadDashboardData === 'function') {
+            console.log('⚠️ refreshDashboard 없음, loadDashboardData 사용');
+            loadDashboardData(teamId); // teamId 전달
+        }
+
     } catch (error) {
         console.error('프로젝트 선택 오류:', error);
         showHeaderNotification('프로젝트 변경에 실패했습니다.', 'error');
@@ -317,19 +364,7 @@ function showNoTeamMessage() {
 // 알림 정보 로드 (더미 데이터 - 대시보드에서 실제 데이터 관리)
 async function loadNotificationInfo() {
     try {
-        // 대시보드에서 실제 데이터로 업데이트하므로 여기서는 더미 데이터 사용 안함
         console.log('알림 정보는 대시보드에서 관리됩니다.');
-        
-        // TODO: 실제 API 연결 시 사용
-        // const response = await fetch('/api/notifications/count/');
-        // const notificationData = await response.json();
-        
-        // 임시 더미 데이터 (사용 안함)
-        // const notificationData = {
-        //     deadline_count: 3
-        // };
-        
-        // updateNotificationInfo(notificationData);
     } catch (error) {
         console.error('알림 정보 로드 오류:', error);
     }
@@ -370,12 +405,6 @@ function setupHeaderEventListeners() {
     if (joinTeamBtn) {
         joinTeamBtn.addEventListener('click', handleJoinTeam);
     }
-    
-    // 마감 임박 알림은 클릭 불가능한 안내 표시
-    // const deadlineNotification = document.querySelector('.notification-item');
-    // if (deadlineNotification) {
-    //     deadlineNotification.addEventListener('click', handleDeadlineNotification);
-    // }
     
     // 프로필 토글
     const profileToggle = document.getElementById('profile-toggle');
@@ -430,12 +459,6 @@ function showProjectDropdown() {
         console.log('드롭다운 CSS 클래스 변경 후:', dropdownMenu.className);
         console.log('드롭다운 표시 완료 (CSS 클래스 사용)');
         
-        // 1초 후 다시 확인
-        setTimeout(() => {
-            console.log('1초 후 CSS 클래스 상태:', dropdownMenu.className);
-            console.log('1초 후 실제 표시 상태:', getComputedStyle(dropdownMenu).display);
-        }, 1000);
-        
         // 외부 클릭 시 드롭다운 닫기 - 약간 지연시켜서 즉시 닫히는 것 방지
         setTimeout(() => {
             document.addEventListener('click', handleOutsideClick);
@@ -476,17 +499,16 @@ function handleOutsideClick(event) {
 
 // 팀 생성 핸들러
 function handleCreateTeam() {
-                window.location.href = '/team/create/?from=dashboard';
+    window.location.href = '/team/create/?from=dashboard';
 }
 
 // 팀 참여 핸들러
 function handleJoinTeam() {
-                window.location.href = '/team/join/?from=dashboard';
+    window.location.href = '/team/join/?from=dashboard';
 }
 
 // 마감 임박 알림 핸들러
 function handleDeadlineNotification() {
-    // TODO: 마감 임박 작업 목록 모달 표시
     showHeaderNotification('마감 임박 작업: 3개', 'info');
 }
 
@@ -498,7 +520,6 @@ function handleCreateNewProject() {
 
 // 프로필 토글 핸들러
 function handleProfileToggle() {
-    // TODO: 프로필 메뉴 또는 설정 페이지로 이동
     showHeaderNotification('프로필 설정 기능은 준비 중입니다.', 'info');
 }
 
@@ -553,8 +574,8 @@ function showHeaderNotification(message, type = 'info') {
         notification.style.transform = 'translateX(100%)';
         setTimeout(() => {
             if (notification.parentNode) {
-                notification.remove();
+                notification.remove();s
             }
         }, 300);
     }, 3000);
-} 
+}
