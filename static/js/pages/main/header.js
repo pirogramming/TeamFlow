@@ -262,6 +262,9 @@ async function selectProject(teamId, teamName) {
                 updateCurrentProject({ name: teamName });
                 hideProjectDropdown();
                 showHeaderNotification(`프로젝트가 "${teamName}"으로 변경되었습니다.`, 'success');
+                // 팀 전환 전역 이벤트 발행
+                window.dispatchEvent(new CustomEvent('team:changed', { detail: { teamId, teamName } }));
+
                 
                 // 대시보드 새로고침 (만약 대시보드 페이지에 있다면)
                 if (typeof refreshDashboard === 'function') {
