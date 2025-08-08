@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 현재 팀 ID 가져오기
     currentTeamId = window.location.pathname.split('/')[3];  // /api/dashboard/{team_id}/tasks/
+    loadTasks();
     // 탭 전환
     const tabs = document.querySelectorAll('.task-tab');
     const taskSections = document.querySelectorAll('.task-section');
@@ -258,27 +259,27 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // 작업 편집
-async function editTask(taskId) {
-    const taskForm = document.getElementById('task-form');
-    try {
-        const response = await fetch(`/api/dashboard/${currentTeamId}/tasks/${taskId}/`, {
-            method: 'GET',
-            headers: {
-                'X-CSRFToken': getCsrfToken()
-            }
-        });
+    async function editTask(taskId) {
+        const taskForm = document.getElementById('task-form');
+        try {
+            const response = await fetch(`/api/dashboard/${currentTeamId}/tasks/${taskId}/`, {
+                method: 'GET',
+                headers: {
+                    'X-CSRFToken': getCsrfToken()
+                }
+            });
 
-        if (!response.ok) throw new Error('작업 정보 가져오기 실패');
+            if (!response.ok) throw new Error('작업 정보 가져오기 실패');
 
-        const taskData = await response.json();
-        taskForm.setAttribute('data-task-id', taskId);
-        openModal(true, taskData);
+            const taskData = await response.json();
+            taskForm.setAttribute('data-task-id', taskId);
+            openModal(true, taskData);
 
-    } catch (error) {
-        console.error('작업 편집 오류:', error);
-        showNotification('작업 정보를 가져오는데 실패했습니다.', 'error');
+        } catch (error) {
+            console.error('작업 편집 오류:', error);
+            showNotification('작업 정보를 가져오는데 실패했습니다.', 'error');
+        }
     }
-}
 
 });
 
@@ -483,3 +484,21 @@ async function deleteTask(taskId) {
         showNotification('작업 삭제에 실패했습니다.', 'error');
     }
 }
+
+// 헤더에서 팀이 바뀌면 team:changed 이벤트가 옴
+window.addEventListener('team:changed', (e) => {
+  const { teamId, teamName } = e.detail || {};
+  if (!teamId) return;
+
+  // 1) 현재 team id 갱신
+  currentTeamId = String(teamId);
+
+  // 2) URL도 바꿔줘서 새로고침/공유 시 일관성 유지
+  const newUrl = `/api/dashboard/${currentTeamId}/tasks/`;
+  if (window.location.pathname !== newUrl) {
+    history.replaceState({}, '', newUrl);
+  }
+
+  // 3) 새 팀 데이터로 목록 재로딩
+  loadTasks();
+});
