@@ -1,5 +1,17 @@
 // 헤더 JavaScript - MGP 개발
 
+//URL에서 team_id 읽기: /api/dashboard/{team_id}/
+function readTeamIdFromPath() {
+  const parts = location.pathname.split('/').filter(Boolean); // ["api","dashboard","{id}"]
+  if (parts[0] === 'api' && parts[1] === 'dashboard' && /^\d+$/.test(parts[2] || '')) {
+    return Number(parts[2]);
+  }
+  return null;
+}
+
+let currentTeamId = readTeamIdFromPath(); // 진입 시 URL을 우선 사용
+
+
 document.addEventListener('DOMContentLoaded', function() {
     // 헤더 초기화
     initializeHeader();
@@ -9,16 +21,39 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // 헤더 초기화
-function initializeHeader() {
-    // 헤더는 대시보드에서 통합 관리하므로 여기서는 기본 초기화만
+async function initializeHeader() {
+    console.log('헤더 초기화 시작');
+
+    // 1) URL team_id를 세션 current_team_id로 반영
+    if (currentTeamId) {
+        await ensureSessionTeam(currentTeamId);
+    }
+
+    // 2) 팀 목록 먼저 로드(드롭다운 옵션 생성)
+    await loadProjectList();
+
+    // 3) 현재 프로젝트(헤더 타이틀) 로드
+    await loadCurrentProject();
+
     console.log('헤더 초기화 완료');
-    
-    // 프로젝트 정보 로드
-    loadCurrentProject();
-    loadProjectList();
-    
-    // 알림 정보는 대시보드에서 관리하므로 여기서는 로드하지 않음
-    // loadNotificationInfo(); // 제거됨
+}
+
+//URL의 team_id를 세션 current_team_id로 맞춰두기
+async function ensureSessionTeam(teamId) {
+    try {
+        const res = await fetch('/api/teams/current/', {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: {
+                'X-CSRFToken': getCsrfToken(),
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ team_id: teamId })
+        });
+        console.log('[ensureSessionTeam] status:', res.status);
+    } catch (e) {
+        console.warn('[ensureSessionTeam] failed:', e);
+    }
 }
 
 // 사용자 정보 로드 (대시보드에서 통합 관리)
@@ -43,24 +78,11 @@ function updateUserInfo(userData) {
 
 /**
  * 🔗 백엔드 API 연결점 - 현재 선택된 팀 조회 (헤더용)
- * 
- * 엔드포인트: GET /api/teams/current/
- * 요청 데이터: 없음 (GET 요청)
- * 
- * 기대하는 응답:
- * - 성공시 (200): {success: true, team: {id, name, description, role, is_owner}}
- * - 실패시 (404): {error: "참여한 팀이 없습니다."}
- * 
- * 📋 백엔드 처리 사항:
- * 1. request.session['current_team_id']로 현재 팀 확인
- * 2. 없으면 사용자의 첫 번째 팀을 current_team_id로 설정
- * 3. 해당 팀에서 사용자의 역할 정보도 함께 반환
- * 4. 헤더의 프로젝트 이름 표시에 사용됨
+ * GET /api/teams/current/
  */
 async function loadCurrentProject() {
     try {
         console.log('현재 프로젝트 정보 로드 시작...');
-        
         const response = await fetch('/api/teams/current/', {
             method: 'GET',
             credentials: 'same-origin',
@@ -69,9 +91,9 @@ async function loadCurrentProject() {
                 'Content-Type': 'application/json'
             }
         });
-        
+
         console.log('API 응답 상태:', response.status);
-        
+
         if (response.ok) {
             const data = await response.json();
             console.log('현재 프로젝트 데이터:', data);
@@ -83,7 +105,6 @@ async function loadCurrentProject() {
             }
         } else if (response.status === 404) {
             console.log('참여한 팀이 없습니다.');
-            // 참여한 팀이 없는 경우
             showNoTeamMessage();
         } else {
             console.log('API 응답 오류:', response.status);
@@ -99,32 +120,14 @@ async function loadCurrentProject() {
 
 /**
  * 🔗 백엔드 API 연결점 - 사용자 팀 목록 조회 (헤더 드롭다운용)
- * 
- * 엔드포인트: GET /api/teams/list/
- * 요청 데이터: 없음 (GET 요청)
- * 
- * 기대하는 응답:
- * {
- *   success: true,
- *   teams: [
- *     {id: number, name: string, description: string, role: string, is_owner: boolean, invite_code: string, created_at: string},
- *     ...
- *   ]
- * }
- * 
- * 📋 백엔드 처리 사항:
- * 1. 사용자가 멤버로 속한 모든 팀 조회 (TeamMember.objects.filter(user=request.user))
- * 2. 각 팀에서 사용자의 역할 정보 포함
- * 3. 팀장 여부 (is_owner) 정보 포함
- * 4. 헤더 드롭다운에서 프로젝트 선택에 사용됨
+ * GET /api/teams/list/
  */
 async function loadProjectList() {
     const projectList = document.getElementById('project-list');
     if (!projectList) return;
-    
+
     try {
         console.log('실제 팀 목록 API 호출 시작...');
-        
         const response = await fetch('/api/teams/list/', {
             method: 'GET',
             credentials: 'same-origin',
@@ -133,9 +136,9 @@ async function loadProjectList() {
                 'Content-Type': 'application/json'
             }
         });
-        
+
         console.log('팀 목록 API 응답 상태:', response.status);
-        
+
         if (response.ok) {
             const data = await response.json();
             console.log('팀 목록 데이터:', data);
@@ -176,7 +179,7 @@ function updateCurrentProject(teamData) {
     }
 }
 
-// 프로젝트 목록 업데이트
+// 프로젝트 목록 업데이트 (드롭다운)
 function updateProjectList(teams) {
     console.log('프로젝트 목록 업데이트 시작:', teams);
     
@@ -225,24 +228,23 @@ function updateProjectList(teams) {
     });
     
     console.log('프로젝트 목록 업데이트 완료');
+
+    //현재 팀 하이라이트
+    if (currentTeamId) {
+        markActiveProjectItem(currentTeamId);
+    }
+}
+
+//현재 선택된 팀을 드롭다운에서 강조
+function markActiveProjectItem(teamId) {
+    document.querySelectorAll('#project-list .project-item').forEach(el => {
+        el.classList.toggle('active', String(el.dataset.teamId) === String(teamId));
+    });
 }
 
 /**
  * 🔗 백엔드 API 연결점 - 헤더에서 프로젝트 변경
- * 
- * 엔드포인트: POST /api/teams/current/
- * 요청 데이터: {team_id: number}
- * 
- * 기대하는 응답:
- * - 성공시 (200): {success: true, team: {id, name, description, role}}
- * - 실패시 (403): {error: "해당 팀의 멤버가 아닙니다."}
- * 
- * 📋 백엔드 처리 사항:
- * 1. 사용자가 해당 팀의 멤버인지 확인
- * 2. request.session['current_team_id'] = team_id 설정
- * 3. 세션 저장 (request.session.save())
- * 4. 이후 대시보드 API 호출 시 새로운 팀 데이터 반환
- * 5. 헤더의 현재 프로젝트 이름 업데이트
+ * POST /api/teams/current/  → 세션 변경 후, 해당 팀 대시보드로 이동
  */
 async function selectProject(teamId, teamName) {
     try {

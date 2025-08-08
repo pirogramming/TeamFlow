@@ -9,6 +9,7 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Count
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponseForbidden
+from .models import TeamLog
 
 
 def format_date(date):
