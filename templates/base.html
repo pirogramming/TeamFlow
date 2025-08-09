@@ -1,0 +1,89 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <meta name="csrf-token" content="{{ csrf_token }}" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="{% static 'images/favicon.ico' %}" />
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+    <!-- CSS 파일들 로드 순서 중요: 공통 스타일 → 페이지별 스타일 -->
+    <link rel="stylesheet" href="{% static 'css/common/reset.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/common/variables.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/common/typography.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/common/layout.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/common/components.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/common/animations.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/pages/main/header.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/pages/main/sidebar.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/pages/main/footer.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/responsive.css' %}" />
+
+    <!-- 페이지별 추가 CSS -->
+    {% block extra_css %}{% endblock %}
+
+    <title>TeamFlow - {% block title %}{% endblock %}</title>
+  </head>
+  <body>
+    <meta name="csrf-token" content="{{ csrf_token }}" />
+
+    <!-- 전역 로딩 스피너 -->
+    <div id="global-loading" class="loading-overlay" style="display: none">
+      <div class="loading-spinner">
+        <div class="spinner"></div>
+        <p>처리 중입니다...</p>
+      </div>
+    </div>
+
+    <!-- 전역 알림 시스템 -->
+    <div id="global-notifications" class="notifications-container">
+      {% if messages %}
+        {% for message in messages %}
+        <div class="notification notification-{{ message.tags }}" data-auto-hide="true">
+        <span class="notification-text">{{ message }}</span>
+          <button class="notification-close" type="button" aria-label="닫기">&times;</button>
+      </div>
+        {% endfor %}
+      {% endif %}
+    </div>
+
+    <!-- 헤더 영역 -->
+    {% if user.is_authenticated %}
+      {% include 'includes/header.html' %}
+    {% endif %}
+
+    <!-- 사이드바 영역 -->
+    {% if user.is_authenticated %}
+      {% include 'includes/sidebar.html' %}
+    {% endif %}
+
+    <!-- 메인 컨텐츠 영역 -->
+    <main class="main-content">
+      {% block content %}{% endblock %}
+    </main>
+
+    <!-- 푸터 영역 -->
+    {% include 'includes/footer.html' %}
+
+    <!-- JavaScript 라이브러리 -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="{% static 'js/common/utils.js' %}"></script>
+    <script src="{% static 'js/common/api.js' %}"></script>
+    <script src="{% static 'js/common/components.js' %}"></script>
+    <script src="{% static 'js/pages/main/header.js' %}"></script>
+    <script src="{% static 'js/pages/main/sidebar.js' %}"></script>
+    <script src="{% static 'js/app.js' %}"></script>
+
+    <!-- 페이지별 추가 JavaScript -->
+    {% block extra_js %}{% endblock %}
+  </body>
+</html>

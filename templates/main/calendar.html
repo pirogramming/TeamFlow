@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}일정 관리 - TeamFlow{% endblock %}
+
+{% block extra_css %}
+  <!-- FullCalendar 라이브러리 CSS -->
+  <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/main.min.css' rel='stylesheet' />
+  <!-- 커스텀 CSS -->
+  <link rel="stylesheet" href="{% static 'css/pages/main/calendar.css' %}" />
+{% endblock %}
+
+{% block content %}
+{# Django 템플릿 변수를 JavaScript에서 사용할 수 있도록 데이터 전달 #}
+<script id="team-data" type="application/json">
+  {
+    "teamId": "{{ team.id }}"
+  }
+</script>
+
+<div class="page-container">
+  <!-- 페이지 헤더 -->
+  <div class="calendar-header">
+    <h1>일정 관리</h1>
+  </div>
+
+  <!-- 탭 네비게이션 -->
+  <div class="tab-navigation">
+    <button class="tab-btn active" data-tab="schedule">
+      <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+      </svg>
+      전체 일정
+    </button>
+    <button class="tab-btn" data-tab="meeting">
+      <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+      </svg>
+      회의 시간 조율
+    </button>
+  </div>
+
+  <!-- 탭 컨텐츠 -->
+  <div class="tab-content">
+    <!-- 1. 전체 일정 탭 -->
+    <div id="schedule-tab" class="tab-panel active">
+      <div class="tab-header">
+        <h2>팀 일정</h2>
+        <button id="add-schedule-btn" class="btn btn-primary">
+          <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+          </svg>
+          새 일정 추가
+        </button>
+      </div>
+      <div id="calendar"></div>
+    </div>
+
+    <!-- 2. 회의 시간 조율 탭 -->
+    <div id="meeting-tab" class="tab-panel">
+      <div class="tab-header">
+        <h2>팀 미팅 시간 조율</h2>
+        <button id="save-vote-btn" class="btn btn-primary">
+          <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+          </svg>
+          내 시간 저장하기
+        </button>
+      </div>
+      
+      <div id="when2meet-grid-container">
+        <p>드래그하여 가능한 시간을 선택하세요. 다른 팀원과 겹치는 시간은 색상이 진해집니다.</p>
+        <div id="when2meet-grid">
+          <!-- JS가 동적으로 채울 그리드 -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 일정 추가 모달 -->
+  <div id="schedule-modal" class="modal-overlay">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3>새 일정 추가</h3>
+        <button id="close-modal-btn" class="modal-close-btn">
+          <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+      <form id="add-schedule-form" class="modal-form">
+        <div class="form-group">
+          <label for="schedule-title">일정 제목</label>
+          <input type="text" id="schedule-title" placeholder="예: 팀 최종 발표" required>
+        </div>
+        <div class="form-group">
+          <label for="schedule-start">시작 시간</label>
+          <input type="datetime-local" id="schedule-start" required>
+        </div>
+        <div class="form-group">
+          <label for="schedule-end">종료 시간</label>
+          <input type="datetime-local" id="schedule-end" required>
+        </div>
+        <div class="modal-actions">
+          <button type="button" id="cancel-schedule-btn" class="btn btn-secondary">취소</button>
+          <button type="submit" class="btn btn-primary">일정 추가</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 툴팁 (hover 시 팀원 이름 표시) -->
+  <div id="hover-tooltip" class="tooltip">
+    <div class="tooltip-content"></div>
+  </div>
+
+  <div id="event-detail-modal" class="modal-overlay">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3 id="modal-title">일정 상세 정보</h3>
+        <button id="close-detail-modal-btn" class="modal-close-btn">&times;</button>
+      </div>
+      <div class="modal-content">
+        <div id="modal-body">
+          <!-- JS가 동적으로 채울 내용 -->
+        </div>
+        <div class="modal-actions">
+          <button id="delete-event-btn" class="btn btn-danger">삭제</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+  <!-- FullCalendar 라이브러리 JS -->
+  <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js'></script>
+  <!-- 커스텀 JS -->
+  <script src="{% static 'js/pages/main/calendar.js' %}"></script>
+{% endblock %}

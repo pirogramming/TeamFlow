@@ -1,0 +1,42 @@
+/* 푸터 스타일 - MGP 개발 */
+
+.footer {
+    margin-top: auto;
+    padding: 1.5rem 0;
+    background-color: #f9fafb;
+    border-top: 1px solid #e5e7eb;
+}
+
+.footer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+.footer-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.copyright {
+    font-size: 0.85rem;
+    color: #6b7280;
+    margin: 0;
+    text-align: center;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+    .footer {
+        padding: 1rem 0;
+    }
+    
+    .footer-container {
+        padding: 0 1rem;
+    }
+    
+    .copyright {
+        font-size: 0.8rem;
+    }
+} 

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>팀 설정 - TeamFlow</title>
+    
+    <!-- CSRF Token -->
+    <meta name="csrf-token" content="{{ csrf_token }}" />
+    
+    <!-- CSS -->
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/common/reset.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/common/variables.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/common/typography.css' %}" />
+<link rel="stylesheet" href="{% static 'css/pages/team-setup.css' %}" />
+</head>
+
+<body class="auth-page team-setup-page">
+<!-- 
+    팀 설정 선택 페이지
+    
+    백엔드 개발자 참고사항:
+    1. 사용자 정보 입력 완료 후 이 페이지로 리다이렉션됩니다
+    2. "팀 만들기" 선택 시 /preview/team-setup/ 페이지로 이동
+    3. "팀 참여하기" 선택 시 /preview/team-join/ 페이지로 이동
+    4. 이미 팀이 있는 사용자는 대시보드로 리다이렉션 처리 필요
+-->
+
+<div class="team-setup-container">
+  <div class="container">
+    <div class="team-setup-content">
+      <!-- 헤더 섹션 -->
+      <div class="setup-header">
+        <!-- 사용자 정보 표시 -->
+        <div class="user-info">
+          <div class="user-avatar">
+            <!-- 사용자 이니셜 표시 -->
+            <span class="user-initial">
+              {{ user.first_name.0|default:"U" }}{{ user.last_name.0|default:"" }}
+            </span>
+          </div>
+          <div class="user-details">
+            <h2 class="user-name">{{ user.first_name|default:"사용자" }}</h2>
+            <p class="user-major">
+              {{ user_profile.major|default:"전공 정보" }}
+            </p>
+          </div>
+        </div>
+
+        <!-- 페이지 제목 -->
+        <div class="page-header">
+          <h1 class="page-title">팀 설정</h1>
+          <p class="page-subtitle">새 팀을 만들거나 기존 팀에 참여하세요</p>
+          <p class="page-info">* 팀 설정은 언제든 변경할 수 있습니다. 나중에 새로운 팀을 만들거나 다른 팀에 참여할 수 있으며, 여러 팀에 동시에 소속될 수도 있습니다.</p>
+          
+
+        </div>
+      </div>
+
+      <!-- 팀 설정 옵션 -->
+      <div class="team-options">
+        <!-- 팀 만들기 옵션 -->
+        <div class="option-card" data-option="create">
+          <div class="option-icon">
+            <!-- 팀 만들기 아이콘 -->
+            <svg fill="currentColor" viewBox="0 0 24 24" width="32" height="32">
+              <path
+                d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+              />
+            </svg>
+          </div>
+          <h3 class="option-title">팀 만들기</h3>
+          <p class="option-description">
+            새로운 팀을 만들고 팀원들을 초대하세요.<br />
+            프로젝트를 함께 관리할 수 있습니다.
+          </p>
+          <button
+            type="button"
+            class="btn btn-primary option-btn"
+            onclick="navigateToTeamCreate()"
+            data-action="create"
+          >
+            팀 만들기
+            <svg
+              class="btn-icon"
+              fill="currentColor"
+              viewBox="0 0 24 24"
+              width="20"
+              height="20"
+            >
+              <path
+                d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"
+              />
+            </svg>
+          </button>
+        </div>
+
+        <!-- 팀 참여하기 옵션 -->
+        <div class="option-card" data-option="join">
+          <div class="option-icon">
+            <!-- 팀 참여 아이콘 -->
+            <svg fill="currentColor" viewBox="0 0 24 24" width="32" height="32">
+              <path
+                d="M16 4c0-1.11.89-2 2-2s2 .89 2 2-.89 2-2 2-2-.89-2-2zm4 18v-6h2.5l-2.54-7.63A1.999 1.999 0 0 0 18.06 7c-.8 0-1.54.5-1.85 1.26l-1.45 3.63c-.25.65-.65 1.15-1.18 1.46C14.28 13.78 15 14.8 15 16v6h5zM12.5 11.5c.83 0 1.5-.67 1.5-1.5s-.67-1.5-1.5-1.5S11 9.17 11 10s.67 1.5 1.5 1.5zM5.5 6c1.11 0 2-.89 2-2s-.89-2-2-2-2 .89-2 2 .89 2 2 2zm2 16v-7H9V9.5a2.5 2.5 0 1 0-5 0V15h1.5v7h2z"
+              />
+            </svg>
+          </div>
+          <h3 class="option-title">팀 참여하기</h3>
+          <p class="option-description">
+            초대 코드를 입력하여 기존 팀에 참여하세요.<br />
+            팀원과 함께 프로젝트를 진행할 수 있습니다.
+          </p>
+          <button
+            type="button"
+            class="btn btn-secondary option-btn"
+            onclick="navigateToTeamJoin()"
+            data-action="join"
+          >
+            팀 참여하기
+            <svg
+              class="btn-icon"
+              fill="currentColor"
+              viewBox="0 0 24 24"
+              width="20"
+              height="20"
+            >
+              <path
+                d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"
+              />
+            </svg>
+          </button>
+        </div>
+        
+        <!-- 뒤로가기 링크 (팀 옵션 하단) -->
+        <div class="back-action-bottom">
+          <a href="#" class="back-link-bottom" onclick="goBack(); return false;">
+            뒤로가기
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- 로딩 오버레이 (페이지 전환 시 사용) -->
+<div id="page-transition-loading" class="loading-overlay" style="display: none">
+  <div class="loading-spinner">
+    <div class="spinner"></div>
+    <p id="loading-message">페이지를 불러오는 중...</p>
+  </div>
+</div>
+
+<!-- 
+    구조화된 데이터 (SEO)
+    백엔드: 사용자 온보딩 프로세스 추적용
+-->
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "팀 설정",
+    "description": "TeamFlow 팀 설정 선택 페이지",
+    "isPartOf": {
+      "@type": "WebSite",
+      "name": "TeamFlow"
+    }
+  }
+</script>
+
+<!-- JavaScript -->
+<script src="{% static 'js/pages/team-setup.js' %}"></script>
+</body>
+</html>

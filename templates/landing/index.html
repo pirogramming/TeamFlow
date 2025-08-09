@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TeamFlow - AI로 시작하는 가장 스마트한 팀플 관리</title>
+    
+    <!-- Meta Tags -->
+    <meta property="og:title" content="TeamFlow - AI로 시작하는 가장 스마트한 팀플 관리">
+    <meta property="og:description" content="AI 역할분담부터 실시간 진행률까지, 대학생 팀 프로젝트의 모든 것을 한 곳에서. 복잡한 툴은 이제 그만, TeamFlow는 오직 팀플에만 집중합니다.">
+    <meta name="description" content="AI 역할분담부터 실시간 진행률까지, 대학생 팀 프로젝트의 모든 것을 한 곳에서. 복잡한 툴은 이제 그만, TeamFlow는 오직 팀플에만 집중합니다.">
+    
+    <!-- CSRF Token -->
+    <meta name="csrf-token" content="{{ csrf_token }}" />
+    
+    <!-- CSS -->
+    {% load static socialaccount %}
+    <link rel="stylesheet" href="{% static 'css/common/reset.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/common/variables.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/common/typography.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/pages/landing.css' %}" />
+</head>
+
+<body class="landing-page notion-style">
+    <!-- 
+        TeamFlow 노션 스타일 랜딩 페이지
+        
+        백엔드 개발자 참고사항:
+        1. 이 페이지는 비로그인 사용자를 위한 메인 페이지
+        2. "구글로 시작하기", "무료로 시작하기" 버튼은 Google OAuth 인증으로 연결
+        3. 디자인 가이드 토큰 (#2383E2 등) 적용
+        4. 노션 스타일 레이아웃 및 애니메이션
+    -->
+
+    <!-- Hero Section - 노션 스타일 -->
+    <section class="hero-section">
+        <div class="hero-container">
+            <div class="hero-content">
+                <div class="hero-badge">
+                    ✨ Google 계정으로 10초 만에 가입하세요
+                </div>
+                <h1 class="hero-title">
+                    AI로 시작하는<br />
+                    <span class="highlight-gradient">가장 스마트한 팀플 관리</span>
+                </h1>
+                <p class="hero-description">
+                    AI 역할 분담부터 실시간 진행 상황까지, 대학생 팀 프로젝트의 모든 것을 한 곳에서 관리하세요.<br />
+                    복잡한 툴은 이제 그만. TeamFlow는 오직 팀플에만 집중합니다.
+                </p>
+                <div class="hero-cta">
+                    <a href="{% provider_login_url 'google' %}" class="btn-primary-large">
+                        <img src="{% static 'images/icons/google-icon.svg' %}" alt="Google" />
+                        <span>구글로 시작하기</span>
+                        <span class="btn-arrow">→</span>
+                    </a>
+                    <a href="{% provider_login_url 'google' %}" class="btn-secondary-large">
+                        무료로 시작하기
+                    </a>
+                </div>
+                <div class="hero-trust">
+                    <span class="trust-text">신용카드 정보 없이도 바로 시작할 수 있습니다</span>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- 핵심 가치 소개 섹션 -->
+    <section class="core-values">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">모두가 만족하는 팀플, 불가능하지 않아요</h2>
+                <p class="section-description">
+                    복잡한 팀 프로젝트도 TeamFlow와 함께라면 간단해집니다
+                </p>
+            </div>
+
+            <div class="values-grid">
+                <div class="value-card">
+                    <div class="value-icon">🤖</div>
+                    <h3 class="value-title">갈등 없는 시작</h3>
+                    <h4 class="value-subtitle">AI 역할 분담</h4>
+                    <p class="value-description">
+                        간단한 성향 테스트로 AI가 최적의 역할을 찾아줘요. 더 이상 눈치 보며 역할을 정하지 마세요.
+                    </p>
+                </div>
+
+                <div class="value-card">
+                    <div class="value-icon">📊</div>
+                    <h3 class="value-title">누가 뭘 하는지 한눈에</h3>
+                    <h4 class="value-subtitle">투명한 진행률</h4>
+                    <p class="value-description">
+                        팀 전체와 개인의 진행 상황이 대시보드에 투명하게 공개되어 동기부여와 책임감을 높여줍니다.
+                    </p>
+                </div>
+
+                <div class="value-card">
+                    <div class="value-icon">🧘</div>
+                    <h3 class="value-title">필요한 기능만 담백하게</h3>
+                    <h4 class="value-subtitle">직관적 사용성</h4>
+                    <p class="value-description">
+                        복잡하고 어려운 기능은 뺐습니다. 회원가입부터 프로젝트 관리까지, 누구나 바로 사용할 수 있어요.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- AI 역할분담 기능 상세 -->
+    <section class="feature-detail">
+        <div class="container">
+            <div class="feature-content left-content">
+                <div class="feature-visual">
+                    <div class="feature-mockup">
+                        <img
+                            src="{% static 'images/illustrations/ai-role-assignment.svg' %}"
+                            alt="AI 역할분담 과정"
+                            class="feature-image"
+                        />
+                    </div>
+                </div>
+                <div class="feature-text">
+                    <div class="feature-label">역할 분담 시스템</div>
+                    <h3 class="feature-headline">AI가 찾아주는 최적의 포지션</h3>
+                    <p class="feature-description">
+                        간단한 성향 테스트만으로 팀원 각자의 강점과 선호를 파악합니다. GPT AI가 분석한 데이터를 바탕으로 가장 시너지를 낼 수 있는 역할 조합을 추천해 갈등을 최소화하고 모두의 만족도를 높입니다. 
+                        <br><br>
+                        물론, 팀원들과 상의하여 자유롭게 수정할 수도 있습니다.
+                    </p>
+                    <div class="feature-highlights">
+                        <div class="highlight-item">
+                            <span class="highlight-icon">✨</span>
+                            <span>5분 만에 완료되는 성향 분석</span>
+                        </div>
+                        <div class="highlight-item">
+                            <span class="highlight-icon">🎯</span>
+                            <span>팀원별 맞춤 역할 추천</span>
+                        </div>
+                        <div class="highlight-item">
+                            <span class="highlight-icon">🤝</span>
+                            <span>갈등 없는 역할 분담</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 실시간 협업 기능 상세 -->
+    <section class="feature-detail reverse">
+        <div class="container">
+            <div class="feature-content right-content">
+                <div class="feature-text">
+                    <div class="feature-label">실시간 협업 관리</div>
+                    <h3 class="feature-headline">팀원들과 함께, 실시간으로</h3>
+                    <p class="feature-description">
+                        우리 팀이 목표까지 얼마나 왔을까? 나는 오늘 무엇을 해야 하지? TeamFlow 대시보드에서는 팀 전체와 개인의 진행률, 할 일 목록, 마감 임박 작업을 한눈에 확인할 수 있습니다. 
+                        <br><br>
+                        더 이상 진행 상황을 묻고 답하느라 시간을 낭비하지 마세요.
+                    </p>
+                    <div class="feature-highlights">
+                        <div class="highlight-item">
+                            <span class="highlight-icon">⚡</span>
+                            <span>실시간 진행률 업데이트</span>
+                        </div>
+                        <div class="highlight-item">
+                            <span class="highlight-icon">🔔</span>
+                            <span>즉시 알림 및 피드백</span>
+                        </div>
+                        <div class="highlight-item">
+                            <span class="highlight-icon">📈</span>
+                            <span>팀 성과 시각화</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="feature-visual">
+                    <div class="feature-mockup">
+                        <img
+                            src="{% static 'images/illustrations/realtime-collaboration.svg' %}"
+                            alt="실시간 협업 대시보드"
+                            class="feature-image"
+                        />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 스마트 일정 관리 기능 상세 -->
+    <section class="feature-detail">
+        <div class="container">
+            <div class="feature-content left-content">
+                <div class="feature-visual">
+                    <div class="feature-mockup">
+                        <img
+                            src="{% static 'images/illustrations/smart-scheduling.svg' %}"
+                            alt="스마트 일정 조율 시스템"
+                            class="feature-image"
+                        />
+                    </div>
+                </div>
+                <div class="feature-text">
+                    <div class="feature-label">스마트 일정 관리</div>
+                    <h3 class="feature-headline">가장 빠른 팀 미팅 조율</h3>
+                    <p class="feature-description">
+                        단톡방에서 "언제 시간 돼?"라고 수십 번 묻는 경험, 이제 끝입니다. 팀원들이 가능한 시간을 각자 입력하면 TeamFlow가 모두가 참여할 수 있는 최적의 미팅 시간을 똑똑하게 찾아냅니다.
+                        <br><br>
+                        When2meet보다 간편하고, 구글 캘린더보다 빠르게. 팀플에 최적화된 일정 조율을 경험하세요.
+                    </p>
+                    <div class="feature-highlights">
+                        <div class="highlight-item">
+                            <span class="highlight-icon">⏰</span>
+                            <span>자동 최적 시간 추천</span>
+                        </div>
+                        <div class="highlight-item">
+                            <span class="highlight-icon">📅</span>
+                            <span>팀원별 가능 시간 시각화</span>
+                        </div>
+                        <div class="highlight-item">
+                            <span class="highlight-icon">🔗</span>
+                            <span>외부 캘린더 연동</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 통합 자료 관리 기능 상세 -->
+    <section class="feature-detail reverse">
+        <div class="container">
+            <div class="feature-content right-content">
+                <div class="feature-text">
+                    <div class="feature-label">통합 자료 관리</div>
+                    <h3 class="feature-headline">흩어진 파일과 링크는 이제 그만</h3>
+                    <p class="feature-description">
+                        모든 프로젝트 자료를 한 곳에 모아 관리하세요. 카테고리별로 파일을 정리하고, 버전별로 관리할 수 있어 "이게 최종 파일 맞나?" 헷갈릴 필요가 없습니다. 
+                        <br><br>
+                        팀원 누구나 최신 자료에 쉽게 접근할 수 있고, 작업 히스토리도 투명하게 관리됩니다.
+                    </p>
+                    <div class="feature-highlights">
+                        <div class="highlight-item">
+                            <span class="highlight-icon">📁</span>
+                            <span>자동 파일 분류 및 정리</span>
+                        </div>
+                        <div class="highlight-item">
+                            <span class="highlight-icon">🔄</span>
+                            <span>버전 관리 및 히스토리</span>
+                        </div>
+                        <div class="highlight-item">
+                            <span class="highlight-icon">🔍</span>
+                            <span>파일 내용 검색 기능</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="feature-visual">
+                    <div class="feature-mockup">
+                        <img
+                            src="{% static 'images/illustrations/file-management.svg' %}"
+                            alt="통합 자료 관리 시스템"
+                            class="feature-image"
+                        />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 대학생 활용 사례 -->
+    <section class="use-cases">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">이런 팀에게 TeamFlow가 필요해요</h2>
+                <p class="section-description">
+                    어떤 상황이든 TeamFlow와 함께라면 성공적인 팀플을 완주할 수 있습니다
+                </p>
+            </div>
+
+            <div class="cases-grid">
+                <div class="case-card">
+                    <div class="case-emoji">🌱</div>
+                    <h3 class="case-title">새내기 팀</h3>
+                    <p class="case-description">
+                        처음이라 막막한 팀플, TeamFlow의 가이드를 따라가다 보면 어느새 A+!
+                    </p>
+                    <div class="case-tags">
+                        <span class="tag">역할분담</span>
+                        <span class="tag">단계별 가이드</span>
+                    </div>
+                </div>
+
+                <div class="case-card">
+                    <div class="case-emoji">👑</div>
+                    <h3 class="case-title">프로 리더 팀</h3>
+                    <p class="case-description">
+                        역할 분담과 진행 상황 체크에 쏟던 에너지를 더 중요한 기획에 집중하세요.
+                    </p>
+                    <div class="case-tags">
+                        <span class="tag">효율성</span>
+                        <span class="tag">리더십</span>
+                    </div>
+                </div>
+
+                <div class="case-card">
+                    <div class="case-emoji">🚫</div>
+                    <h3 class="case-title">무임승차 방지 팀</h3>
+                    <p class="case-description">
+                        모든 활동이 투명하게 기록되니, 누가 얼마나 기여하는지 명확해져요.
+                    </p>
+                    <div class="case-tags">
+                        <span class="tag">투명성</span>
+                        <span class="tag">공정성</span>
+                    </div>
+                </div>
+
+                <div class="case-card">
+                    <div class="case-emoji">💻</div>
+                    <h3 class="case-title">디자인/공대 팀</h3>
+                    <p class="case-description">
+                        기획, 디자인, 개발, 테스팅까지 복잡한 단계별 과제도 체계적으로 관리할 수 있어요.
+                    </p>
+                    <div class="case-tags">
+                        <span class="tag">프로젝트 관리</span>
+                        <span class="tag">기술 팀</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 간단한 시작 과정 -->
+    <section class="simple-start">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">간단한 3단계로 시작하세요</h2>
+                <p class="section-description">
+                    복잡한 설정 없이 바로 팀 프로젝트를 시작할 수 있습니다
+                </p>
+            </div>
+
+            <div class="start-steps">
+                <div class="start-step">
+                    <div class="step-circle">1</div>
+                    <h3 class="step-title">Google로 가입</h3>
+                    <p class="step-desc">10초 만에 간편 가입</p>
+                </div>
+                <div class="step-arrow">→</div>
+                <div class="start-step">
+                    <div class="step-circle">2</div>
+                    <h3 class="step-title">팀 생성/참여</h3>
+                    <p class="step-desc">새 팀을 만들거나 초대코드로 참여</p>
+                </div>
+                <div class="step-arrow">→</div>
+                <div class="start-step">
+                    <div class="step-circle">3</div>
+                    <h3 class="step-title">AI 역할분담</h3>
+                    <p class="step-desc">5분 테스트로 최적 역할 추천</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 성과 지표 섹션 -->
+    <section class="stats-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">TeamFlow로 달라지는 팀플 경험</h2>
+                <p class="section-description">
+                    실제 사용자들이 경험한 변화를 숫자로 확인하세요
+                </p>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-visual">
+                        <div class="stat-circle">
+                            <span class="stat-number" data-target="85">0</span>
+                            <span class="stat-percent">%</span>
+                        </div>
+                    </div>
+                    <h3 class="stat-title">역할분담 시간 단축</h3>
+                    <p class="stat-description">
+                        AI 추천으로 눈치보며 역할 정하는 시간이 대폭 줄었어요
+                    </p>
+                </div>
+
+                <div class="stat-item">
+                    <div class="stat-visual">
+                        <div class="stat-circle">
+                            <span class="stat-number" data-target="92">0</span>
+                            <span class="stat-percent">%</span>
+                        </div>
+                    </div>
+                    <h3 class="stat-title">일정 조율 효율성</h3>
+                    <p class="stat-description">
+                        언제 시간 돼? 질문 없이 바로 미팅 시간을 정할 수 있어요
+                    </p>
+                </div>
+
+                <div class="stat-item">
+                    <div class="stat-visual">
+                        <div class="stat-circle">
+                            <span class="stat-number" data-target="78">0</span>
+                            <span class="stat-percent">%</span>
+                        </div>
+                    </div>
+                    <h3 class="stat-title">파일 관리 스트레스 감소</h3>
+                    <p class="stat-description">
+                        최종_진짜최종_파일.docx 같은 파일명과 이제 안녕!
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 사용자 후기 섹션 -->
+    <section class="testimonials-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">실제 사용자들의 이야기</h2>
+                <p class="section-description">
+                    TeamFlow와 함께 성공적인 팀플을 완주한 학생들의 생생한 후기
+                </p>
+            </div>
+
+            <div class="testimonials-container">
+                <div class="testimonial-card large">
+                    <div class="testimonial-content">
+                        <div class="quote-mark">"</div>
+                        <blockquote class="testimonial-quote">
+                            팀 프로젝트 때마다 역할분담으로 고민이 많았는데, TeamFlow의 AI 추천 덕분에 훨씬 효율적으로 팀을 구성할 수 있었어요. 
+                            특히 성향 테스트 결과를 보니 제가 몰랐던 저의 강점도 알게 되었고, 팀원들과의 갈등도 줄어들었습니다.
+                        </blockquote>
+                        <div class="testimonial-author">
+                            <img
+                                src="{% static 'images/avatars/default-avatar.png' %}"
+                                alt="김지은"
+                                class="author-avatar"
+                            />
+                            <div class="author-info">
+                                <span class="author-name">김지은</span>
+                                <span class="author-role">서울대 컴퓨터공학과 3학년</span>
+                                <span class="author-grade">A+ 학점 달성</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="testimonials-grid">
+                    <div class="testimonial-card">
+                        <blockquote class="testimonial-quote-small">
+                            "일정 관리가 정말 편해졌어요. 팀원들 스케줄을 한눈에 보고 회의 시간을 정하니까 시간 낭비가 줄어들었습니다."
+                        </blockquote>
+                        <div class="testimonial-author-small">
+                            <img src="{% static 'images/avatars/default-avatar.png' %}" alt="박민수" class="author-avatar-small" />
+                            <div>
+                                <span class="author-name">박민수</span>
+                                <span class="author-role">연세대 경영학과 4학년</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="testimonial-card">
+                        <blockquote class="testimonial-quote-small">
+                            "자료 관리가 체계적이어서 프로젝트 진행이 훨씬 수월해졌어요. 파일 찾느라 헤매는 시간이 없어졌습니다."
+                        </blockquote>
+                        <div class="testimonial-author-small">
+                            <img src="{% static 'images/avatars/default-avatar.png' %}" alt="이서연" class="author-avatar-small" />
+                            <div>
+                                <span class="author-name">이서연</span>
+                                <span class="author-role">홍익대 디자인학과 2학년</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="testimonial-card">
+                        <blockquote class="testimonial-quote-small">
+                            "무임승차하는 팀원 때문에 고생했는데, 이제는 모든 게 투명하게 보여서 모두가 열심히 참여해요."
+                        </blockquote>
+                        <div class="testimonial-author-small">
+                            <img src="{% static 'images/avatars/default-avatar.png' %}" alt="최영호" class="author-avatar-small" />
+                            <div>
+                                <span class="author-name">최영호</span>
+                                <span class="author-role">고려대 경제학과 3학년</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ 섹션 -->
+    <section class="faq-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">자주 묻는 질문</h2>
+                <p class="section-description">
+                    TeamFlow 사용 전 궁금한 점들을 해결해드릴게요
+                </p>
+            </div>
+
+            <div class="faq-container">
+                <div class="faq-item">
+                    <button class="faq-question" type="button">
+                        <span class="faq-question-text">TeamFlow는 무료로 사용할 수 있나요?</span>
+                        <span class="faq-icon">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                <path d="M8 3V13M3 8H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                        </span>
+                    </button>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p>
+                                네, TeamFlow는 <strong>완전 무료</strong>로 사용할 수 있습니다. 팀 생성, AI 역할분담, 실시간 진행률 관리, 일정 조율, 자료 관리 등 
+                                모든 핵심 기능을 제한 없이 사용하실 수 있어요. 대학생 팀플에 필요한 모든 기능이 무료입니다!
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question" type="button">
+                        <span class="faq-question-text">팀원 수에 제한이 있나요?</span>
+                        <span class="faq-icon">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                <path d="M8 3V13M3 8H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                        </span>
+                    </button>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p>
+                                팀당 최대 <strong>10명</strong>까지 참여할 수 있습니다. 대부분의 대학 팀프로젝트가 3-6명으로 구성되니까 충분할 거예요. 
+                                혹시 더 큰 팀이 필요하다면 언제든 문의해주세요!
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question" type="button">
+                        <span class="faq-question-text">AI 역할분담은 어떻게 작동하나요?</span>
+                        <span class="faq-icon">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                <path d="M8 3V13M3 8H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                        </span>
+                    </button>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p>
+                                간단한 <strong>5분 성향 테스트</strong>를 통해 각 팀원의 전공, 경험, 선호도, 성격을 분석합니다. 
+                                그 다음 GPT AI가 팀 전체 시너지를 고려해서 최적의 역할 조합을 추천해줘요. 
+                                물론 추천 결과는 팀원들과 상의해서 언제든 수정할 수 있습니다.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question" type="button">
+                        <span class="faq-question-text">개인정보와 데이터는 안전한가요?</span>
+                        <span class="faq-icon">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                <path d="M8 3V13M3 8H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                        </span>
+                    </button>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p>
+                                모든 데이터는 <strong>암호화되어 안전하게 저장</strong>되며, 팀원들만 접근할 수 있습니다. 
+                                개인정보는 오직 역할분담 추천과 팀 매칭 목적으로만 사용되고, 절대 외부에 공유하지 않아요. 
+                                Google 로그인을 통해 안전하게 가입할 수 있습니다.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question" type="button">
+                        <span class="faq-question-text">모바일에서도 사용할 수 있나요?</span>
+                        <span class="faq-icon">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                <path d="M8 3V13M3 8H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                        </span>
+                    </button>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p>
+                                네! TeamFlow는 <strong>반응형 웹</strong>으로 제작되어 스마트폰, 태블릿, 노트북 등 
+                                어떤 기기에서든 편리하게 사용할 수 있어요. 이동 중에도 팀 진행상황을 확인하고 할 일을 체크할 수 있습니다.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question" type="button">
+                        <span class="faq-question-text">다른 도구들과 어떻게 다른가요?</span>
+                        <span class="faq-icon">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                <path d="M8 3V13M3 8H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                        </span>
+                    </button>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p>
+                                대부분의 도구들은 직장인용이거나 복잡해요. TeamFlow는 <strong>오직 대학생 팀플</strong>에만 집중했습니다. 
+                                AI 역할분담, When2meet 스타일 일정 조율, 무임승차 방지 등 팀플에서 진짜 필요한 기능들만 담았어요. 
+                                사용법도 5분이면 익힐 수 있을 정도로 간단합니다.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 최종 CTA 섹션 -->
+    <section class="final-cta">
+        <div class="container">
+            <div class="cta-content">
+                <div class="cta-visual">
+                    <div class="cta-emoji">🚀</div>
+                </div>
+                <h2 class="cta-title">지금 바로 당신의 팀을 바꿔보세요</h2>
+                <p class="cta-description">
+                    가장 성공적인 팀 프로젝트 경험, TeamFlow와 함께 시작하세요.<br>
+                    회원가입부터 첫 팀 생성까지 단 2분이면 충분합니다.
+                </p>
+                <div class="cta-buttons">
+                    <a href="{% provider_login_url 'google' %}" class="cta-btn-primary">
+                        <span class="btn-content">
+                            <img src="{% static 'images/icons/google-icon.svg' %}" alt="Google" />
+                            <span>Google로 시작하기</span>
+                        </span>
+                        <span class="btn-subtitle">10초 만에 가입 완료</span>
+                    </a>
+                    <a href="{% provider_login_url 'google' %}" class="cta-btn-secondary">
+                        <span class="btn-content">
+                            <span>무료로 시작하기</span>
+                        </span>
+                        <span class="btn-subtitle">신용카드 없이도 OK</span>
+                    </a>
+                </div>
+                <div class="cta-trust">
+                    <div class="trust-items">
+                        <div class="trust-item">
+                            <span class="trust-icon">✅</span>
+                            <span>무료 사용</span>
+                        </div>
+                        <div class="trust-item">
+                            <span class="trust-icon">⚡</span>
+                            <span>즉시 시작</span>
+                        </div>
+                        <div class="trust-item">
+                            <span class="trust-icon">🔒</span>
+                            <span>안전한 데이터</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- JSON-LD 스키마 마크업 -->
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "SoftwareApplication",
+            "name": "TeamFlow",
+            "description": "AI 기반 팀 프로젝트 관리 플랫폼",
+            "url": "https://teamflow.com",
+            "applicationCategory": "ProductivityApplication",
+            "operatingSystem": "Web",
+            "offers": {
+                "@type": "Offer",
+                "price": "0",
+                "priceCurrency": "KRW"
+            },
+            "aggregateRating": {
+                "@type": "AggregateRating",
+                "ratingValue": "4.8",
+                "ratingCount": "1000"
+            },
+            "creator": {
+                "@type": "Organization",
+                "name": "TeamFlow"
+            }
+        }
+    </script>
+    
+    <!-- JavaScript -->
+    <script src="{% static 'js/pages/landing.js' %}"></script>
+</body>
+</html>

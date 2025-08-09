@@ -1,0 +1,25 @@
+<div id="role-modal" class="modal-overlay hidden">
+    <div class="modal-container">
+        <div class="modal-header">
+            <h2>새 역할 등록</h2>
+            <button id="close-role-modal" class="modal-close">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        <form id="role-form" class="modal-content">
+            <p class="modal-subtitle">팀에서 사용할 새로운 역할을 등록하세요.</p>
+            
+            <div class="form-group">
+                <label for="role-name">역할명</label>
+                <input type="text" id="role-name" name="name" placeholder="예: 프론트엔드 개발자" required>
+            </div>
+            
+            <div class="modal-footer">
+                <button type="button" id="cancel-role">취소</button>
+                <button type="submit">등록</button>
+            </div>
+        </form>
+    </div>
+</div>

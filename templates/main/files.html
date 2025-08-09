@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}자료실 - TeamFlow{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/pages/main/files.css' %}" />
+{% endblock %}
+
+{% block content %}
+<script id="team-data" type="application/json">
+  {
+    "teamId": "{{ team.id }}"
+  }
+</script>
+
+<div class="page-container">
+  <div class="view-header">
+    <h1>자료 관리</h1>
+    <div class="header-actions">
+      <form id="file-upload-form" class="upload-form">
+        {% csrf_token %}
+        <input type="file" id="file-input" name="file" class="file-input" style="display: none;" accept="*/*">
+        <button type="button" class="btn-upload" id="upload-btn">
+          <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+          </svg>
+          파일 업로드
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- 파일 목록 -->
+  <div class="file-list-container">
+    <h3>공유 파일</h3>
+    {% if files %}
+      <div class="file-list" id="file-list">
+        {% for file in files %}
+          <div class="file-item" data-file-id="{{ file.id }}">
+            <div class="file-icon">
+              {% if file.filename|slice:"-4:" == ".pdf" %}
+                <svg width="24" height="24" fill="#E53E3E" viewBox="0 0 24 24">
+                  <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z" />
+                </svg>
+              {% else %}
+                <svg width="24" height="24" fill="#4299E1" viewBox="0 0 24 24">
+                  <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z" />
+                </svg>
+              {% endif %}
+            </div>
+            <div class="file-info">
+              <div class="file-name">{{ file.filename }}</div>
+              <div class="file-meta">
+                {{ file.file.size|filesizeformat }} • {{ file.uploaded_at|date:"Y-m-d" }} • {{ file.uploader.username }}
+              </div>
+            </div>
+            <div class="file-actions">
+              <a href="{% url 'file_download' file.id %}" class="btn-download" title="다운로드">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3M3 17V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+                </svg>
+                다운로드
+              </a>
+              <button class="btn-delete" title="파일 삭제">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <svg class="empty-state-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+        </svg>
+        <h3>업로드된 파일이 없습니다</h3>
+        <p>첫 번째 파일을 업로드해보세요</p>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+  <script src="{% static 'js/pages/main/files.js' %}"></script>
+{% endblock %}

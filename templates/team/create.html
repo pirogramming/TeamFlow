@@ -1,0 +1,283 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+팀 만들기 - TeamFlow
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/team-create.css' %}" />
+<style>
+/* 팀 설정 페이지에서는 헤더와 사이드바 숨기기 */
+.header, .sidebar {
+    display: none !important;
+}
+.main-content {
+    margin-left: 0 !important;
+    padding-top: 0 !important;
+}
+</style>
+{% endblock %}
+
+{% block body_class %}
+auth-page team-create-page
+{% endblock %}
+
+{% block content %}
+<!-- 
+    팀 생성 페이지
+    
+    백엔드 개발자 참고사항:
+    1. 팀 설정 선택 페이지에서 "팀 만들기" 선택 시 이 페이지로 이동
+    2. 폼 제출 시 /api/teams/ 엔드포인트로 POST 요청을 보냄
+    3. 생성 성공 시 초대 코드를 포함한 결과 화면을 표시
+    4. 이미 팀이 있는 사용자는 대시보드로 리다이렉션 처리가 필요
+-->
+<div class="team-setup-container">
+  <div class="container">
+    <div class="team-setup-content">
+      <!-- 헤더 섹션 -->
+      <div class="setup-header">
+        <!-- 사용자 정보 표시 -->
+        <div class="user-info">
+          <div class="user-avatar">
+            <!-- 사용자 이니셜 표시 -->
+            <span class="user-initial">
+              {{ user.first_name.0|default:"U" }}{{ user.last_name.0|default:"" }}
+            </span>
+          </div>
+          <div class="user-details">
+            <h2 class="user-name">{{ user.get_full_name|default:"사용자" }}</h2>
+            <p class="user-major">
+              {{ user.profile.major_display|default:"전공 정보" }}
+            </p>
+          </div>
+        </div>
+
+        <!-- 페이지 제목 -->
+        <div class="page-header">
+          <h1 class="page-title">팀 만들기</h1>
+          <p class="page-subtitle">새로운 팀을 생성하고 멤버들을 초대하세요</p>
+        </div>
+      </div>
+
+
+
+      <!-- 팀 만들기 폼 -->
+      <div class="team-form-section" id="create-form-section">
+        <!-- ✨ 이 부분을 수정했습니다. -->
+        <form id="team-create-form" class="team-form" method="POST" action="{% url 'team_create' %}">
+          {% csrf_token %}
+
+          <!-- 팀 이름 입력 -->
+          <div class="form-group">
+            <label for="team-name" class="form-label required">팀 이름</label>
+            <input
+              type="text"
+              id="team-name"
+              name="name"
+              class="form-input"
+              placeholder="팀 이름을 입력하세요"
+              required
+              maxlength="100"
+              autocomplete="organization"
+            />
+          </div>
+
+          <!-- 팀 설명 입력 -->
+          <div class="form-group">
+            <label for="team-description" class="form-label">팀 설명</label>
+            <textarea
+              id="team-description"
+              name="description"
+              class="form-textarea"
+              placeholder="팀에 대한 간단한 설명을 입력하세요"
+              rows="4"
+              maxlength="500"
+            ></textarea>
+            <small class="form-help-text">
+              팀원들이 이해할 수 있도록 프로젝트나 팀에 대해 간단히 설명해주세요
+              (선택사항)
+            </small>
+          </div>
+
+          <!-- 초대 코드 섹션 -->
+          <div class="form-group">
+            <label class="form-label">초대 코드</label>
+            <div class="invite-code-container">
+              <div class="invite-code-display">
+                <span class="invite-code" id="invite-code-text">------</span>
+                <button
+                  type="button"
+                  class="copy-btn"
+                  id="copy-code-btn"
+                  title="코드 복사"
+                  aria-label="초대 코드 복사"
+                >
+                  <svg
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                    width="20"
+                    height="20"
+                  >
+                    <path
+                      d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"
+                    />
+                  </svg>
+                </button>
+              </div>
+              <small class="form-help-text">
+                팀 생성 후 팀원들에게 이 코드를 공유하세요
+              </small>
+            </div>
+          </div>
+
+          <!-- 제출 버튼 -->
+          <div class="form-actions">
+            <button
+              type="submit"
+              class="btn btn-primary btn-full btn-lg"
+              id="team-create-btn"
+            >
+              <svg
+                class="btn-icon"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+                width="20"
+                height="20"
+              >
+                <path
+                  d="M16 4c0-1.11.89-2 2-2s2 .89 2 2-.89 2-2 2-2-.89-2-2zm4 18v-6h2.5l-2.54-7.63A1.999 1.999 0 0 0 18.06 7c-.8 0-1.54.5-1.85 1.26l-1.45 3.63c-.25.65-.65 1.15-1.18 1.46C14.28 13.78 15 14.8 15 16v6h5z"
+                />
+              </svg>
+              팀 만들기
+            </button>
+          </div>
+        </form>
+
+        <!-- 뒤로가기 링크 -->
+        <div class="back-action">
+          <a href="#" onclick="goBack(); return false;" class="back-link">
+            뒤로가기
+          </a>
+        </div>
+      </div>
+
+      <!-- 팀 생성 성공 화면 (초기에는 숨김) -->
+      <div
+        class="team-success-section"
+        id="success-section"
+        style="display: none"
+      >
+        <div class="success-content">
+          <div class="success-icon">
+            <!-- 성공 아이콘 -->
+            <svg fill="currentColor" viewBox="0 0 24 24" width="48" height="48">
+              <path
+                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"
+              />
+            </svg>
+          </div>
+
+          <h2 class="success-title">팀이 생성되었습니다!</h2>
+          <p class="success-subtitle">초대 코드를 팀원들과 공유하세요</p>
+
+          <!-- 생성된 팀 정보 -->
+          <div class="team-info-card">
+            <div class="team-info-row">
+              <span class="info-label">팀 이름</span>
+              <span class="info-value" id="created-team-name">-</span>
+            </div>
+            <div class="team-info-row">
+              <span class="info-label">팀 설명</span>
+              <span class="info-value" id="created-team-description">-</span>
+            </div>
+          </div>
+
+          <!-- 초대 코드 -->
+          <div class="invite-code-section">
+            <label class="invite-code-label">초대 코드</label>
+            <div class="invite-code-container">
+              <div class="invite-code-display">
+                <span class="invite-code" id="invite-code-text">------</span>
+                <button
+                  type="button"
+                  class="copy-btn"
+                  id="copy-code-btn"
+                  title="코드 복사"
+                  aria-label="초대 코드 복사"
+                >
+                  <svg
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                    width="20"
+                    height="20"
+                  >
+                    <path
+                      d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"
+                    />
+                  </svg>
+                </button>
+              </div>
+              <small class="invite-code-help">
+                팀원들에게 이 코드를 공유하세요
+              </small>
+            </div>
+          </div>
+
+          <!-- 액션 버튼들 -->
+          <div class="success-actions">
+            <button
+              type="button"
+              class="btn btn-primary btn-full"
+              onclick="navigateToDashboard()"
+            >
+              대시보드로 이동
+              <svg
+                class="btn-icon"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+                width="20"
+                height="20"
+              >
+                <path
+                  d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"
+                />
+              </svg>
+            </button>
+
+            <button
+              type="button"
+              class="btn btn-secondary btn-full"
+              onclick="createAnotherTeam()"
+            >
+              새 팀 만들기
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 
+    구조화된 데이터 (SEO)
+    백엔드: 팀 생성 프로세스 추적용
+-->
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "팀 생성",
+    "description": "TeamFlow 팀 생성 페이지",
+    "isPartOf": {
+      "@type": "WebSite",
+      "name": "TeamFlow"
+    }
+  }
+</script>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/pages/team-create.js' %}"></script>
+{% endblock %}

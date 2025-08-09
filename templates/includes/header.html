@@ -1,0 +1,64 @@
+<!-- 상단 헤더 (로고, 알림, 프로필) -->
+<header class="header">
+    <div class="header-container">
+        <!-- 좌측: 프로젝트 선택 -->
+        <div class="header-left">
+            <div class="project-selector">
+                <button class="project-dropdown" id="project-dropdown">
+                    <span class="project-name" id="current-project-name">{{ team.name|default:"프로젝트" }}</span>
+                    <span class="project-status">{{ team.status|default:"진행중" }}</span>
+                    <svg class="dropdown-icon" fill="currentColor" viewBox="0 0 24 24" width="16" height="16">
+                        <path d="M7 10l5 5 5-5z"/>
+                    </svg>
+                </button>
+                
+                <!-- 드롭다운 메뉴 -->
+                <div class="dropdown-menu" id="project-dropdown-menu" style="display: none;">
+                    <div class="dropdown-header">
+                        <span>프로젝트 선택</span>
+                    </div>
+                    <div class="dropdown-items" id="project-list">
+                        <!-- 프로젝트 목록이 동적으로 로드됩니다 -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 중앙: 팀 프로젝트 정보 -->
+        <div class="header-center">
+            <div class="team-info">
+                <h1 class="team-project-title">{{ team.name|default:"웹 개발 프로젝트" }}</h1>
+                <div class="project-subtitle">{{ team.description|default:"2024년 1학기 캡스톤 디자인" }}</div>
+            </div>
+        </div>
+
+        <!-- 우측: 알림 및 액션 버튼 -->
+        <div class="header-right">
+            <!-- 마감 임박 알림 -->
+            <div class="notification-item">
+                <div class="notification-icon urgent">
+                    <svg fill="currentColor" viewBox="0 0 24 24" width="20" height="20">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+                    </svg>
+                </div>
+                <span class="notification-text" id="deadline-notification">마감 임박 {{ deadline_imminent_count|default:0 }}개</span>
+            </div>
+
+            <!-- 팀 생성 버튼 -->
+            <button class="action-button" id="create-team-btn" onclick="window.location.href='{% url 'team_create' %}'">
+                <svg fill="currentColor" viewBox="0 0 24 24" width="20" height="20">
+                    <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                </svg>
+                <span>팀 생성</span>
+            </button>
+
+            <!-- 팀 참여 버튼 -->
+            <button class="action-button" id="join-team-btn" onclick="window.location.href='{% url 'team_join' %}'">
+                <svg fill="currentColor" viewBox="0 0 24 24" width="20" height="20">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/>
+                </svg>
+                <span>팀 참여</span>
+            </button>
+        </div>
+    </div>
+</header>
