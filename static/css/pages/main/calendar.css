@@ -1,13 +1,7 @@
 /* 일정 관리 페이지 스타일 - Design Guide 준수 */
 
 /* 기본 레이아웃 */
-.page-container {
-    padding: 2rem;
-    max-width: 1400px;
-    margin: 0 auto;
-    background-color: #F8F9FA;
-    min-height: calc(100vh - 64px); /* 헤더 높이 제외 */
-}
+.page-container { padding: 2rem; max-width: 1400px; margin: 0 auto; background: var(--bg); min-height: calc(100vh - 64px); }
 
 /* 페이지 헤더 */
 .calendar-header {
@@ -17,49 +11,12 @@
     margin-bottom: 1.5rem;
 }
 
-.calendar-header h1 {
-    font-size: 2rem;
-    font-weight: 700;
-    color: #1a1a1a;
-    margin: 0;
-}
+.calendar-header .page-title { font-size: 1.5rem; }
 
 /* 탭 네비게이션 */
-.tab-navigation {
-    display: flex;
-    gap: 0.5rem;
-    margin-bottom: 2rem;
-    padding: 0.25rem;
-    background-color: #f1f5f9;
-    border-radius: 0.5rem;
-    width: fit-content;
-}
+.tab-navigation { /* unified via common components */ margin-top: .75rem; }
 
-.tab-btn {
-    display: flex;
-    align-items: center;
-    gap: 0.375rem;
-    padding: 0.5rem 1rem;
-    border: none;
-    background: none;
-    border-radius: 0.375rem;
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: #64748b;
-    cursor: pointer;
-    transition: all 0.2s;
-    white-space: nowrap;
-}
-
-.tab-btn:hover {
-    color: #475569;
-}
-
-.tab-btn.active {
-    background-color: white;
-    color: #1e293b;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-}
+.tab-btn { /* unified via common components */ display:flex; align-items:center; gap:.375rem; }
 
 .tab-btn svg {
     width: 16px;
@@ -80,72 +37,21 @@
     display: block;
 }
 
-.tab-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.5rem;
-    padding: 1.5rem;
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    border: 1px solid #e1e5e9;
-}
+.tab-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; padding:1.5rem; background: var(--surface); border-radius: var(--radius-12); box-shadow: var(--shadow-1); border:1px solid var(--border); }
 
-.tab-header h2 {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: #1a1a1a;
-    margin: 0;
-    white-space: nowrap;
-    margin-right: 1rem;
-}
+.tab-header h2 { font-size:1.125rem; font-weight:600; color: var(--text-1); margin:0; white-space:nowrap; margin-right:1rem; }
 
 /* 버튼 스타일 - Design Guide 준수 */
-.btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    padding: 0.75rem 1.5rem;
-    border: 1px solid #d1d5db;
-    background-color: white;
-    color: #374151;
-    cursor: pointer;
-    border-radius: 8px;
-    font-size: 0.875rem;
-    font-weight: 500;
-    text-decoration: none;
-    transition: all 0.2s ease;
-    font-family: inherit;
-}
+.btn { display:inline-flex; align-items:center; justify-content:center; gap:.5rem; padding:.75rem 1.5rem; border:1px solid var(--border); background: var(--surface); color: var(--text-1); cursor:pointer; border-radius: var(--radius); font-size:.875rem; font-weight:500; text-decoration:none; transition: all var(--transition-1); font-family: inherit; }
 
-.btn:hover {
-    background-color: #f9fafb;
-    border-color: #9ca3af;
-}
+.btn:hover { background: var(--surface-2); border-color: var(--primary-600); }
 
-.btn-primary {
-    background: #2383e2;
-    color: white;
-    border-color: #2383e2;
-}
+.btn-primary { background: var(--primary-600); color:#fff; border-color: var(--primary-600); }
 
-.btn-primary:hover {
-    background: #1a6bc9;
-    border-color: #1a6bc9;
-    transform: translateY(-1px);
-}
+.btn-primary:hover { background: var(--primary-700); border-color: var(--primary-700); transform: translateY(-1px); }
 
 /* 일정 조율 섹션 */
-#when2meet-grid-container {
-    background: white;
-    border-radius: 12px;
-    padding: 1.5rem;
-    margin-bottom: 2rem;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    border: 1px solid #e1e5e9;
-}
+#when2meet-grid-container { background: var(--surface); border-radius: var(--radius-12); padding:1.5rem; margin-bottom:2rem; box-shadow: var(--shadow-1); border:1px solid var(--border); }
 
 #when2meet-grid-container > p {
     font-size: 0.875rem;
@@ -155,57 +61,19 @@
 }
 
 /* When2Meet 그리드 스타일 */
-#when2meet-grid {
-    display: grid;
-    grid-template-columns: 80px repeat(7, 1fr); /* 시간 열 + 요일 열 */
-    border-radius: 8px;
-    overflow: hidden;
-    border: 1px solid #e1e5e9;
-    user-select: none; /* 드래그 시 텍스트 선택 방지 */
-}
+#when2meet-grid { display:grid; grid-template-columns: 80px repeat(7, 1fr); border-radius: 8px; overflow:hidden; border:1px solid var(--border); user-select:none; }
 
-.grid-header, .time-label, .grid-cell {
-    border-right: 1px solid #e1e5e9;
-    border-bottom: 1px solid #e1e5e9;
-    padding: 0.75rem 0.5rem;
-    text-align: center;
-    font-size: 0.75rem;
-    min-height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
+.grid-header, .time-label, .grid-cell { border-right:1px solid var(--border); border-bottom:1px solid var(--border); padding:.75rem .5rem; text-align:center; font-size:.75rem; min-height:40px; display:flex; align-items:center; justify-content:center; }
 
-.grid-header {
-    background-color: #f8f9fa;
-    font-weight: 600;
-    color: #374151;
-    border-bottom: 2px solid #e1e5e9;
-}
+.grid-header { background: var(--surface-2); font-weight:600; color: var(--text-1); border-bottom:2px solid var(--border); }
 
-.time-label {
-    background-color: #f8f9fa;
-    font-weight: 500;
-    color: #6b7280;
-    border-right: 2px solid #e1e5e9;
-}
+.time-label { background: var(--surface-2); font-weight:500; color: var(--text-2); border-right:2px solid var(--border); }
 
-.grid-cell {
-    background-color: #ffffff;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    position: relative;
-}
+.grid-cell { background: var(--surface); cursor:pointer; transition: all var(--transition-1); position:relative; }
 
-.grid-cell:hover {
-    background-color: #f0f9ff;
-}
+.grid-cell:hover { background: rgba(59,130,246,.06); }
 
-.grid-cell.selected {
-    background-color: #2383e2 !important;
-    color: white;
-    font-weight: 500;
-}
+.grid-cell.selected { background: var(--primary-600) !important; color:#fff; font-weight:500; }
 
 /* 팀원별 가용성 표시 */
 .grid-cell[data-availability="1"] { background-color: #fef2f2; }
@@ -265,35 +133,15 @@
 }
 
 /* FullCalendar 커스텀 스타일 */
-#calendar {
-    background: white;
-    border-radius: 12px;
-    padding: 1.5rem;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    border: 1px solid #e1e5e9;
-}
+#calendar { background: var(--surface); border-radius: var(--radius-12); padding:1.5rem; box-shadow: var(--shadow-1); border:1px solid var(--border); }
 
 /* FullCalendar 헤더 버튼 스타일 */
-.fc .fc-button-primary {
-    background-color: #2383e2;
-    border-color: #2383e2;
-    color: white;
-    border-radius: 6px;
-    padding: 0.5rem 1rem;
-    font-weight: 500;
-    font-size: 0.875rem;
-}
+.fc .fc-button-primary { background: var(--primary-600); border-color: var(--primary-600); color:#fff; border-radius:6px; padding:.5rem 1rem; font-weight:500; font-size:.875rem; }
 
 .fc .fc-button-primary:not(:disabled):active,
-.fc .fc-button-primary:not(:disabled).fc-button-active {
-    background-color: #1a6bc9;
-    border-color: #1a6bc9;
-}
+.fc .fc-button-primary:not(:disabled).fc-button-active { background: var(--primary-700); border-color: var(--primary-700); }
 
-.fc .fc-button-primary:hover {
-    background-color: #1a6bc9;
-    border-color: #1a6bc9;
-}
+.fc .fc-button-primary:hover { background: var(--primary-700); border-color: var(--primary-700); }
 
 .fc .fc-button-primary:disabled {
     background-color: #9ca3af;
@@ -301,24 +149,12 @@
 }
 
 /* FullCalendar 제목 스타일 */
-.fc .fc-toolbar-title {
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: #1a1a1a;
-}
+.fc .fc-toolbar-title { font-size:1.25rem; font-weight:600; color: var(--text-1); }
 
 /* FullCalendar 이벤트 스타일 */
-.fc-event {
-    background-color: #2383e2;
-    border-color: #2383e2;
-    border-radius: 4px;
-    padding: 2px 4px;
-}
+.fc-event { background: var(--primary-600); border-color: var(--primary-600); border-radius: 4px; padding:2px 4px; }
 
-.fc-event:hover {
-    background-color: #1a6bc9;
-    border-color: #1a6bc9;
-}
+.fc-event:hover { background: var(--primary-700); border-color: var(--primary-700); }
 
 /* FullCalendar 날짜 셀 스타일 */
 .fc .fc-daygrid-day.fc-day-today {

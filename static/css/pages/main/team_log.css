@@ -1,13 +1,7 @@
 /* 팀플 기록 페이지 스타일 - Design Guide 준수 */
 
 /* 기본 레이아웃 */
-.page-container {
-    padding: 2rem;
-    max-width: 1400px;
-    margin: 0 auto;
-    background-color: #F8F9FA;
-    min-height: calc(100vh - 64px); /* 헤더 높이 제외 */
-}
+.page-container { padding: 2rem; max-width: 1400px; margin: 0 auto; background: var(--bg); min-height: calc(100vh - 64px); }
 
 .view-header {
     display: flex;
@@ -15,15 +9,10 @@
     align-items: center;
     margin-bottom: 2rem;
     padding-bottom: 1rem;
-    border-bottom: 1px solid #e1e5e9;
+    border-bottom: 1px solid var(--border);
 }
 
-.view-header h1 {
-    font-size: 2rem;
-    font-weight: 700;
-    color: #1a1a1a;
-    margin: 0;
-}
+.view-header h1 { font-size: 24px; font-weight:700; color: var(--text-1); margin:0; }
 
 /* 팀 프로젝트 그리드 */
 .team-projects-grid {
@@ -34,20 +23,9 @@
 }
 
 /* 프로젝트 카드 */
-.project-card {
-    background: white;
-    border-radius: 12px;
-    padding: 1.5rem;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    border: 1px solid #e1e5e9;
-    transition: all 0.2s ease;
-    animation: fadeIn 0.15s ease-out;
-}
+.project-card { background: var(--surface); border-radius: var(--radius-12); padding:1.5rem; box-shadow: var(--shadow-1); border:1px solid var(--border); transition: all var(--transition-1); animation: fadeIn 0.15s ease-out; }
 
-.project-card:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    transform: translateY(-2px);
-}
+.project-card:hover { box-shadow: var(--shadow-2); transform: translateY(-2px); }
 
 /* 카드 헤더 */
 .project-card-header {
@@ -57,53 +35,20 @@
     margin-bottom: 1rem;
 }
 
-.project-title {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: #1a1a1a;
-    margin: 0 0 0.25rem 0;
-    line-height: 1.3;
-}
+.project-title { font-size: 1.25rem; font-weight: 600; color: var(--text-1); margin: 0 0 0.25rem 0; line-height: 1.3; }
 
-.project-description {
-    font-size: 0.875rem;
-    color: #666;
-    margin: 0;
-}
+.project-description { font-size: 0.875rem; color: var(--text-2); margin: 0; }
 
-.project-status {
-    padding: 0.25rem 0.75rem;
-    border-radius: 20px;
-    font-size: 0.75rem;
-    font-weight: 500;
-    flex-shrink: 0;
-}
+.project-status { padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.75rem; font-weight: 500; flex-shrink: 0; }
 
-.status-active {
-    background-color: #eff6ff;
-    color: #2383e2;
-    border: 1px solid #bfdbfe;
-}
+.status-active { background: rgba(59,130,246,.08); color: var(--info-600); border:1px solid rgba(59,130,246,.22); }
 
-.status-completed {
-    background-color: #f0fdf4;
-    color: #10b981;
-    border: 1px solid #bbf7d0;
-}
+.status-completed { background: rgba(16,185,129,.08); color: var(--success-600); border:1px solid rgba(16,185,129,.22); }
 
 /* 팀원 정보 섹션 */
-.team-info-section {
-    margin-bottom: 1.5rem;
-}
+.team-info-section { margin-bottom: 1.5rem; }
 
-.team-members-count {
-    font-size: 0.875rem;
-    color: #666;
-    margin-bottom: 0.75rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
+.team-members-count { font-size: 0.875rem; color: var(--text-2); margin-bottom: 0.75rem; display:flex; align-items:center; gap:.5rem; }
 
 .members-icon {
     width: 16px;
@@ -111,12 +56,7 @@
     opacity: 0.6;
 }
 
-.team-members-list {
-    font-size: 0.875rem;
-    color: #1a1a1a;
-    line-height: 1.4;
-    margin-bottom: 1rem;
-}
+.team-members-list { font-size: 0.875rem; color: var(--text-1); line-height: 1.4; margin-bottom: 1rem; }
 
 /* 진행률 섹션 */
 .progress-section {
@@ -130,32 +70,13 @@
     margin-bottom: 0.5rem;
 }
 
-.progress-label {
-    font-size: 0.875rem;
-    color: #666;
-    font-weight: 500;
-}
+.progress-label { font-size: .875rem; color: var(--text-2); font-weight: 500; }
 
-.progress-percentage {
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: #2383e2;
-}
+.progress-percentage { font-size:.875rem; font-weight:600; color: var(--primary-600); }
 
-.progress-bar {
-    width: 100%;
-    height: 8px;
-    background-color: #f1f3f4;
-    border-radius: 4px;
-    overflow: hidden;
-}
+.progress-bar { width:100%; height:8px; background: var(--border); border-radius:4px; overflow:hidden; }
 
-.progress-bar-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #2383e2, #1a6bc9);
-    border-radius: 4px;
-    transition: width 0.3s ease;
-}
+.progress-bar-fill { height:100%; background: var(--primary-600); border-radius:4px; transition: width .3s ease; }
 
 /* 세부 진행률 */
 .detailed-progress {
@@ -198,28 +119,9 @@
     border-top: 1px solid #f1f3f4;
 }
 
-.btn-primary {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    padding: 0.75rem 1.5rem;
-    background: #2383e2;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-size: 0.875rem;
-    font-weight: 500;
-    text-decoration: none;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    flex: 1;
-}
+.btn-primary { display:inline-flex; align-items:center; justify-content:center; gap:.5rem; padding:.75rem 1.5rem; background: var(--primary-600); color:#fff; border:none; border-radius: var(--radius); font-size:.875rem; font-weight:500; text-decoration:none; cursor:pointer; transition: all var(--transition-1); flex:1; }
 
-.btn-primary:hover {
-    background: #1a6bc9;
-    transform: translateY(-1px);
-}
+.btn-primary:hover { background: var(--primary-700); transform: translateY(-1px); }
 
 .btn-primary:active {
     transform: translateY(0);

@@ -37,15 +37,7 @@
 }
 
 /* 프로필 카드 - 메인 페이지 카드 스타일과 통일 */
-.profile-card {
-  background: white;
-  border-radius: 12px;
-  padding: 2rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
-  border: 1px solid #e2e8f0;
-  position: relative;
-  overflow: hidden;
-}
+.profile-card { background: var(--surface); border-radius: var(--radius-12); padding: 2rem; box-shadow: var(--shadow-1); border: 1px solid var(--border); position: relative; overflow: hidden; }
 
 .profile-card::before {
   content: '';
@@ -204,28 +196,13 @@
   min-width: 140px;
 }
 
-.profile-btn-primary {
-  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-  color: white;
-}
+.profile-btn-primary { background: var(--primary-600); color: #fff; }
 
-.profile-btn-primary:hover {
-  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
-}
+.profile-btn-primary:hover { background: var(--primary-700); transform: translateY(-2px); }
 
-.profile-btn-secondary {
-  background: white;
-  border: 1px solid #d1d5db;
-  color: #374151;
-}
+.profile-btn-secondary { background: var(--surface); border: 1px solid var(--border); color: var(--text-1); }
 
-.profile-btn-secondary:hover {
-  background: #f9fafb;
-  border-color: #9ca3af;
-  transform: translateY(-1px);
-}
+.profile-btn-secondary:hover { background: var(--surface-2); border-color: var(--primary-600); transform: translateY(-1px); }
 
 .profile-btn:active {
   transform: translateY(0);
