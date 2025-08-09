@@ -1,53 +1,14 @@
 /* 역할 관리 페이지 스타일 */
 
 /* 페이지 헤더 */
-.roles-header {
-    margin-bottom: 2rem;
-}
-
-.roles-header h1 {
-    font-size: 2rem;
-    font-weight: 700;
-    color: #1f2937;
-    margin-bottom: 0.5rem;
-}
-
-.roles-subtitle {
-    color: #6b7280;
-    font-size: 1rem;
-}
+.roles-header { margin-bottom: 2rem; }
+.roles-header .page-title { font-size: 1.5rem; }
 
 /* 탭 네비게이션 */
-.tab-navigation {
-    display: flex;
-    border-bottom: 1px solid #e5e7eb;
-    margin-bottom: 2rem;
-}
+.tab-navigation { /* unified via common components */ }
 
 /* 탭 버튼 스타일 - 팀 생성 버튼과 동일한 컬러 */
-.tab-btn {
-    padding: 0.75rem 1.5rem;
-    background: #f8fafc;
-    color: #64748b;
-    border: 1px solid #e2e8f0;
-    border-radius: 0.5rem 0.5rem 0 0;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    border-bottom: none;
-}
-
-.tab-btn:hover {
-    background: #f1f5f9;
-    color: #475569;
-}
-
-.tab-btn.active {
-    background: #3b82f6;
-    color: white;
-    border-color: #3b82f6;
-    font-weight: 600;
-}
+.tab-btn { /* unified via common components */ }
 
 /* 탭 콘텐츠 */
 .tab-content {
@@ -59,12 +20,7 @@
 }
 
 /* AI 추천 섹션 */
-.ai-section h2 {
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: #1f2937;
-    margin-bottom: 0.5rem;
-}
+.ai-section h2 { font-size: 1.25rem; font-weight:600; color: var(--text-1); margin-bottom:.5rem; }
 
 .ai-section > p {
     color: #6b7280;
@@ -165,30 +121,15 @@
     gap: 0.75rem;
 }
 
-.checkbox-item {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.75rem;
-    border: 1px solid #e5e7eb;
-    border-radius: 0.5rem;
-    cursor: pointer;
-    transition: all 0.2s;
-}
+.checkbox-item { display:flex; align-items:center; gap:.5rem; padding:.75rem; border:1px solid var(--border); border-radius: var(--radius); cursor:pointer; transition: all var(--transition-1); }
 
-.checkbox-item:hover {
-    background: #f3f4f6;
-    border-color: #9ca3af;
-}
+.checkbox-item:hover { background: var(--surface-2); border-color: var(--primary-600); }
 
 .checkbox-item input[type="checkbox"] {
     margin: 0;
 }
 
-.checkbox-item input[type="checkbox"]:checked + span {
-    color: #4f46e5;
-    font-weight: 500;
-}
+.checkbox-item input[type="checkbox"]:checked + span { color: var(--primary-600); font-weight: 500; }
 
 .preferred-roles {
     display: flex;
@@ -225,13 +166,7 @@
 }
 
 /* AI 결과 */
-.ai-result-container {
-    margin-top: 2rem;
-    padding: 2rem;
-    background: #f0f9ff;
-    border: 1px solid #0ea5e9;
-    border-radius: 0.75rem;
-}
+.ai-result-container { margin-top:2rem; padding:2rem; background: rgba(59,130,246,.06); border:1px solid rgba(59,130,246,.3); border-radius: var(--radius-12); }
 
 .ai-result-container.hidden {
     display: none;
@@ -251,28 +186,9 @@
     margin: 0;
 }
 
-.recommended-role-name {
-    display: inline-flex;
-    align-items: center;
-    padding: 0.5rem 1rem;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    border-radius: 9999px;
-    font-weight: 600;
-    font-size: 1rem;
-    min-width: 120px;
-    justify-content: center;
-}
+.recommended-role-name { display:inline-flex; align-items:center; padding:.5rem 1rem; background: rgba(59,130,246,.12); color: var(--info-600); border-radius: 9999px; font-weight:600; font-size:1rem; min-width:120px; justify-content:center; border:1px solid rgba(59,130,246,.3); }
 
-.result-content {
-    background: white;
-    padding: 1.5rem;
-    border-radius: 0.5rem;
-    margin-bottom: 1.5rem;
-    color: #374151;
-    line-height: 1.6;
-    font-size: 1rem;
-}
+.result-content { background: var(--surface); padding: 1.5rem; border-radius: var(--radius); margin-bottom: 1.5rem; color: var(--text-1); line-height:1.6; font-size:1rem; border:1px solid var(--border); }
 
 .result-actions {
     display: flex;
@@ -280,40 +196,16 @@
 }
 
 /* AI 추천 버튼들 */
-.btn-ai-recommend {
-    width: 100%;
-    padding: 0.875rem 1.5rem;
-    background: #3b82f6;
-    color: white;
-    border: none;
-    border-radius: 0.5rem;
-    font-weight: 600;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
+.btn-ai-recommend { width:100%; padding:.875rem 1.5rem; background: var(--primary-600); color:#fff; border:none; border-radius: var(--radius); font-weight:600; font-size:1rem; cursor:pointer; transition: background var(--transition-1), transform var(--transition-1); }
 
-.btn-ai-recommend:hover {
-    background: #2563eb;
-    transform: translateY(-1px);
-}
+.btn-ai-recommend:hover { background: var(--primary-700); transform: translateY(-1px); }
 
 .btn-ai-recommend:active {
     transform: translateY(0);
 }
 
 /* AI 결과 수락 버튼 */
-.btn-accept-role {
-    padding: 0.75rem 2rem;
-    background: #3b82f6;
-    color: white;
-    border: none;
-    border-radius: 0.5rem;
-    font-weight: 600;
-    font-size: 0.875rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
+.btn-accept-role { padding:.75rem 2rem; background: var(--primary-600); color:#fff; border:none; border-radius: var(--radius); font-weight:600; font-size:.875rem; cursor:pointer; transition: background var(--transition-1), transform var(--transition-1); }
 
 .btn-accept-role:hover {
     background: #2563eb;
@@ -338,29 +230,12 @@
     margin-bottom: 2rem;
 }
 
-.section-header h2 {
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: #1f2937;
-}
+.section-header h2 { font-size: 1.25rem; font-weight:600; color: var(--text-1); }
 
 /* 역할 등록 버튼 */
-.btn-add-role {
-    padding: 0.75rem 1.5rem;
-    background: #3b82f6;
-    color: white;
-    border: none;
-    border-radius: 0.5rem;
-    font-weight: 600;
-    font-size: 0.875rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
+.btn-add-role { padding:.75rem 1.5rem; background: var(--primary-600); color:#fff; border:none; border-radius: var(--radius); font-weight:600; font-size:.875rem; cursor:pointer; transition: background var(--transition-1), transform var(--transition-1); }
 
-.btn-add-role:hover {
-    background: #2563eb;
-    transform: translateY(-1px);
-}
+.btn-add-role:hover { background: var(--primary-700); transform: translateY(-1px); }
 
 /* 역할 등록하러 가기 버튼 */
 .empty-roles-notice .btn-goto-register {

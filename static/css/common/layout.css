@@ -1,49 +1,45 @@
 /* 공통 레이아웃 (container, grid, flex 유틸리티) */
 
 /* 전체 페이지 레이아웃 */
-body {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-}
+body { display:flex; flex-direction:column; min-height:100vh; }
 
 /* 메인 콘텐츠 영역 */
 .main-content {
-    margin-left: 280px; /* 사이드바 너비만큼 여백 */
-    padding-top: 80px; /* 헤더 높이만큼 상단 패딩 (64px + 여유분) */
-    flex: 1; /* 남은 공간을 모두 차지 */
-    background-color: #f8fafc;
-    display: flex;
-    flex-direction: column;
-    min-height: calc(100vh - 80px); /* 헤더 높이를 제외한 전체 높이 */
+  margin-left: var(--sidebar-width);
+  padding-top: 72px; /* header height */
+  flex: 1;
+  background-color: var(--bg);
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - 72px);
+  transition: margin-left var(--transition-1);
 }
 
 /* 페이지 콘텐츠 컨테이너 */
-.page-container {
-    flex: 1;
-    padding: 2rem;
-    max-width: 1400px;
-    margin: 0 auto;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    min-height: calc(100vh - 200px); /* 푸터가 아래 고정되도록 최소 높이 설정 */
-}
+.page-container { flex:1; padding: 2rem; max-width: 1400px; margin: 0 auto; width:100%; display:flex; flex-direction:column; min-height: calc(100vh - 200px); }
+
+/* Header */
+.header { position: fixed; top:0; left:0; right:0; height: 64px; backdrop-filter: saturate(120%) blur(8px); background: color-mix(in srgb, var(--surface) 70%, transparent); border-bottom: 1px solid var(--border); z-index: 100; display:flex; align-items:center; }
+.header-container { max-width: 1400px; margin: 0 auto; width:100%; padding: 0 1rem; display:flex; align-items:center; justify-content:space-between; }
+.header-right, .header-left, .header-center { display:flex; align-items:center; gap:.5rem; }
+
+/* Sidebar */
+.sidebar { position: fixed; top:64px; left:0; bottom:0; width: var(--sidebar-width); background: var(--surface); border-right:1px solid var(--border); overflow:auto; transition: width var(--transition-1); }
+.sidebar .nav-item.active > a { position:relative; }
+.sidebar .nav-item.active > a::before { content:""; position:absolute; left:-1px; top:8px; bottom:8px; width:2px; background: var(--primary-600); border-radius:2px; }
+
+.sidebar-collapsed .sidebar { width: 72px; }
+.sidebar-collapsed .main-content { margin-left: 72px; }
 
 /* 반응형 디자인 */
 @media (max-width: 1024px) {
     .main-content {
-        margin-left: 0; /* 모바일에서는 사이드바 여백 제거 */
+        margin-left: 0;
     }
 }
 
 @media (max-width: 768px) {
-    .main-content {
-        padding-top: 70px; /* 모바일 헤더 높이 + 여유분 */
-        min-height: calc(100vh - 70px);
-    }
+    .main-content { padding-top: 64px; min-height: calc(100vh - 64px); }
     
-    .page-container {
-        padding: 1rem;
-    }
+    .page-container { padding: 1rem; }
 }

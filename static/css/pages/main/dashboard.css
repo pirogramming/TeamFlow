@@ -1,19 +1,9 @@
 /* 대시보드 페이지 스타일 - MGP 개발 */
 
 /* 전체 레이아웃 */
-.dashboard-container {
-    display: flex;
-    min-height: 100vh;
-    background-color: #F8F9FA;
-}
+.dashboard-container { display:flex; min-height:100vh; background: var(--bg); }
 
-.main-content {
-    flex: 1;
-    padding: 2rem 2rem 2rem 1rem; /* 왼쪽 패딩 줄이기 */
-    margin-left: 280px; /* 사이드바 너비만큼 여백 */
-    margin-top: 64px; /* 헤더 높이만큼 여백 */
-    background-color: #F8F9FA;
-}
+.main-content { flex:1; padding: 2rem; margin-left: var(--sidebar-width); margin-top: 64px; background: var(--bg); }
 
 .dashboard-content {
     max-width: 1400px; /* 최대 너비 늘리기 */
@@ -94,14 +84,7 @@
     margin-bottom: 2rem;
 }
 
-.summary-card {
-    background: white;
-    border-radius: 12px;
-    padding: 1.5rem;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    border: 1px solid #e1e5e9;
-    transition: all 0.2s ease;
-}
+.summary-card { background: var(--surface); border-radius: var(--radius-12); padding:1.5rem; box-shadow: var(--shadow-1); border:1px solid var(--border); transition: all var(--transition-1); }
 
 .summary-card:hover {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -112,12 +95,7 @@
     margin-bottom: 1rem;
 }
 
-.card-title {
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: #1a1a1a;
-    margin: 0;
-}
+.card-title { font-size: 1.1rem; font-weight:600; color: var(--text-1); margin:0; }
 
 .card-content {
     display: flex;
@@ -164,27 +142,11 @@
     margin-bottom: 0.5rem;
 }
 
-.progress-percentage {
-    font-size: 2rem;
-    font-weight: 700;
-    color: #3b82f6;
-    min-width: 60px;
-}
+.progress-percentage { font-size: 2rem; font-weight:700; color: var(--primary-600); min-width:60px; }
 
-.progress-bar {
-    flex: 1;
-    height: 8px;
-    background-color: #e5e7eb;
-    border-radius: 4px;
-    overflow: hidden;
-}
+.progress-bar { flex:1; height:8px; background: var(--border); border-radius:4px; overflow:hidden; }
 
-.progress-fill {
-    height: 100%;
-    background-color: #3b82f6;
-    border-radius: 4px;
-    transition: width 0.3s ease;
-}
+.progress-fill { height:100%; background: var(--primary-600); border-radius:4px; transition: width .3s ease; }
 
 .progress-text {
     font-size: 0.9rem;
@@ -236,14 +198,7 @@
     margin-bottom: 2rem;
 }
 
-.tasks-card {
-    background: white;
-    border-radius: 12px;
-    padding: 1.5rem;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    border: 1px solid #e1e5e9;
-    transition: all 0.2s ease;
-}
+.tasks-card { background: var(--surface); border-radius: var(--radius-12); padding:1.5rem; box-shadow: var(--shadow-1); border:1px solid var(--border); transition: all var(--transition-1); }
 
 .tasks-card:hover {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -262,21 +217,9 @@
     gap: 0.75rem;
 }
 
-.task-item {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 0.75rem;
-    border-radius: 8px;
-    background-color: #f9fafb;
-    border: 1px solid #e5e7eb;
-    transition: all 0.2s ease;
-}
+.task-item { display:flex; align-items:center; gap:.75rem; padding:.75rem; border-radius:8px; background: var(--surface-2); border:1px solid var(--border); transition: all var(--transition-1); }
 
-.task-item:hover {
-    background-color: #f3f4f6;
-    border-color: #d1d5db;
-}
+.task-item:hover { background: var(--surface); border-color: var(--primary-600); }
 
 .task-checkbox {
     width: 18px;
@@ -314,18 +257,9 @@
     gap: 0.25rem;
 }
 
-.task-title {
-    font-size: 0.9rem;
-    font-weight: 500;
-    color: #1a1a1a;
-    margin: 0;
-}
+.task-title { font-size:.9rem; font-weight:500; color: var(--text-1); margin:0; }
 
-.task-meta {
-    font-size: 0.8rem;
-    color: #6b7280;
-    margin: 0;
-}
+.task-meta { font-size:.8rem; color: var(--text-2); margin:0; }
 
 .task-tag {
     padding: 0.25rem 0.5rem;
@@ -342,14 +276,7 @@
     margin-bottom: 2rem;
 }
 
-.team-status-card {
-    background: white;
-    border-radius: 12px;
-    padding: 1.5rem;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    border: 1px solid #e1e5e9;
-    transition: all 0.2s ease;
-}
+.team-status-card { background: var(--surface); border-radius: var(--radius-12); padding:1.5rem; box-shadow: var(--shadow-1); border:1px solid var(--border); transition: all var(--transition-1); }
 
 .team-status-card:hover {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -362,35 +289,14 @@
     gap: 1rem;
 }
 
-.team-member {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 1rem;
-    border-radius: 8px;
-    background-color: #f9fafb;
-    border: 1px solid #e5e7eb;
-    transition: all 0.2s ease;
-}
+.team-member { display:flex; flex-direction:column; align-items:center; gap:.5rem; padding:1rem; border-radius:8px; background: var(--surface-2); border:1px solid var(--border); transition: all var(--transition-1); }
 
 .team-member:hover {
     background-color: #f3f4f6;
     border-color: #d1d5db;
 }
 
-.member-avatar {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    background-color: #e5e7eb;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #6b7280;
-    font-size: 1.2rem;
-    font-weight: 600;
-}
+.member-avatar { width:48px; height:48px; border-radius:50%; background: var(--surface); display:flex; align-items:center; justify-content:center; color: var(--text-2); font-size:1.2rem; font-weight:600; border:1px solid var(--border); }
 
 .member-info {
     text-align: center;
