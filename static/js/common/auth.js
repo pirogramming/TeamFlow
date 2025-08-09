@@ -1,3 +1,6 @@
+// noop placeholder to preserve import order if referenced elsewhere
+export const noop = () => {};
+
 /**
  * 인증 관리 기본 함수 (백엔드 테스트용)
  */

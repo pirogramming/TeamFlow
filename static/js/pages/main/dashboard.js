@@ -505,8 +505,7 @@ function setupDashboardData(data) {
     // 초대 코드 섹션 업데이트
     updateInviteCodeSection(data.team);
     
-    // 프로젝트 드롭다운 설정
-    setupProjectDropdown(data.team);
+    // 프로젝트 드롭다운은 전역 헤더 스크립트(header.js)에서만 관리 (중복 제거)
     
     // 진행률 업데이트
     updateProgressBars(data.total_progress, data.personal_progress);
@@ -611,108 +610,4 @@ function setupProjectDropdown(currentTeam) {
     }
 }
 
-// 프로젝트 목록 로드
-async function loadProjectList() {
-    const projectList = document.getElementById('project-list');
-    if (!projectList) return;
-    
-    try {
-        const response = await fetch('/api/teams/list/', {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': getCsrfToken()
-            },
-            credentials: 'same-origin'
-        });
-
-        if (response.ok) {
-            const data = await response.json();
-            if (data.success && data.teams) {
-                // API 응답에서 받은 실제 팀 목록으로 변환
-                const projects = data.teams.map(team => ({
-                    id: team.id,
-                    name: team.name,
-                status: '진행중',
-                    isActive: false // 현재 선택된 팀은 별도로 처리
-                }));
-                
-                // 현재 선택된 팀 표시
-                const currentTeamId = document.querySelector('[name=current-team-id]')?.value;
-                if (currentTeamId) {
-                    projects.forEach(project => {
-                        project.isActive = project.id.toString() === currentTeamId;
-                    });
-                }
-        
-        renderProjectList(projects);
-            } else {
-                projectList.innerHTML = '<div class="dropdown-item no-projects"><span>참여한 팀이 없습니다</span></div>';
-            }
-        } else {
-            throw new Error('팀 목록 로드 실패');
-        }
-    } catch (error) {
-        console.error('프로젝트 목록 로드 오류:', error);
-        projectList.innerHTML = '<div class="dropdown-item no-projects"><span>팀 목록을 불러올 수 없습니다</span></div>';
-    }
-}
-
-// 프로젝트 목록 렌더링
-function renderProjectList(projects) {
-    const projectList = document.getElementById('project-list');
-    if (!projectList) return;
-    
-    projectList.innerHTML = projects.map(project => `
-        <div class="dropdown-item ${project.isActive ? 'active' : ''}" data-project-id="${project.id}">
-            <svg class="dropdown-item-icon" fill="currentColor" viewBox="0 0 24 24" width="16" height="16">
-                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
-            </svg>
-            <div class="dropdown-item-content">
-                <div class="dropdown-item-name">${project.name}</div>
-                <span class="dropdown-item-status">${project.status}</span>
-            </div>
-        </div>
-    `).join('');
-    
-    // 프로젝트 선택 이벤트
-    projectList.querySelectorAll('.dropdown-item').forEach(item => {
-        item.addEventListener('click', function() {
-            const projectId = this.dataset.projectId;
-            selectProject(projectId);
-        });
-    });
-}
-
-// 프로젝트 선택
-async function selectProject(projectId) {
-    console.log('프로젝트 선택됨, projectId:', projectId); // 클릭 시 값 확인
-
-    if (!projectId) {
-        console.error('❌ projectId가 비어있음 - 드롭다운 data-project-id 확인 필요');
-        return;
-    }
-
-    try {
-        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-
-        // 세션에 선택된 team_id 저장
-        const response = await fetch('/api/dashboard/set-current-team/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': csrftoken
-            },
-            body: JSON.stringify({ team_id: projectId })
-        });
-
-        const result = await response.json();
-        console.log('세션 저장 결과:', result);
-
-        // teamId 전달해서 새로고침
-        refreshDashboard(projectId);
-
-    } catch (error) {
-        console.error('팀 변경 중 오류:', error);
-    }
-}
+// 프로젝트 드롭다운/목록/선택은 전역 헤더 스크립트에서 처리하므로 이 파일에서는 제거

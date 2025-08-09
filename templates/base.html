@@ -32,6 +32,8 @@
     {% block extra_css %}{% endblock %}
 
     <title>TeamFlow - {% block title %}{% endblock %}</title>
+
+    
   </head>
   <body>
     <meta name="csrf-token" content="{{ csrf_token }}" />
@@ -77,8 +79,9 @@
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="{% static 'js/common/utils.js' %}"></script>
     <script src="{% static 'js/common/api.js' %}"></script>
-    <script src="{% static 'js/common/components.js' %}"></script>
-    <script src="{% static 'js/pages/main/header.js' %}"></script>
+    <script type="module" src="{% static 'js/common/components.js' %}"></script>
+    
+    <script type="module" src="{% static 'js/pages/main/header.js' %}"></script>
     <script src="{% static 'js/pages/main/sidebar.js' %}"></script>
     <script src="{% static 'js/app.js' %}"></script>
 

@@ -1,54 +1,15 @@
 /* 자료실 페이지 스타일 - Design Guide 준수 */
 
-.page-container {
-    padding: 2rem;
-    max-width: 1400px;
-    margin: 0 auto;
-    background-color: #F8F9FA;
-    min-height: calc(100vh - 64px); /* 헤더 높이 제외 */
-    display: flex;
-    flex-direction: column;
-}
+.page-container { padding: 2rem; max-width: 1400px; margin: 0 auto; background: var(--bg); min-height: calc(100vh - 64px); display:flex; flex-direction:column; }
 
-.view-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 2rem;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid #e1e5e9;
-}
+.view-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:2rem; padding-bottom:1rem; border-bottom:1px solid var(--border); }
 
-.view-header h1 {
-    font-size: 2rem;
-    font-weight: 700;
-    color: #1a1a1a;
-    margin: 0;
-}
+.view-header .page-title { font-size: 1.5rem; }
 
 /* 파일 업로드 버튼 */
-.btn-upload {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    padding: 0.75rem 1.5rem;
-    background: #2383e2;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-size: 0.875rem;
-    font-weight: 500;
-    text-decoration: none;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    font-family: inherit;
-}
+.btn-upload { display:inline-flex; align-items:center; justify-content:center; gap:.5rem; padding:.75rem 1.5rem; background: var(--primary-600); color:#fff; border:none; border-radius: var(--radius); font-size:.875rem; font-weight:500; text-decoration:none; cursor:pointer; transition: all var(--transition-1); font-family:inherit; }
 
-.btn-upload:hover {
-    background: #1a6bc9;
-    transform: translateY(-1px);
-}
+.btn-upload:hover { background: var(--primary-700); transform: translateY(-1px); }
 
 /* 헤더 액션 영역 */
 .header-actions {
@@ -65,15 +26,7 @@
 }
 
 /* 파일 리스트 스타일 */
-.file-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0;
-    border-radius: 8px;
-    overflow: hidden;
-    border: 1px solid #e1e5e9;
-    background: white;
-}
+.file-list { display:flex; flex-direction:column; gap:0; border-radius: 8px; overflow:hidden; border:1px solid var(--border); background: var(--surface); }
 
 .file-item {
     display: flex;
@@ -87,9 +40,7 @@
     border-bottom: none;
 }
 
-.file-item:hover {
-    background-color: #f8f9fa;
-}
+.file-item:hover { background: var(--surface-2); }
 
 .file-icon {
     flex-shrink: 0;
@@ -101,21 +52,9 @@
     min-width: 0;
 }
 
-.file-name {
-    font-size: 0.95rem;
-    font-weight: 600;
-    color: #1a1a1a;
-    margin: 0 0 0.25rem 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
+.file-name { font-size:.95rem; font-weight:600; color: var(--text-1); margin:0 0 .25rem 0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 
-.file-meta {
-    font-size: 0.8rem;
-    color: #6b7280;
-    margin: 0;
-}
+.file-meta { font-size:.8rem; color: var(--text-2); margin:0; }
 
 .file-actions {
     display: flex;
@@ -138,26 +77,9 @@
 
 
 
-.btn-download {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.25rem;
-    padding: 0.5rem 0.75rem;
-    background: #2383e2;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    font-size: 0.75rem;
-    font-weight: 500;
-    text-decoration: none;
-    transition: all 0.2s ease;
-}
+.btn-download { display:inline-flex; align-items:center; justify-content:center; gap:.25rem; padding:.5rem .75rem; background: var(--primary-600); color:#fff; border:none; border-radius:6px; font-size:.75rem; font-weight:500; text-decoration:none; transition: all var(--transition-1); }
 
-.btn-download:hover {
-    background: #1a6bc9;
-    color: white;
-}
+.btn-download:hover { background: var(--primary-700); color:#fff; }
 
 .btn-delete {
     padding: 0.5rem;

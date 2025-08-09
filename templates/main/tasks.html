@@ -7,10 +7,12 @@
 
 {% block content %}
 <div class="page-container">
-<div class="tasks-container">
         <!-- 헤더 -->
         <div class="tasks-header">
-            <h1>작업 관리</h1>
+            <div class="page-title-group">
+                <h1 class="page-title">작업 관리</h1>
+                <p class="page-subtitle">팀과 개인 작업을 한눈에 보고 관리하세요</p>
+            </div>
             <button id="add-task-btn" class="btn-primary">
                 <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
@@ -140,7 +142,6 @@
                     <p>개인 작업이 없습니다.</p>
                 </div>
             {% endfor %}
-            </div>
         </div>
     </div>
 </div>

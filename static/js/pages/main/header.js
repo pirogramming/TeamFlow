@@ -1,3 +1,5 @@
+// 테마 토글 제거됨 (라이트 모드만 유지)
+
 // 헤더 JavaScript - MGP 개발
 
 //URL에서 team_id 읽기: /api/dashboard/{team_id}/
@@ -313,19 +315,37 @@ async function selectProject(teamId, teamName) { // PATCH: 전면 보강
         // 팀 전환 전역 이벤트 발행
         window.dispatchEvent(new CustomEvent('team:changed', { detail: { teamId, teamName } }));
 
-        // 대시보드 외 페이지에서는 리로드로 반영
-        if (!location.pathname.startsWith('/api/dashboard/')) {
-            location.reload();
+        // 현재 경로 기준으로 동일 섹션에서 팀 전환하도록 URL 재구성
+        const parts = location.pathname.split('/').filter(Boolean); // ['api','dashboard','{id}',...]
+        let targetUrl = null;
+        if (parts[0] === 'api' && parts[1] === 'dashboard') {
+            // /api/dashboard/{id}/... → teamId만 교체
+            if (parts.length === 2) {
+                // 루트인 경우 대시보드 메인으로 이동
+                targetUrl = `/api/dashboard/${teamId}/`;
+            } else {
+                parts[2] = String(teamId);
+                targetUrl = `/${parts.join('/')}`;
+                if (!targetUrl.endsWith('/')) targetUrl += '/';
+            }
+        } else {
+            // 그 외 페이지에서는 대시보드 메인으로 이동
+            targetUrl = `/api/dashboard/${teamId}/`;
+        }
+
+        // 내비게이션 실행
+        if (targetUrl && targetUrl !== location.pathname) {
+            location.href = targetUrl;
             return;
         }
 
-        // 대시보드 새로고침 (만약 대시보드 페이지에 있다면)
+        // 폴백: 대시보드 함수가 있으면 사용
         if (typeof refreshDashboard === 'function') {
             console.log('🔄 헤더에서 대시보드 새로고침 요청, teamId:', teamId);
-            refreshDashboard(teamId); // teamId 전달
+            refreshDashboard(teamId);
         } else if (typeof loadDashboardData === 'function') {
             console.log('⚠️ refreshDashboard 없음, loadDashboardData 사용');
-            loadDashboardData(teamId); // teamId 전달
+            loadDashboardData(teamId);
         }
 
     } catch (error) {
@@ -574,7 +594,7 @@ function showHeaderNotification(message, type = 'info') {
         notification.style.transform = 'translateX(100%)';
         setTimeout(() => {
             if (notification.parentNode) {
-                notification.remove();s
+                notification.remove();
             }
         }, 300);
     }, 3000);
