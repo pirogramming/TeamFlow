@@ -32,6 +32,13 @@ function formatDate(dateString) {
     return `${year}-${month}-${day}`;
 }
 
+// 상태 필터링 유틸
+function filterByStatus(tasks, mode) {
+    if (!Array.isArray(tasks)) return [];
+    if (mode === 'completed') return tasks.filter(t => t.status === 'completed' || t.status === '완료');
+    return tasks.filter(t => t.status !== 'completed' && t.status !== '완료');
+}
+
 // 대시보드 초기화
 async function initializeDashboard() {
     try {
@@ -212,6 +219,7 @@ function renderTeamTasks(tasks = []) {
     teamTasksContainer.innerHTML = tasks.map(task => {
         // 마감 임박 여부 계산
         const isDeadlineImminent = checkDeadlineImminent(task.due_date);
+        const isCompleted = task.status === 'completed' || task.status === '완료';
         
         // 담당자 정보
         const assigneeName = task.assignee__first_name || task.assignee__username || '미정';
@@ -223,9 +231,9 @@ function renderTeamTasks(tasks = []) {
             <div class="task-item" data-task-id="${task.id}">
             <div class="task-content">
                     <div class="task-header">
-                        <span class="task-name">${task.name}</span>
+                        <span class="task-name ${isCompleted ? 'completed' : ''}">${task.name}</span>
                         <div class="task-meta">
-                            ${isDeadlineImminent ? '<span class="task-badge-urgent">마감 임박</span>' : ''}
+                            ${isCompleted ? '<span class="task-badge-complete">완료</span>' : (isDeadlineImminent ? '<span class="task-badge-urgent">마감 임박</span>' : '')}
                         </div>
                     </div>
                     <div class="task-details">
@@ -237,6 +245,20 @@ function renderTeamTasks(tasks = []) {
             </div>
         `;
     }).join('');
+
+    // 기본 3개만 보이기, 4번째부터 숨김
+    const items = teamTasksContainer.querySelectorAll('.task-item');
+    items.forEach((el, idx) => {
+        if (idx >= 3) el.classList.add('is-hidden');
+    });
+
+    // 토글 버튼 상태 설정
+    const toggleBtn = document.getElementById('team-tasks-toggle');
+    if (toggleBtn) {
+        toggleBtn.textContent = items.length > 3 ? '더보기' : '더보기 없음';
+        toggleBtn.disabled = items.length <= 3;
+        toggleBtn.onclick = () => toggleTaskList('team');
+    }
 }
 
 // 개인 작업 목록 렌더링
@@ -252,6 +274,7 @@ function renderPersonalTasks(tasks = []) {
     personalTasksContainer.innerHTML = tasks.map(task => {
         // 마감 임박 여부 계산
         const isDeadlineImminent = checkDeadlineImminent(task.due_date);
+        const isCompleted = task.status === 'completed' || task.status === '완료';
         
         // 마감일 포맷
         const dueDate = task.due_date ? formatDate(task.due_date) : '';
@@ -260,9 +283,9 @@ function renderPersonalTasks(tasks = []) {
             <div class="task-item" data-task-id="${task.id}">
             <div class="task-content">
                     <div class="task-header">
-                        <span class="task-name">${task.name}</span>
+                        <span class="task-name ${isCompleted ? 'completed' : ''}">${task.name}</span>
                         <div class="task-meta">
-                            ${isDeadlineImminent ? '<span class="task-badge-urgent">마감 임박</span>' : ''}
+                            ${isCompleted ? '<span class="task-badge-complete">완료</span>' : (isDeadlineImminent ? '<span class="task-badge-urgent">마감 임박</span>' : '')}
                         </div>
                     </div>
                     <div class="task-details">
@@ -273,6 +296,45 @@ function renderPersonalTasks(tasks = []) {
             </div>
         `;
     }).join('');
+
+    // 기본 3개만 보이기, 4번째부터 숨김
+    const items = personalTasksContainer.querySelectorAll('.task-item');
+    items.forEach((el, idx) => {
+        if (idx >= 3) el.classList.add('is-hidden');
+    });
+
+    // 토글 버튼 상태 설정
+    const toggleBtn = document.getElementById('personal-tasks-toggle');
+    if (toggleBtn) {
+        toggleBtn.textContent = items.length > 3 ? '더보기' : '더보기 없음';
+        toggleBtn.disabled = items.length <= 3;
+        toggleBtn.onclick = () => toggleTaskList('personal');
+    }
+}
+
+// 작업 리스트 더보기/접기 토글 (사후 처리 방식)
+function toggleTaskList(type) {
+    const containerId = type === 'team' ? 'team-tasks' : 'personal-tasks';
+    const toggleId = type === 'team' ? 'team-tasks-toggle' : 'personal-tasks-toggle';
+    const container = document.getElementById(containerId);
+    const toggleBtn = document.getElementById(toggleId);
+    if (!container || !toggleBtn) return;
+
+    const hiddenItems = container.querySelectorAll('.task-item.is-hidden');
+    const isCollapsed = hiddenItems.length > 0;
+
+    if (isCollapsed) {
+        // 펼치기: 모두 보이기
+        container.querySelectorAll('.task-item').forEach(el => el.classList.remove('is-hidden'));
+        toggleBtn.textContent = '접기';
+    } else {
+        // 접기: 4번째부터 숨기기 (0,1,2만 표시)
+        const items = Array.from(container.querySelectorAll('.task-item'));
+        items.forEach((el, idx) => {
+            if (idx >= 3) el.classList.add('is-hidden');
+        });
+        toggleBtn.textContent = '더보기';
+    }
 }
 
 // 팀원 목록 렌더링
@@ -334,6 +396,26 @@ function setupEventListeners() {
         joinTeamBtn.addEventListener('click', handleJoinTeam);
     }
     
+    // 작업 상태 탭 클릭 처리
+    document.addEventListener('click', (e) => {
+        const btn = e.target.closest('.task-status-tab');
+        if (!btn) return;
+        const scope = btn.dataset.scope; // 'team' | 'personal'
+        const status = btn.dataset.status; // 'active' | 'completed'
+
+        // 탭 active 토글
+        document.querySelectorAll(`.task-status-tabs[data-scope="${scope}"] .task-status-tab`).forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        if (scope === 'team') {
+            window.__teamTasksStatus = status;
+            renderTeamTasks(filterByStatus(window.__teamTasks || [], status));
+        } else {
+            window.__personalTasksStatus = status;
+            renderPersonalTasks(filterByStatus(window.__personalTasks || [], status));
+        }
+    });
+
     // 마감 임박 알림은 클릭 불가능한 안내 표시
     // const deadlineNotification = document.querySelector('.notification-item');
     // if (deadlineNotification) {
@@ -522,13 +604,17 @@ function setupDashboardData(data) {
         renderTeamMembers(data.team_members);
     }
     
-    // 작업 목록 표시
+    // 작업 목록 표시 (상태 탭과 연동)
     if (data.team_tasks) {
-        renderTeamTasks(data.team_tasks);
+        window.__teamTasks = data.team_tasks;
+        window.__teamTasksStatus = window.__teamTasksStatus || 'active';
+        renderTeamTasks(filterByStatus(window.__teamTasks, window.__teamTasksStatus));
     }
     
     if (data.personal_tasks) {
-        renderPersonalTasks(data.personal_tasks);
+        window.__personalTasks = data.personal_tasks;
+        window.__personalTasksStatus = window.__personalTasksStatus || 'active';
+        renderPersonalTasks(filterByStatus(window.__personalTasks, window.__personalTasksStatus));
     }
 }
 
