@@ -1,16 +1,15 @@
 import json
 from collections import defaultdict
+from datetime import date, timedelta
 
-from django.http import JsonResponse, HttpResponseForbidden
+from django.http import JsonResponse, HttpResponse, HttpResponseForbidden
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
-from collections import defaultdict
-from datetime import date, timedelta 
 
 from teams.models import Team
+from tasks.models import Task
 from .models import Meeting, SchedulePoll, Vote
-from tasks.models import Task 
 
 # ===================================================================
 # 페이지 렌더링 뷰
@@ -22,12 +21,10 @@ def calendar_page_view(request, team_id):
     일정 관리(FullCalendar) 메인 HTML 페이지를 렌더링합니다.
     """
     team = get_object_or_404(Team, id=team_id)
-    request.session['current_team_id'] = team.id  # 현재 팀 ID를 세션에 저장
     context = {
         'team': team,
     }
     return render(request, 'main/calendar.html', context)
-
 
 # ===================================================================
 # API 뷰 (JSON 응답)
@@ -43,48 +40,56 @@ def schedule_list_view(request, team_id):
     if not team.members.filter(id=request.user.id).exists():
         return HttpResponseForbidden("팀 멤버가 아닙니다.")
 
-    meetings = Meeting.objects.filter(team_id=team_id)
-    tasks = Task.objects.filter(team_id=team_id) # 나중에 Task 기능 추가 시
+    events = []
     today = date.today()
     
-    events = []
+    # 1. 회의 일정을 events 리스트에 추가
+    meetings = Meeting.objects.filter(team_id=team_id)
     for meeting in meetings:
         events.append({
-            'id': meeting.id, # 일정 수정을 위해 id 추가
+            'id': f"meeting_{meeting.id}",
             'title': meeting.title,
             'start': meeting.start_time.isoformat(),
             'end': meeting.end_time.isoformat(),
-            'color': '#3498db', # 회의는 파란색 계열로 표시
-            'type': 'meeting'
+            'color': '#3498db', # 회의는 파란색
+            'extendedProps': {
+                'type': 'meeting',
+                'description': '팀 회의 일정입니다.'
+            }
         })
+    
+    # 2. Task(할 일) 데이터를 가져와 events 리스트에 추가
+    tasks = Task.objects.filter(team_id=team_id)
     for task in tasks:
-        # 마감일이 없는 Task는 건너뜁니다.
-        if task.due_date < today:
-            color = '#000000' # 검은색
-        # 마감일이 오늘로부터 2일 이내이면 빨간색
-        elif (task.due_date - today).days <= 2:
-            color = '#e74c3c' # 빨간색
-        # 개인 할 일이면 초록색
-        elif task.type == 'personal':
-            color = '#2ecc71' # 초록색
-        # 팀 할 일이면 노란색
-        elif task.type == 'team':
-            color = '#f1c40f' # 노란색
+        if not task.due_date:
+            continue
+
+        color = '#808080' # 기본 색상
         
+        if task.status == 'completed':
+            color = '#adb5bd' # 완료된 작업은 회색 (가장 높은 우선순위)
+        elif task.due_date < today:
+            color = '#343a40' # 지난 작업은 검은색 계열
+        elif task.is_deadline_imminent:
+            color = '#e74c3c' # 마감 임박은 빨간색
+        elif task.type == 'personal':
+            color = '#2ecc71' # 개인 할 일은 초록색
+        elif task.type == 'team':
+            color = '#f1c40f' # 팀 할 일은 노란색
+
         events.append({
-            'id': task.id, # 과제 수정을 위해 id 추가
-            'title': task.name,
-            'start': task.due_date.isoformat(), # 과제는 하루 종일 일정
-            'allDay': True, # 하루 종일 일정으로 표시
+            'id': f"task_{task.id}",
+            'title': f"[작업] {task.name}",
+            'start': task.due_date.isoformat(),
+            'allDay': True,
             'color': color,
             'extendedProps': {
                 'type': 'task',
                 'description': task.description,
                 'assignee': task.assignee.username if task.assignee else '미지정',
-                'status': task.get_status_display(), # 'pending' -> '대기중'
+                'status': task.get_status_display(),
             }
         })
-    
 
     return JsonResponse(events, safe=False)
 
@@ -113,17 +118,15 @@ def schedule_create_view(request, team_id):
 @require_http_methods(["DELETE"])
 def schedule_delete_view(request, team_id, schedule_id):
     """
-    DELETE /api/teams/{team_id}/schedule/{schedule_id}/delete
-    특정 회의 일정을 삭제합니다.
+    DELETE 요청을 받아 특정 회의 일정을 삭제합니다.
     """
     meeting = get_object_or_404(Meeting, id=schedule_id, team_id=team_id)
     
-    # 팀장 또는 일정 생성자만 삭제 가능
     if request.user != meeting.created_by and request.user != meeting.team.owner:
-        return HttpResponseForbidden("일정을 삭제할 권한이 없습니다.")
+        return JsonResponse({"error": "일정을 삭제할 권한이 없습니다."}, status=403)
         
     meeting.delete()
-    return JsonResponse({'success': True, 'message': '일정이 삭제되었습니다.'})
+    return HttpResponse(status=204)
 
 @login_required
 @require_http_methods(["PATCH"])
@@ -146,25 +149,44 @@ def schedule_update_view(request, team_id, schedule_id):
 def schedule_mediate_view(request, team_id):
     """
     GET /api/teams/{team_id}/schedule/mediate
-    When2Meet 그리드에 필요한 데이터를 계산하여 JSON으로 반환합니다.
+    When2Meet 그리드에 필요한 데이터와 가장 많이 겹치는 시간대, 그리고 이번 주 날짜를 계산하여 JSON으로 반환합니다.
     """
     poll, _ = SchedulePoll.objects.get_or_create(team_id=team_id, is_active=True)
-    votes = Vote.objects.filter(poll=poll)
+    votes = Vote.objects.filter(poll=poll).select_related('voter')
     
-    availability_counts = defaultdict(int)
+    availability_data = defaultdict(lambda: {'count': 0, 'users': []})
+    
     for vote in votes:
-        for day, slots in vote.available_slots.items():
-            for slot in slots:
-                availability_counts[f"{day}-{slot}"] += 1
+        if isinstance(vote.available_slots, dict):
+            for day, slots in vote.available_slots.items():
+                for slot in slots:
+                    slot_key = f"{day}-{slot}"
+                    availability_data[slot_key]['count'] += 1
+                    availability_data[slot_key]['users'].append(vote.voter.username)
     
+    best_slots = []
+    if availability_data:
+        max_votes = max((data['count'] for data in availability_data.values()), default=0)
+        if max_votes > 0:
+            best_slots = [
+                slot for slot, data in availability_data.items() 
+                if data['count'] == max_votes
+            ]
+
+    today = date.today()
+    start_of_week = today - timedelta(days=today.weekday())
+    week_dates = [(start_of_week + timedelta(days=i)).strftime('%m/%d') for i in range(7)]
+
     my_vote = Vote.objects.filter(poll=poll, voter=request.user).first()
     my_slots = my_vote.available_slots if my_vote else {}
 
     return JsonResponse({
         'poll_id': poll.id,
         'team_members_count': poll.team.members.count(),
-        'availability': availability_counts,
+        'availability': availability_data,
         'my_vote': my_slots,
+        'best_slots': best_slots,
+        'week_dates': week_dates,
     })
 
 @login_required
@@ -184,51 +206,3 @@ def save_vote_view(request, team_id):
         defaults={'available_slots': available_slots}
     )
     return JsonResponse({'success': True, 'message': '시간이 저장되었습니다.'})
-
-@login_required
-def schedule_mediate_view(request, team_id):
-    """
-    GET /api/teams/{team_id}/schedule/mediate
-    When2Meet 그리드에 필요한 데이터와 가장 많이 겹치는 시간대, 그리고 이번 주 날짜를 계산하여 JSON으로 반환합니다.
-    hover 기능을 위해 각 시간대별 사용자 이름 목록도 포함합니다.
-    """
-    poll, _ = SchedulePoll.objects.get_or_create(team_id=team_id, is_active=True)
-    votes = Vote.objects.filter(poll=poll)
-    
-    # 시간대별 카운트와 사용자 목록을 함께 저장
-    availability_data = defaultdict(lambda: {'count': 0, 'users': []})
-    
-    for vote in votes:
-        if isinstance(vote.available_slots, dict):
-            for day, slots in vote.available_slots.items():
-                for slot in slots:
-                    slot_key = f"{day}-{slot}"
-                    availability_data[slot_key]['count'] += 1
-                    availability_data[slot_key]['users'].append(vote.voter.username)
-    
-    # 1. 가장 많이 겹치는 시간대를 찾는 로직
-    best_slots = []
-    if availability_data:
-        max_votes = max(data['count'] for data in availability_data.values())
-        if max_votes > 0:
-            best_slots = [
-                slot for slot, data in availability_data.items() 
-                if data['count'] == max_votes
-            ]
-
-    # 2. 이번 주 날짜(월~일)를 계산하는 로직
-    today = date.today()
-    start_of_week = today - timedelta(days=today.weekday()) # 이번 주 월요일
-    week_dates = [(start_of_week + timedelta(days=i)).strftime('%m/%d') for i in range(7)]
-
-    my_vote = Vote.objects.filter(poll=poll, voter=request.user).first()
-    my_slots = my_vote.available_slots if my_vote else {}
-
-    return JsonResponse({
-        'poll_id': poll.id,
-        'team_members_count': poll.team.members.count(),
-        'availability': availability_data,  # 이제 count와 users 모두 포함
-        'my_vote': my_slots,
-        'best_slots': best_slots,     # 최적 시간대 정보 추가
-        'week_dates': week_dates,     # 주간 날짜 정보 추가
-    })

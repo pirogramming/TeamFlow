@@ -30,6 +30,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const when2meetGrid = document.getElementById('when2meet-grid');
     const saveVoteBtn = document.getElementById('save-vote-btn');
     const tooltip = document.getElementById('hover-tooltip');
+    
     // modal 관련 요소
     const detailModal = document.getElementById('event-detail-modal');
     const closeDetailModalBtn = document.getElementById('close-detail-modal-btn');
@@ -67,22 +68,17 @@ document.addEventListener('DOMContentLoaded', function() {
      * 탭 전환 기능
      */
     function switchTab(tabName) {
-        // 탭 버튼 활성화 상태 변경
         tabButtons.forEach(btn => {
             btn.classList.toggle('active', btn.dataset.tab === tabName);
         });
 
-        // 탭 패널 표시 상태 변경
         tabPanels.forEach(panel => {
             panel.classList.toggle('active', panel.id === `${tabName}-tab`);
         });
 
-        // 탭별 초기화 로직
         if (tabName === 'schedule' && calendar) {
-            // FullCalendar 리사이즈 (탭 전환 시 크기 조정)
             setTimeout(() => calendar.updateSize(), 100);
         } else if (tabName === 'meeting') {
-            // When2Meet 데이터 로드
             loadWhen2MeetData();
         }
     }
@@ -106,7 +102,7 @@ document.addEventListener('DOMContentLoaded', function() {
             height: 'auto',
             eventClick: function(info) {
                 const event = info.event;
-                currentEventId = event.id; // meeting_1 또는 task_1 형태
+                currentEventId = event.id;
                 currentEventType = event.extendedProps.type;
 
                 modalTitle.textContent = event.title;
@@ -119,12 +115,16 @@ document.addEventListener('DOMContentLoaded', function() {
                         <p><strong>마감일:</strong> ${new Date(event.start).toLocaleDateString()}</p>
                         <p><strong>설명:</strong> ${event.extendedProps.description || '없음'}</p>
                     `;
+                    // ✨ 작업 일정일 경우 삭제 버튼 숨김
+                    deleteEventBtn.style.display = 'none';
                 } else { // meeting
                     contentHTML = `
                         <p><strong>시작:</strong> ${new Date(event.start).toLocaleString()}</p>
                         <p><strong>종료:</strong> ${new Date(event.end).toLocaleString()}</p>
                         <p><strong>설명:</strong> ${event.extendedProps.description || '팀 회의입니다.'}</p>
                     `;
+                    // ✨ 회의 일정일 경우 삭제 버튼 표시
+                    deleteEventBtn.style.display = 'block';
                 }
                 modalBody.innerHTML = contentHTML;
                 detailModal.classList.add('active');
@@ -139,7 +139,6 @@ document.addEventListener('DOMContentLoaded', function() {
             calendarEl.innerHTML = '<p style="color: red; text-align: center; padding: 2rem;">캘린더를 불러올 수 없습니다.</p>';
         }
 
-        // ✨ 모달 닫기 이벤트
         closeDetailModalBtn.addEventListener('click', () => detailModal.classList.remove('active'));
         detailModal.addEventListener('click', (e) => {
             if (e.target === detailModal) {
@@ -147,36 +146,32 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
-        // ✨ 삭제 버튼 클릭 이벤트
+        // 삭제 버튼 클릭 이벤트
         deleteEventBtn.addEventListener('click', async () => {
-            if (!currentEventId || !currentEventType) return;
+            if (!currentEventId || currentEventType !== 'meeting') return;
 
             if (confirm('정말로 이 일정을 삭제하시겠습니까?')) {
                 const [type, id] = currentEventId.split('_');
-                let deleteUrl = '';
-                
-                // 타입에 따라 다른 삭제 API 호출
-                if (type === 'task') {
-                    // '/api/dashboard/' -> '/api/teams/'로 변경
-                    deleteUrl = `/api/teams/${teamId}/tasks/${id}/delete/`;
-                } else if (type === 'meeting') {
-                    // 이 URL은 이미 올바릅니다.
-                    deleteUrl = `/api/teams/${teamId}/schedule/${id}/delete`;
-                }
+                const deleteUrl = `/api/teams/${teamId}/schedule/${id}/delete`;
 
                 try {
                     const response = await fetch(deleteUrl, {
-                        method: 'DELETE', // tasks/views.py의 TaskDeleteView는 DELETE를 사용
+                        method: 'DELETE',
                         headers: { 'X-CSRFToken': getCookie('csrftoken') }
                     });
 
+                    // 204 No Content 응답을 올바르게 처리합니다.
                     if (response.ok) {
                         showToast('일정이 삭제되었습니다.', 'success');
                         detailModal.classList.remove('active');
                         calendar.refetchEvents();
                     } else {
-                        const result = await response.json();
-                        showToast(`삭제 실패: ${result.error || '알 수 없는 오류'}`, 'error');
+                        if (response.headers.get("content-length") > 0) {
+                            const result = await response.json();
+                            showToast(`삭제 실패: ${result.error || '알 수 없는 오류'}`, 'error');
+                        } else {
+                            showToast(`삭제 실패: 서버에서 오류가 발생했습니다. (상태 코드: ${response.status})`, 'error');
+                        }
                     }
                 } catch (error) {
                     console.error('삭제 오류:', error);
@@ -192,21 +187,14 @@ document.addEventListener('DOMContentLoaded', function() {
     function initializeModal() {
         if (!addScheduleBtn || !scheduleModal) return;
 
-        // 모달 열기
         addScheduleBtn.addEventListener('click', openScheduleModal);
-        
-        // 모달 닫기
         closeModalBtn.addEventListener('click', closeScheduleModal);
         cancelScheduleBtn.addEventListener('click', closeScheduleModal);
-        
-        // 배경 클릭 시 모달 닫기
         scheduleModal.addEventListener('click', (e) => {
             if (e.target === scheduleModal) {
                 closeScheduleModal();
             }
         });
-
-        // 일정 추가 폼 제출
         scheduleForm.addEventListener('submit', handleScheduleSubmit);
     }
 
@@ -217,10 +205,9 @@ document.addEventListener('DOMContentLoaded', function() {
         scheduleModal.classList.add('active');
         document.body.style.overflow = 'hidden';
         
-        // 현재 시간으로 기본값 설정
         const now = new Date();
-        const startTime = new Date(now.getTime() + 60 * 60 * 1000); // 1시간 후
-        const endTime = new Date(startTime.getTime() + 60 * 60 * 1000); // 2시간 후
+        const startTime = new Date(now.getTime() + 60 * 60 * 1000);
+        const endTime = new Date(startTime.getTime() + 60 * 60 * 1000);
         
         document.getElementById('schedule-start').value = formatDateTimeLocal(startTime);
         document.getElementById('schedule-end').value = formatDateTimeLocal(endTime);
@@ -262,7 +249,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (result.success) {
                 showToast('일정이 추가되었습니다.', 'success');
                 closeScheduleModal();
-                calendar.refetchEvents(); // 캘린더 새로고침
+                calendar.refetchEvents();
             } else {
                 showToast('일정 추가에 실패했습니다.', 'error');
             }
@@ -277,10 +264,7 @@ document.addEventListener('DOMContentLoaded', function() {
      */
     function initializeWhen2Meet() {
         if (!when2meetGrid || !saveVoteBtn) return;
-
         saveVoteBtn.addEventListener('click', saveVote);
-        
-        // 마우스 이벤트 설정은 그리드 렌더링 후에
     }
 
     /**
@@ -309,21 +293,18 @@ document.addEventListener('DOMContentLoaded', function() {
         const days = ['월', '화', '수', '목', '금', '토', '일'];
         const timeSlots = [];
         
-        // 9:00 ~ 21:00 시간 슬롯 생성
         for (let hour = 0; hour <= 24; hour++) {
             timeSlots.push(`${hour.toString().padStart(2, '0')}00`);
         }
 
         let gridHTML = '';
         
-        // 헤더 행
-        gridHTML += '<div class="grid-header"></div>'; // 좌상단 빈 칸
+        gridHTML += '<div class="grid-header"></div>';
         days.forEach((day, index) => {
             const date = data.week_dates ? data.week_dates[index] : '';
             gridHTML += `<div class="grid-header">${day}<br><small>${date}</small></div>`;
         });
 
-        // 시간 행들
         timeSlots.forEach(timeSlot => {
             const hour = parseInt(timeSlot.substring(0, 2));
             const displayTime = `${hour}:00`;
@@ -345,7 +326,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     const users = availability.users || [];
                     const intensity = Math.min(count / data.team_members_count, 1);
                     
-                    // 가용성에 따른 색상 설정
                     cellStyle = `background-color: rgba(35, 131, 226, ${0.1 + intensity * 0.7});`;
                     dataUsers = users.join(', ');
                 }
@@ -374,12 +354,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const cells = when2meetGrid.querySelectorAll('.grid-cell');
         
         cells.forEach(cell => {
-            // 마우스 드래그 선택
             cell.addEventListener('mousedown', startSelection);
             cell.addEventListener('mouseenter', continueSelection);
             cell.addEventListener('mouseup', endSelection);
-            
-            // hover 툴팁
             cell.addEventListener('mouseenter', showTooltip);
             cell.addEventListener('mouseleave', hideTooltip);
         });
@@ -388,25 +365,17 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     /**
-     * 드래그 선택 시작
+     * 드래그 선택 관련 함수들
      */
     function startSelection(e) {
         isMouseDown = true;
         toggleCellSelection(e.target);
     }
-
-    /**
-     * 드래그 선택 계속
-     */
     function continueSelection(e) {
         if (isMouseDown && e.target.classList.contains('grid-cell')) {
             toggleCellSelection(e.target);
         }
     }
-
-    /**
-     * 드래그 선택 종료
-     */
     function endSelection() {
         isMouseDown = false;
     }
@@ -433,7 +402,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     /**
-     * 툴팁 표시
+     * 툴팁 관련 함수들
      */
     function showTooltip(e) {
         const cell = e.target;
@@ -443,16 +412,11 @@ document.addEventListener('DOMContentLoaded', function() {
             tooltip.querySelector('.tooltip-content').textContent = `가능한 팀원: ${users}`;
             tooltip.classList.add('show');
             
-            // 툴팁 위치 설정
             const rect = cell.getBoundingClientRect();
             tooltip.style.left = rect.left + rect.width / 2 - tooltip.offsetWidth / 2 + 'px';
             tooltip.style.top = rect.top - tooltip.offsetHeight - 8 + 'px';
         }
     }
-
-    /**
-     * 툴팁 숨김
-     */
     function hideTooltip() {
         tooltip.classList.remove('show');
     }
@@ -470,12 +434,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 },
                 body: JSON.stringify({ available_slots: myVoteData })
             });
-
             const result = await response.json();
-
             if (result.success) {
                 showToast('시간이 저장되었습니다.', 'success');
-                loadWhen2MeetData(); // 데이터 새로고침
+                loadWhen2MeetData();
             } else {
                 showToast('저장에 실패했습니다.', 'error');
             }
@@ -510,11 +472,10 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function showToast(message, type = 'info') {
-        // 간단한 토스트 알림 (나중에 개선 가능)
         alert(message);
     }
 
-    // 개발자 디버깅을 위한 전역 함수 노출
+    // 개발자 디버깅용
     if (window.TeamFlow && window.TeamFlow.debug) {
         window.CalendarDebug = {
             switchTab,
