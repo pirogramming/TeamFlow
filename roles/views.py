@@ -12,6 +12,9 @@ from .models import Role, MemberRoleAssignment
 from teams.models import Team, TeamMember
 from users.models import Profile
 from .clova_ai import call_clova_recommendation, make_prompt
+import logging
+logger = logging.getLogger(__name__)
+
 
 # 역할 페이지 렌더링
 @login_required
@@ -131,51 +134,47 @@ def delete_role_api(request, team_id, role_id):
 @csrf_exempt
 @require_http_methods(["POST"])
 def recommend_role_api(request):
-    if request.method == "POST":
-        try:
-            data = json.loads(request.body)
-            major = data.get("major")
-            traits = data.get("traits", [])
-            preferences = data.get("preferences", [])
+    try:
+        # 1) 요청 바디 파싱 (프론트에서 보낸 사용자 정보)
+        data = {}
+        if request.body:
+            try:
+                data = json.loads(request.body.decode("utf-8"))
+            except Exception:
+                # 바디가 비어있거나 JSON 아님 → 빈 값으로 진행
+                data = {}
 
-            # 현재 팀 ID를 세션에서 가져옵니다.
-            current_team_id = request.session.get('current_team_id')
-            if not current_team_id:
-                return JsonResponse({"error": "현재 팀 정보가 없습니다. 먼저 팀 페이지에 접속해주세요."}, status=400)
+        major = (data.get("major") or getattr(getattr(request.user, "profile", None), "major", "") or "").strip()
+        traits = data.get("traits") or []           # ["분석적", "꼼꼼함"] 등
+        preferences = data.get("preferences") or [] # ["기획", "개발"] 등
 
-            team = get_object_or_404(Team, id=current_team_id)
+        # 2) 추천 가능한 역할 목록 (팀 기준으로 우선 조회)
+        team_id = request.session.get("current_team_id")
+        if team_id:
+            roles_qs = Role.objects.filter(team_id=team_id).only("name")
+        else:
+            roles_qs = Role.objects.all().only("name")
 
-            # 현재 팀에 등록된 역할들의 이름을 가져옵니다.
-            # 이 역할들을 AI에게 추천 가능한 역할 종류로 전달합니다.
-            available_role_names = list(Role.objects.filter(team=team).values_list('name', flat=True))
-            if not available_role_names:
-                return JsonResponse({"error": "현재 팀에 등록된 역할이 없습니다. 먼저 역할을 생성해주세요."}, status=400)
+        available_role_names = [r.name for r in roles_qs]
+        if not available_role_names:
+            # 최소 기본값 (비어있으면 LLM 프롬프트가 애매해짐)
+            available_role_names = ["기획", "개발", "디자인", "PM"]
 
-            # clova_ai.py의 make_prompt 함수를 사용하여 기본 프롬프트를 생성합니다.
-            prompt = make_prompt(major, traits, preferences)
+        # 3) 프롬프트 생성
+        prompt = make_prompt(major, traits, preferences)
 
-            print("🟢 사용자 프롬프트:", prompt)
-            print("🟢 AI에게 전달할 추천 가능 역할 종류:", available_role_names)
+        # 4) LLM 호출
+        result = call_clova_recommendation(prompt, available_role_names)
+        if not result:
+            return JsonResponse({"ok": False, "error": "LLM 응답 파싱 실패"}, status=502)
 
-            # ✅ clova_ai.py의 call_clova_recommendation 함수를 호출합니다.
-            # 이 함수는 (추천 역할, 추천 이유) 튜플을 반환합니다.
-            recommended_role, reason = call_clova_recommendation(prompt, available_role_names)
+        role, reason = result
+        return JsonResponse({"ok": True, "role": role, "reason": reason}, status=200)
 
-            if recommended_role and reason:
-                return JsonResponse({
-                    "recommended_role": recommended_role,
-                    "reason": reason
-                })
-            else:
-                return JsonResponse({"error": "Clova 응답에서 추천 역할을 파싱할 수 없거나 유효한 내용이 없습니다.", "detail": "AI 응답 형식을 확인하세요."}, status=500)
-
-        except json.JSONDecodeError:
-            return JsonResponse({'error': '잘못된 요청 형식입니다.'}, status=400)
-        except Exception as e:
-            import traceback
-            print("❌ 에러 발생:", e)
-            traceback.print_exc()
-            return JsonResponse({"error": str(e)}, status=500)
+    except Exception as e:
+        logger.exception("recommend_role_api failed")
+        # 500 대신 502로 내려서 프론트가 메시지를 그대로 보여줄 수 있게 함
+        return JsonResponse({"ok": False, "error": str(e)}, status=502)
 
 # ========================================
 # MGP: 역할 할당 API 추가

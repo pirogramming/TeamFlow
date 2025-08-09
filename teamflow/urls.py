@@ -19,6 +19,8 @@ from tasks import views as tasks
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    
+    path('', include('roles.urls')),
 
     path('api/teams/', include('teams.urls')),
     path('api/dashboard/', include('dashboard.urls')),
@@ -62,8 +64,6 @@ urlpatterns = [
     path('api/', include('schedule.urls')),
 
     path('team-log/', team_log_views.team_log_page, name='team_log_page'),  # HTML 페이지
-
-    path('', include('roles.urls')),
 
 
 ]
