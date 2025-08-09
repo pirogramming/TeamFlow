@@ -22,6 +22,11 @@ class Task(models.Model):
     description = models.TextField(blank=True)
     team = models.ForeignKey(Team, on_delete=models.CASCADE)
     assignee = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    # ========================================
+    # MGP: 공동 담당자 저장을 위한 필드 추가 (UI에 여러 담당자 표시 요구)
+    # 기존 단일 assignee는 호환성을 위해 유지, 추가 담당자는 assignees에 저장
+    # ========================================
+    assignees = models.ManyToManyField(User, blank=True, related_name='task_assignees')
     type = models.CharField(max_length=10, choices=TASK_TYPES, default='team')
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     due_date = models.DateField(null=True, blank=True)

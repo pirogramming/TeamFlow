@@ -103,6 +103,37 @@
     gap: 0.5rem;
 }
 
+/* 상태 탭 */
+.task-status-tabs {
+    display: inline-flex;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+.task-status-tab {
+    border: 1px solid #e5e7eb;
+    background: #f9fafb;
+    color: #6b7280;
+    padding: 6px 12px;
+    border-radius: 9999px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all .18s ease;
+}
+.task-status-tab:hover {
+    background: #f3f4f6;
+    color: #374151;
+    transform: translateY(-1px);
+}
+.task-status-tab:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px #e5e7eb;
+}
+.task-status-tab.active {
+    background: #111827;
+    color: #fff;
+    border-color: #111827;
+}
+
 /* 진행률 표시 */
 .progress-display {
     display: flex;
@@ -412,12 +443,58 @@
     flex-shrink: 0;
 }
 
+/* 완료 배지 */
+.task-badge-complete {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    color: #10b981;
+    background-color: #ecfdf5;
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+    border: 1px solid #a7f3d0;
+    flex-shrink: 0;
+}
+
 /* 기존 스타일 제거 */
 .task-status,
 .task-info {
     display: none;
 }
 
+/* 작업 더보기 액션 영역 */
+.task-actions {
+    display: flex;
+    justify-content: center;
+    margin-top: 0.5rem;
+}
+
+.btn-link {
+    border: 1px solid #e5e7eb;
+    background: #f3f4f6;
+    color: #6b7280;
+    padding: 6px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.btn-link.small {
+    font-size: 0.85rem;
+}
+
+.btn-link:hover:not(:disabled) {
+    background: #e5e7eb;
+    color: #374151;
+}
+
+.btn-link:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* 숨김 처리 */
+.is-hidden {
+    display: none !important;
+}
 
 /* 반응형 디자인 */
 @media (max-width: 1024px) {

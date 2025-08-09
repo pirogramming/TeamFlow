@@ -80,6 +80,10 @@
                             <p class="card-subtitle">팀의 최근 작업 현황</p>
                         </div>
                         <div class="card-content">
+                            <div class="task-status-tabs" data-scope="team">
+                                <button type="button" class="task-status-tab active" data-scope="team" data-status="active">진행중</button>
+                                <button type="button" class="task-status-tab" data-scope="team" data-status="completed">완료</button>
+                            </div>
                             <div class="task-list" id="team-tasks">
                                 {% for task in team_tasks %}
                                 <div class="task-item">
@@ -110,6 +114,9 @@
                                 <p>팀 작업이 없습니다.</p>
                                 {% endfor %}
                             </div>
+                            <div class="task-actions">
+                                <button type="button" id="team-tasks-toggle" class="btn-link small">더보기</button>
+                            </div>
                         </div>
                     </div>
 
@@ -120,6 +127,10 @@
                             <p class="card-subtitle">나의 개인 작업 현황</p>
                         </div>
                         <div class="card-content">
+                            <div class="task-status-tabs" data-scope="personal">
+                                <button type="button" class="task-status-tab active" data-scope="personal" data-status="active">진행중</button>
+                                <button type="button" class="task-status-tab" data-scope="personal" data-status="completed">완료</button>
+                            </div>
                             <div class="task-list" id="personal-tasks">
                                 {% for task in personal_tasks %}
                                 <div class="task-item">
@@ -182,6 +193,9 @@
                                 {% empty %}
                                 <p>팀원 정보가 없습니다.</p>
                                 {% endfor %}
+                            </div>
+                            <div class="task-actions">
+                                <button type="button" id="personal-tasks-toggle" class="btn-link small">더보기</button>
                             </div>
                         </div>
                     </div>
