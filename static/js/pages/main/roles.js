@@ -162,7 +162,7 @@ async function handleAIRecommendation(e) {
         const response = await fetch('/roles/ai-recommend-role/', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
+                'Content-Type': 'application/json; charset=UTF-8',
                 'X-CSRFToken': getCsrfToken()
             },
             body: JSON.stringify({
@@ -194,121 +194,217 @@ async function handleAIRecommendation(e) {
     }
 }
 
-// 더미 AI 결과 생성 (AI API 문제로 인한 임시 처리)
+// // 더미 AI 결과 생성 (AI API 문제로 인한 임시 처리)
+// function generateDummyAIResult(major, traits, preferredRoles) {
+//     const roleNames = ['프론트엔드 개발자', '백엔드 개발자', 'UI/UX 디자이너', '프로젝트 매니저', '데이터 분석가', 'QA 엔지니어'];
+//     const randomRole = roleNames[Math.floor(Math.random() * roleNames.length)];
+
+//     const traitText = traits.join(', ');
+//     const preferredText = preferredRoles.length > 0 ? `선호 역할: ${preferredRoles.join(', ')}` : '';
+
+//     // ✅ 더미 결과도 백엔드 응답 형식에 맞게 수정
+//     return {
+//         recommended_role: randomRole,
+//         reason: `${major} 전공자로서 ${traitText}한 성향을 보이는 당신에게 "${randomRole}" 역할을 추천합니다. ${preferredText} ${traitText}한 특성을 활용하여 팀 프로젝트에서 뛰어난 성과를 낼 수 있을 것입니다.`
+//     };
+// }
+
 function generateDummyAIResult(major, traits, preferredRoles) {
-    const roleNames = ['프론트엔드 개발자', '백엔드 개발자', 'UI/UX 디자이너', '프로젝트 매니저', '데이터 분석가', 'QA 엔지니어'];
-    const randomRole = roleNames[Math.floor(Math.random() * roleNames.length)];
+  // DOM에서 현재 등록된 역할 목록 수집
+  const items = [...document.querySelectorAll('.role-item')];
+  const pool = items.map(it => ({
+    id: it.dataset.roleId,
+    name: it.querySelector('.role-name')?.textContent?.trim() || ''
+  })).filter(r => r.id && r.name);
 
-    const traitText = traits.join(', ');
-    const preferredText = preferredRoles.length > 0 ? `선호 역할: ${preferredRoles.join(', ')}` : '';
+  const selected = pool.length ? pool[Math.floor(Math.random() * pool.length)] 
+                               : { id: null, name: '임시 역할' };
 
-    // ✅ 더미 결과도 백엔드 응답 형식에 맞게 수정
-    return {
-        recommended_role: randomRole,
-        reason: `${major} 전공자로서 ${traitText}한 성향을 보이는 당신에게 "${randomRole}" 역할을 추천합니다. ${preferredText} ${traitText}한 특성을 활용하여 팀 프로젝트에서 뛰어난 성과를 낼 수 있을 것입니다.`
-    };
+  const traitText = traits.join(', ');
+  const preferredText = preferredRoles.length > 0 ? `선호 역할 ID: ${preferredRoles.join(', ')}` : '';
+
+  return {
+    recommended_role_id: selected.id,
+    recommended_role: selected.name,
+    reason: `${major} 전공, ${traitText} 성향을 바탕으로 "${selected.name}"을(를) 추천합니다. ${preferredText}`
+  };
 }
+
 
 // AI 결과 표시
 function showAIResult(result) {
-    const resultContainer = document.getElementById('ai-result');
-    const resultContent = document.getElementById('ai-result-content');
-    const recommendedRoleNameElement = document.getElementById('recommended-role-name'); // 변수명 변경
+  const resultContainer = document.getElementById('ai-result');
+  const resultContent = document.getElementById('ai-result-content');
+  const recommendedRoleNameElement = document.getElementById('recommended-role-name');
 
-    if (resultContainer && resultContent && recommendedRoleNameElement) {
-        // ✅ 객체 형태의 결과 처리 (백엔드에서 오는 데이터 형식)
-        // result는 { recommended_role: "...", reason: "..." } 형태
-        const recommendedRole = result.recommended_role;
-        const reason = result.reason;
+  if (!resultContainer || !resultContent || !recommendedRoleNameElement) return;
 
-        // ✅ 전역 변수에 AI 추천 결과 저장 (수락 버튼에서 사용)
-        currentAIResult = {
-            name: recommendedRole,
-            description: reason // 이유를 설명으로 사용
-        };
+  // 백엔드/더미 모두 호환
+  const recommendedRole = result.recommended_role || result.role || '';
+  const reason = result.reason || '추천 이유를 불러올 수 없습니다.';
+  let roleId = result.recommended_role_id || result.role_id || null;
 
-        recommendedRoleNameElement.textContent = recommendedRole || '추천 역할';
-        resultContent.textContent = reason || '추천 이유를 불러올 수 없습니다.';
+  // 화면의 등록된 역할 리스트에서 name으로 id 탐색 (id 없을 때)
+  if (!roleId && recommendedRole) {
+    roleId = getRoleIdByName(recommendedRole);
+  }
 
-        // 결과 컨테이너 표시
-        resultContainer.classList.remove('hidden');
+  // 전역 저장 (accept에서 사용)
+  currentAIResult = {
+    id: roleId,
+    name: recommendedRole,
+    description: reason,
+  };
 
-        // 스크롤을 결과로 이동
-        resultContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    }
+  recommendedRoleNameElement.textContent = recommendedRole || '추천 역할';
+  resultContent.textContent = reason;
+
+  resultContainer.classList.remove('hidden');
+  resultContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+  // 버튼 활성화 + 클릭 바인딩(한 번만)
+  const acceptBtn = resultContainer.querySelector('.btn-accept-role');
+  if (acceptBtn) {
+    acceptBtn.disabled = false;
+    acceptBtn.onclick = acceptAIRole; // 동적 DOM이라 여기서 직접 바인딩이 안전
+  }
 }
 
-// AI 역할 수락
+// 역할 이름으로 DOM에서 roleId 찾아오기
+function getRoleIdByName(name) {
+  const items = document.querySelectorAll('.role-item');
+  for (const it of items) {
+    const n = it.querySelector('.role-name')?.textContent?.trim();
+    if (n === name) {
+      return it.dataset.roleId || null;
+    }
+  }
+  return null;
+}
+
+
+// // AI 역할 수락
+// async function acceptAIRole() {
+//     if (!currentAIResult || !currentAIResult.name) {
+//         showNotification('추천 결과를 찾을 수 없습니다.', 'error');
+//         return;
+//     }
+
+//     const roleName = currentAIResult.name;
+//     const roleDescription = currentAIResult.description; // AI 추천 이유를 설명으로 사용
+
+//     try {
+//         // 1. 먼저 역할을 등록
+//         const createResponse = await fetch(`/api/dashboard/${currentTeamId}/roles/create/`, {
+//             method: 'POST',
+//             headers: {
+//                 'Content-Type': 'application/json',
+//                 'X-CSRFToken': getCsrfToken()
+//             },
+//             body: JSON.stringify({
+//                 name: roleName,
+//                 description: roleDescription, // 설명 필드 추가
+//                 is_ai_generated: true
+//             })
+//         });
+
+//         const createData = await createResponse.json();
+
+//         if (!createResponse.ok) {
+//             throw new Error(createData.error || '역할 등록 실패');
+//         }
+
+//         // 2. 현재 사용자에게 AI 추천 역할 할당
+//         const assignResponse = await fetch(`/api/dashboard/${currentTeamId}/roles/assign/`, {
+//             method: 'POST',
+//             headers: {
+//                 'Content-Type': 'application/json',
+//                 'X-CSRFToken': getCsrfToken()
+//             },
+//             body: JSON.stringify({
+//                 user_id: window.currentUserId || getCurrentUserId(),
+//                 role_id: createData.role.id,
+//                 is_ai_assigned: true
+//             })
+//         });
+
+//         const assignData = await assignResponse.json();
+
+//         if (!assignResponse.ok) {
+//             throw new Error(assignData.error || '역할 할당 실패');
+//         }
+
+//         showNotification(`AI 추천 역할이 수락되었습니다: ${roleName}`, 'success');
+
+//         // 3. UI 업데이트
+//         // 역할 목록에 추가
+//         addRoleToList(createData.role);
+
+//         // 팀원 현황 업데이트 (현재 사용자)
+//         updateMemberStatus(window.currentUserId || getCurrentUserId(), assignData.assignment);
+
+//         // 대시보드 팀 현황 업데이트
+//         updateDashboardTeamStatus();
+
+//         // AI 결과 숨기기
+//         hideAIResult();
+
+//     } catch (error) {
+//         console.error('AI 역할 수락 오류:', error);
+//         showNotification(error.message || 'AI 역할 수락 중 오류가 발생했습니다.', 'error');
+//     }
+// }
+
 async function acceptAIRole() {
-    if (!currentAIResult || !currentAIResult.name) {
-        showNotification('추천 결과를 찾을 수 없습니다.', 'error');
-        return;
+  // ▶ 누락된 id는 화면에서 다시 찾아본다
+  if (!currentAIResult || (!currentAIResult.id && !currentAIResult.name)) {
+    showNotification('추천 결과를 찾을 수 없습니다.', 'error');
+    return;
+  }
+  if (!currentAIResult.id && currentAIResult.name) {
+    currentAIResult.id = getRoleIdByName(currentAIResult.name);
+  }
+  if (!currentAIResult.id) {
+    // 필요하면 여기서 "역할 자동 생성 → 그 id로 assign" 로직을 넣을 수도 있음
+    showNotification('등록된 역할 목록에서 추천 역할을 찾을 수 없습니다. 역할을 먼저 등록하세요.', 'error');
+    return;
+  }
+
+  const userId = window.currentUserId || getCurrentUserId();
+  if (!userId) {
+    showNotification('현재 사용자 정보를 찾을 수 없습니다.', 'error');
+    return;
+  }
+
+  try {
+    const assignResponse = await fetch(`/api/dashboard/${currentTeamId}/roles/assign/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json; charset=UTF-8',
+        'X-CSRFToken': getCsrfToken()
+      },
+      body: JSON.stringify({
+        user_id: userId,
+        role_id: currentAIResult.id,
+        is_ai_assigned: true
+      })
+    });
+
+    const assignData = await assignResponse.json();
+    if (!assignResponse.ok || !assignData.assignment) {
+      throw new Error(assignData.error || '역할 할당 실패');
     }
 
-    const roleName = currentAIResult.name;
-    const roleDescription = currentAIResult.description; // AI 추천 이유를 설명으로 사용
-
-    try {
-        // 1. 먼저 역할을 등록
-        const createResponse = await fetch(`/api/dashboard/${currentTeamId}/roles/create/`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': getCsrfToken()
-            },
-            body: JSON.stringify({
-                name: roleName,
-                description: roleDescription, // 설명 필드 추가
-                is_ai_generated: true
-            })
-        });
-
-        const createData = await createResponse.json();
-
-        if (!createResponse.ok) {
-            throw new Error(createData.error || '역할 등록 실패');
-        }
-
-        // 2. 현재 사용자에게 AI 추천 역할 할당
-        const assignResponse = await fetch(`/api/dashboard/${currentTeamId}/roles/assign/`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': getCsrfToken()
-            },
-            body: JSON.stringify({
-                user_id: window.currentUserId || getCurrentUserId(),
-                role_id: createData.role.id,
-                is_ai_assigned: true
-            })
-        });
-
-        const assignData = await assignResponse.json();
-
-        if (!assignResponse.ok) {
-            throw new Error(assignData.error || '역할 할당 실패');
-        }
-
-        showNotification(`AI 추천 역할이 수락되었습니다: ${roleName}`, 'success');
-
-        // 3. UI 업데이트
-        // 역할 목록에 추가
-        addRoleToList(createData.role);
-
-        // 팀원 현황 업데이트 (현재 사용자)
-        updateMemberStatus(window.currentUserId || getCurrentUserId(), assignData.assignment);
-
-        // 대시보드 팀 현황 업데이트
-        updateDashboardTeamStatus();
-
-        // AI 결과 숨기기
-        hideAIResult();
-
-    } catch (error) {
-        console.error('AI 역할 수락 오류:', error);
-        showNotification(error.message || 'AI 역할 수락 중 오류가 발생했습니다.', 'error');
-    }
+    showNotification(`AI 추천 역할이 수락되었습니다: ${currentAIResult.name}`, 'success');
+    updateMemberStatus(userId, assignData.assignment);
+    updateDashboardTeamStatus();
+    hideAIResult();
+  } catch (error) {
+    console.error('AI 역할 수락 오류:', error);
+    showNotification(error.message || 'AI 역할 수락 중 오류가 발생했습니다.', 'error');
+  }
 }
+
 
 // AI 결과 숨기기
 function hideAIResult() {
