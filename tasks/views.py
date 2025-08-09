@@ -78,11 +78,25 @@ class TaskCreateView(generics.CreateAPIView):
         elif data.get('type') == 'team' and not data.get('assignee'):
             data['assignee'] = None  # 담당자 미정 허용
 
-        
+        # ========================================
+        # MGP: 다중 담당자 필드 처리
+        # 프론트에서 assignee(단일) 외에 assignees(배열)로 오면 ManyToMany에 저장
+        # ========================================
+        assignees = data.get('assignees', [])
+        if isinstance(assignees, str):
+            # JSON 문자열로 올 수 있어 파싱
+            import json
+            try:
+                assignees = json.loads(assignees)
+            except Exception:
+                assignees = []
+
         serializer = self.serializer_class(data=data)
         if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            task = serializer.save()
+            if assignees:
+                task.assignees.set(assignees)
+            return Response(TaskSerializer(task).data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # 작업 상세
@@ -113,7 +127,19 @@ class TaskUpdateView(generics.UpdateAPIView):
         task = get_object_or_404(Task, id=task_id, team_id=team_id)
         serializer = self.serializer_class(task, data=request.data, partial=True)
         if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
+            task = serializer.save()
+            # ========================================
+            # MGP: 다중 담당자 갱신 처리
+            # ========================================
+            assignees = request.data.get('assignees', None)
+            if assignees is not None:
+                if isinstance(assignees, str):
+                    import json
+                    try:
+                        assignees = json.loads(assignees)
+                    except Exception:
+                        assignees = []
+                task.assignees.set(assignees)
+            return Response(TaskSerializer(task).data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 # ========================================

@@ -132,6 +132,8 @@ function updateAITabState() {
     if (hasRoles) {
         // 역할이 있으면 빈 알림 숨기고 AI 폼 표시
         hideEmptyRolesInAITab();
+        // 선호 역할 체크박스 강제 갱신 (탭 전환 시 최신 반영)
+        updateAllPreferredRoles();
     } else {
         // 역할이 없으면 빈 알림 표시
         showEmptyRolesInAITab();
@@ -700,32 +702,42 @@ function addRoleToList(role) {
 
 // 모든 선호 역할 체크박스 업데이트
 function updateAllPreferredRoles() {
-    const preferredRolesContainer = document.getElementById('preferred-roles-container'); // ID 수정
-    if (!preferredRolesContainer) return;
+    // 템플릿/동적 생성 모두 지원: 두 컨테이너 동시 갱신
+    const containers = [
+        document.getElementById('preferred-roles'),
+        document.getElementById('preferred-roles-container'),
+    ].filter(Boolean);
 
-    // 기존 체크박스들 제거
-    preferredRolesContainer.innerHTML = '';
+    if (containers.length === 0) return;
 
-    // 등록된 역할들로 체크박스 재생성
     const roleItems = document.querySelectorAll('.role-item');
-    roleItems.forEach(item => {
-        const roleName = item.querySelector('.role-name').textContent;
-        const roleId = item.dataset.roleId;
 
-        const checkboxWrapper = document.createElement('label');
-        checkboxWrapper.className = 'checkbox-item';
-        checkboxWrapper.innerHTML = `
-            <input type="checkbox" name="preferred_roles" value="${roleId}">
-            <span class="checkbox-label">${roleName}</span>
-        `;
+    containers.forEach(container => {
+        // 기존 체크박스들 제거
+        container.innerHTML = '';
 
-        preferredRolesContainer.appendChild(checkboxWrapper);
+        if (roleItems.length === 0) {
+            container.innerHTML = '<p class="no-roles-message">등록된 역할이 없습니다. 먼저 역할을 등록해주세요.</p>';
+            return;
+        }
+
+        // 등록된 역할들로 체크박스 재생성
+        roleItems.forEach(item => {
+            const roleNameElement = item.querySelector('.role-name');
+            if (!roleNameElement) return;
+            const roleName = roleNameElement.textContent.trim();
+            const roleId = item.dataset.roleId;
+
+            const checkboxWrapper = document.createElement('label');
+            checkboxWrapper.className = 'checkbox-item';
+            checkboxWrapper.innerHTML = `
+                <input type="checkbox" name="preferred_roles" value="${roleId}">
+                <span class="checkbox-label">${roleName}</span>
+            `;
+
+            container.appendChild(checkboxWrapper);
+        });
     });
-
-    // 역할이 없으면 안내 메시지 표시
-    if (roleItems.length === 0) {
-        preferredRolesContainer.innerHTML = '<p class="no-roles-message">등록된 역할이 없습니다. 먼저 역할을 등록해주세요.</p>';
-    }
 }
 
 

@@ -100,9 +100,15 @@ document.addEventListener('DOMContentLoaded', async function() {
 
                 document.getElementById('task-description').value = taskData.description || '';
                 
-                if (taskData.assignee) {
-                    const checkbox = document.querySelector(`input[name="assignee"][value="${taskData.assignee}"]`);
-                    if (checkbox) checkbox.checked = true;
+                // 다중 담당자 체크 반영
+                if (Array.isArray(taskData.assignees)) {
+                    taskData.assignees.forEach(id => {
+                        const cb = document.querySelector(`input[name="assignee"][value="${id}"]`);
+                        if (cb) cb.checked = true;
+                    });
+                } else if (taskData.assignee) {
+                    const cb = document.querySelector(`input[name="assignee"][value="${taskData.assignee}"]`);
+                    if (cb) cb.checked = true;
                 }
 
             }
@@ -245,27 +251,23 @@ document.addEventListener('DOMContentLoaded', async function() {
         const isEdit = taskForm.hasAttribute('data-task-id');
         const taskId = taskForm.getAttribute('data-task-id');
 
+        // 연도(마감일) 유효성: 비어있으면 경고 후 중단
+        const dueDate = (taskData.due_date || '').trim();
+        if (!dueDate) {
+            showNotification('연도를 선택해주세요.', 'error');
+            return;
+        }
+
         if (taskData.type === 'team') {
-            // 체크박스 전부 가져오기
+            // 체크된 담당자 모두 수집 → assignees 배열로 전송 (백엔드 M2M)
             const assigneeCheckboxes = document.querySelectorAll('input[name="assignee"]:checked');
-            const selectedOptions = Array.from(assigneeCheckboxes).map(cb => parseInt(cb.value));
-
-            // 여러 명 선택 시 → 여러 Task 생성
-            if (!isEdit && selectedOptions.length > 1) {
-                for (const assigneeId of selectedOptions) {
-                    const multiTaskData = { ...taskData, assignee: assigneeId };
-                    await createTask(multiTaskData);
-                }
-                closeModal();
-                showNotification('작업이 생성되었습니다.', 'success');
-                await loadTasks();
-                return;
-            }
-
-            // 한 명만 선택했을 때
-            taskData.assignee = selectedOptions[0] || null;
+            const selectedIds = Array.from(assigneeCheckboxes).map(cb => parseInt(cb.value));
+            taskData.assignees = selectedIds;
+            // 호환성: 단일 assignee 필드도 첫 번째 값만 동반 전송
+            taskData.assignee = selectedIds[0] || null;
         } else {
             delete taskData.assignee;
+            delete taskData.assignees;
         }
 
         try {
@@ -420,6 +422,11 @@ function renderTaskList(type, tasks) {
         taskItem.classList.add('task-item');
         taskItem.dataset.taskId = task.id;
 
+        // 담당자 이름 표시 (다중 우선, 단일 호환)
+        const names = Array.isArray(task.assignees_names) && task.assignees_names.length
+            ? task.assignees_names.join(', ')
+            : (task.assignee_name || '미정');
+
         taskItem.innerHTML = `
             <div class="task-checkbox ${task.status === 'completed' ? 'checked' : ''}" data-task-id="${task.id}"></div>
             <div class="task-content">
@@ -431,7 +438,7 @@ function renderTaskList(type, tasks) {
                 </div>
                 <div class="task-details">
                     <span class="task-assignee">
-                        담당자: ${task.assignee_name ? task.assignee_name : '미정'}
+                        담당자: ${names}
                     </span>
                     ${task.due_date 
                         ? `<span class="task-separator">•</span><span class="task-due-date">${task.due_date}</span>` 
