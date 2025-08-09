@@ -29,6 +29,7 @@ urlpatterns = [
 
     # 실제 페이지들 URL 패턴
     path('auth/profile-setup/', users.profile_setup_page, name='profile-setup'),
+    path('auth/profile/', users.profile_page, name='profile-page'),
     path('team-setup/', teams.team_setup_page, name='team-setup'),
     path('team/create/', teams.team_create_page, name='team_create'),
     path('team/join/', teams.team_join_page, name='team_join'),
