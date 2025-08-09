@@ -6,7 +6,7 @@ from files.models import File
 from teams.models import TeamMember
 from django.utils.dateformat import DateFormat
 from django.contrib.auth.decorators import login_required
-from django.db.models import Count
+from django.db.models import Count, Q  # [추가] 진행률 계산을 위한 Q import (최근활동 제거)
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponseForbidden
 from .models import TeamLog
@@ -28,20 +28,48 @@ def team_log_detail_page(request, team_id):
 # 로그인 필수 + 멤버십 필터
 @login_required
 def all_team_logs_api(request):
+    # [추가] 팀 목록 카드에 실제 사용자 데이터를 표시하기 위한 확장 로직
+    #  - 작업 집계(전체/완료), 진행률 계산
+    #  - 팀원 이름 목록과 작업 집계 포함하여 프론트로 반환
+    #  - 요구사항에 따라 '상태', '최근 수정 시각' 필드는 제거
     # 로그인한 사용자가 속한 팀만
     teams = (Team.objects
-             .filter(teammember__user=request.user)
-             .distinct()
-             .values('id', 'name', 'created_at'))
+            .filter(teammember__user=request.user)
+            .distinct()
+            .values('id', 'name', 'created_at'))
 
     result = []
     for t in teams:
+        team_id = t['id']
+
+        # [추가] 작업 집계: 전체/완료
+        task_agg = Task.objects.filter(team_id=team_id).aggregate(
+            total=Count('id'),
+            completed=Count('id', filter=Q(status='completed')),
+        )
+        total_tasks_count = task_agg['total'] or 0
+        completed_tasks_count = task_agg['completed'] or 0
+
+        # [추가] 진행률 계산 (상태 필드 제거)
+        progress_percentage = int(round((completed_tasks_count / total_tasks_count) * 100)) if total_tasks_count > 0 else 0
+
+        # [추가] 팀원 이름 목록 (first_name 우선, 없으면 username)
+        member_names = []
+        for m in TeamMember.objects.filter(team_id=team_id).select_related('user'):
+            display_name = getattr(m.user, 'first_name', '') or getattr(m.user, 'username', '') or '사용자'
+            member_names.append(display_name)
+
         result.append({
-            "team_id": t['id'],
+            "team_id": team_id,
             "title": t['name'],
-            "status": "진행중",  # TODO: 필요 시 진행률 계산
-            "last_activity": format_date(t['created_at']),
-            "dashboard_url": f"/api/dashboard/{t['id']}/",  # 프로젝트 보기
+            "dashboard_url": f"/api/dashboard/{team_id}/",  # 프로젝트 보기
+            # [추가] 프론트에서 더미를 대체할 실제 데이터 필드들
+            "team_members": {
+                "names": member_names,
+                "totalTasks": total_tasks_count,
+                "completedTasks": completed_tasks_count,
+            },
+            "progress_percentage": progress_percentage,
         })
     return JsonResponse(result, safe=False)
 
