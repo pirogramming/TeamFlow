@@ -182,7 +182,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     BASE_DIR / 'static',
 ]
@@ -205,38 +205,6 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
-
-# ========================================
-# 원래 백엔드 개발자 설정 (주석처리)
-# AUTHENTICATION_BACKENDS = (
-#     'django.contrib.auth.backends.ModelBackend',
-#     'allauth.account.auth_backends.AuthenticationBackend',
-# )
-# 
-# REST_FRAMEWORK = {
-#     'DEFAULT_AUTHENTICATION_CLASSES': [
-#         'rest_framework.authentication.SessionAuthentication',
-#         'rest_framework.authentication.TokenAuthentication',
-#     ]
-# }
-# 
-# LOGIN_REDIRECT_URL = '/api/auth/after-login/'  # 로그인 후 이동
-# LOGOUT_REDIRECT_URL = '/'           # 로그아웃 후 이동할 페이지
-# 
-# # 구글 OAuth 클라이언트 정보
-# SOCIALACCOUNT_PROVIDERS = {
-#     'google': {
-#         "APP": {
-#         "client_id": (f"{GOOGLE_CLIENT_ID}"),
-#         "secret": (f"{GOOGLE_CLIENT_SECRET}"),
-#         "key": ""
-#          },
-# 
-#         'SCOPE': ['profile', 'email'],
-#         'AUTH_PARAMS': {'access_type': 'online'},
-#     }
-# }
-# ========================================
 
 # ========================================
 # MGP: allauth 로그인 후 리다이렉트 설정 추가
