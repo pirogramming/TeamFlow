@@ -49,11 +49,13 @@ SECRET_KEY = 'django-insecure-#jczp$^#q)@^(4v(921(w5*(gk$mo8nkpzy-rp@8e+dogjur_3
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["223.130.129.249", "localhost", "127.0.0.1"]
+ALLOWED_HOSTS = ["223-130-129-249.nip.io", "223.130.129.249", "localhost", "127.0.0.1"]
 
 CSRF_TRUSTED_ORIGINS = [
+    "http://223-130-129-249.nip.io",
+    "http://223-130-129-249.nip.io:8000",
     "http://223.130.129.249",
-    "https://223.130.129.249",
+    "http://223.130.129.249:8000",
 ]
 
 # Application definition
