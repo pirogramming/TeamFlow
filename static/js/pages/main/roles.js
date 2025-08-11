@@ -133,6 +133,7 @@ function connectWebSocket() {
             updateSubmissionStatusUI(data.total_members, data.submitted_members);
         } else if (data.type === 'assignment_complete') {
             updateAllMemberRolesUI(data.assignments);
+            showTeamAssignmentResults(data.assignments);
             showNotification('AI가 팀 전체 역할을 배정했습니다!', 'success');
         }
     };
@@ -192,6 +193,9 @@ async function handleAISubmission(e) {
     e.preventDefault();
 
     hideAIResult();
+    const existingBoxes = document.querySelectorAll('.ai-individual-result-box');
+    existingBoxes.forEach(box => box.remove());
+    
     const aiAssignBtn = document.getElementById('team-ai-assign-btn');
     if (aiAssignBtn) {
         aiAssignBtn.disabled = true; // AI 배정 버튼 비활성화
@@ -584,7 +588,31 @@ function getCurrentUserId() {
 
     return null;
 }
+function showTeamAssignmentResults(assignments) {
+    // 현재 로그인한 사용자 ID를 가져옵니다.
+    const currentUserId = window.currentUserId || getCurrentUserId();
+    
+    // assignments 배열에서 현재 사용자의 배정 결과를 찾습니다.
+    // user_id의 데이터 타입이 다를 수 있으므로 String()으로 변환하여 비교합니다.
+    const currentUserAssignment = assignments.find(
+        (a) => String(a.user_id) === String(currentUserId)
+    );
 
+    const resultContainer = document.getElementById('ai-result');
+    const recommendedRoleNameElement = document.getElementById('recommended-role-name');
+    const resultContent = document.getElementById('ai-result-content');
+
+    if (currentUserAssignment) {
+        // AI 배정 결과가 있는 경우, HTML 요소를 업데이트합니다.
+        recommendedRoleNameElement.textContent = `${currentUserAssignment.username}님에게 추천하는 역할: ${currentUserAssignment.assigned_role}`;
+        resultContent.innerHTML = `<p><strong>추천 이유:</strong> ${currentUserAssignment.reason || '추천 이유를 불러올 수 없습니다.'}</p>`;
+        
+        // 결과 컨테이너를 보이게 합니다.
+        resultContainer.classList.remove('hidden');
+        resultContainer.style.display = 'block';
+        resultContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    } 
+}
 // 역할 등록 모달 열기
 function openRoleModal() {
     const modal = document.getElementById('role-modal');
@@ -870,9 +898,6 @@ function showAIFormAfterRoleCreation() {
                         <div class="recommended-role-name" id="recommended-role-name"></div>
                     </div>
                     <div id="ai-result-content" class="result-content"></div>
-                    <div class="result-actions">
-                        <button class="btn-accept-role">추천 역할 수락</button>
-                    </div>
                 </div>
             `;
 

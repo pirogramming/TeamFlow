@@ -151,6 +151,7 @@ class RoleAssignmentConsumer(AsyncWebsocketConsumer):
         for assignment in assignments:
             try:
                 user = User.objects.get(username=assignment['username'])
+                assignment['user_id'] = user.id
                 role = Role.objects.get(team=team, name=assignment['assigned_role'])
                 MemberRoleAssignment.objects.update_or_create(
                     user=user, team=team, defaults={'role': role, 'assigned_by_ai': True}

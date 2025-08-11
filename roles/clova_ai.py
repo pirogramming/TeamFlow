@@ -151,7 +151,13 @@ def call_clova_team_assignment(prompt: str) -> Union[list, None]:
     system_content = (
         "너는 프로젝트 팀의 역할을 배정하는 HR 전문가야. "
         "사용자가 제공한 역할 종류와 팀원 정보를 보고, 중복 없이 역할을 배정해줘. "
-        "응답은 반드시 순수 JSON 배열만 출력해야해. 다른 설명은 절대 추가하지 마."
+        "각 팀원에게 할당된 역할과 **그 역할이 추천된 이유(reason)**, "
+        "그리고 역할의 **고유 ID(role_id)**를 함께 반환해줘. "
+        "응답은 반드시 아래 형식의 순수 JSON 배열만 출력해야해. 다른 설명은 절대 추가하지 마."
+        "[\n"
+        "  { \"username\": \"팀원1 이름\", \"assigned_role\": \"배정된 역할\", \"role_id\": 1, \"reason\": \"이유\" },\n"
+        "  { \"username\": \"팀원2 이름\", \"assigned_role\": \"배정된 역할\", \"role_id\": 2, \"reason\": \"이유\" }\n"
+        "]"
     )
     user_content = prompt
     try:
@@ -206,8 +212,18 @@ def make_team_assignment_prompt(team_roles, members_info):
 [출력 형식]
 반드시 아래와 같은 JSON 배열 형식으로만 답변해줘. 다른 설명은 절대 추가하지 마.
 [
-  {{"username": "팀원이름1", "assigned_role": "배정된역할1"}},
-  {{"username": "팀원이름2", "assigned_role": "배정된역할2"}}
+  {{
+    "username": "팀원이름1",
+    "assigned_role": "배정된역할1",
+    "role_id": 1,
+    "reason": "이 역할이 추천된 이유"
+  }},
+  {{
+    "username": "팀원이름2",
+    "assigned_role": "배정된역할2",
+    "role_id": 2,
+    "reason": "이 역할이 추천된 이유"
+  }}
 ]
 """
     return prompt
