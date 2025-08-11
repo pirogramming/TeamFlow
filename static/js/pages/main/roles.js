@@ -872,7 +872,7 @@ function updateMemberStatus(userId, assignment) {
                 // 팀장 + 할당된 역할 표시
                 if (assignment.role && assignment.role !== '역할 없음') {
                     assignedRoleElement.innerHTML = `
-                        <span class="leader-role">팀장</span>
+
                         <span class="assigned-role-name">${assignment.role}</span>
                         ${assignment.is_ai_assigned ? '<small>(AI 추천)</small>' : ''}
                     `;

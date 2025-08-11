@@ -195,7 +195,11 @@
                 <div class="team-role">
                     {% if member.user == team.owner %}팀장{% else %}팀원{% endif %}
                 </div>
-                <div class="no-role">역할 미정</div>
+                {% if member.assigned_role %}
+                <div class="assigned-role">{{ member.assigned_role.name }}</div>
+                {% else %}
+                    <div class="no-role">역할 미정</div>
+                {% endif %}
             </div>
             {% endfor %}
         </div>
