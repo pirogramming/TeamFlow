@@ -29,10 +29,9 @@ def _extract_json(text: str) -> dict:
         t = re.sub(r"\s*```$", "", t).strip()
 
     # 문자열 전체에서 첫 번째 JSON 객체만 추출
-    m = re.search(r"\{[\s\S]*\}", t)
+    m = re.search(r"(\{[\s\S]*\}|\[[\s\S]*\])", t)
     if not m:
-        raise ValueError(f"no JSON object found in: {text!r}")
-
+        raise ValueError(f"no JSON object or array found in: {text!r}")
     json_str = m.group(0)
 
     # 스마트 따옴표 보정
@@ -145,8 +144,70 @@ def call_clova_recommendation(prompt: str, role_types: List[str]) -> Union[Tuple
     print("❌ Clova 응답 JSON에 필드 누락:", parsed)
     return None
 
+def call_clova_team_assignment(prompt: str) -> Union[list, None]:
+    """
+    팀 전체 역할 배정을 요청하고, JSON 배열을 반환합니다.
+    """
+    system_content = (
+        "너는 프로젝트 팀의 역할을 배정하는 HR 전문가야. "
+        "사용자가 제공한 역할 종류와 팀원 정보를 보고, 중복 없이 역할을 배정해줘. "
+        "응답은 반드시 순수 JSON 배열만 출력해야해. 다른 설명은 절대 추가하지 마."
+    )
+    user_content = prompt
+    try:
+        resp = client.chat.completions.create(
+            model="HCX-005",
+            messages=[
+                {"role": "system", "content": system_content},
+                {"role": "user", "content": user_content},
+            ],
+            temperature=0.5,
+            top_p=0.8,
+            max_tokens=1024, # 여러 명의 정보를 반환해야 하므로 토큰 수 증가
+        )
+        text = (resp.choices[0].message.content or "").strip()
+        parsed = _extract_json(text)
+        if isinstance(parsed, list):
+            return parsed
+        else:
+            print(f"❌ AI 응답이 예상된 배열 형식이 아님: {parsed}")
+            return None
+    except Exception as e:
+        print(f"❌ Clova 팀 배정 API 호출 실패: {e}")
+        return None
+
 def make_prompt(major, traits, preferences):
     trait_str = ", ".join(traits)
     pref_str = ", ".join(preferences)
     return f"전공은 {major}이고, 성향은 {trait_str}이며, 선호하는 작업은 {pref_str}입니다. 이 사람에게 가장 어울리는 역할은 무엇인가요?"
 # ========================================
+
+# ✨ 이 함수를 파일 맨 아래에 추가하세요.
+def make_team_assignment_prompt(team_roles, members_info):
+    """
+    팀 전체의 역할과 멤버 정보를 바탕으로 AI에게 보낼 프롬프트를 생성합니다.
+    """
+    roles_list_str = "\n- ".join(team_roles)
+    members_info_str = "\n".join([
+        f"- {member['name']}: 전공({member['major']}), 성향({', '.join(member['traits'])}), 선호({', '.join(member['preferences'])})"
+        for member in members_info
+    ])
+
+    prompt = f"""
+너는 프로젝트 팀의 역할을 배정하는 HR 전문가야.
+아래에 있는 '팀 역할 목록'과 각 '팀원 정보'를 보고, 각 팀원에게 가장 적합한 역할을 중복되지 않게 하나씩만 배정해줘. 모든 팀원이 역할을 하나씩 가져야 해.
+
+[팀 역할 목록]
+- {roles_list_str}
+
+[팀원 정보]
+{members_info_str}
+
+[출력 형식]
+반드시 아래와 같은 JSON 배열 형식으로만 답변해줘. 다른 설명은 절대 추가하지 마.
+[
+  {{"username": "팀원이름1", "assigned_role": "배정된역할1"}},
+  {{"username": "팀원이름2", "assigned_role": "배정된역할2"}}
+]
+"""
+    return prompt

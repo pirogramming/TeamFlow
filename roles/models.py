@@ -32,3 +32,16 @@ class MemberRoleAssignment(models.Model):
         team_name = self.team.name if self.team else "Unknown Team"
         return f"{self.user.username} - {self.role.name} in {team_name}"
 # ========================================
+
+class AISubmission(models.Model):
+    """
+    AI 역할 배정을 위해 각 팀원이 제출한 정보를 임시 저장하는 모델
+    """
+    team = models.ForeignKey(Team, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    major = models.CharField(max_length=100)
+    traits = models.JSONField(default=list)      # 성향 키워드
+    preferences = models.JSONField(default=list) # 선호 역할
+
+    class Meta:
+        unique_together = ('team', 'user')
