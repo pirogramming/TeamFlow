@@ -403,16 +403,53 @@ function updateNotificationInfo(notificationData) {
 function setupHeaderEventListeners() {
     console.log('헤더 이벤트 리스너 설정 시작...');
     
-    // 프로젝트 드롭다운
+    // 프로젝트 드롭다운 토글
     const projectDropdown = document.getElementById('project-dropdown');
-    console.log('프로젝트 드롭다운 요소:', projectDropdown);
+    const projectDropdownMenu = document.getElementById('project-dropdown-menu');
     
-    if (projectDropdown) {
-        projectDropdown.addEventListener('click', handleProjectDropdown);
-        console.log('프로젝트 드롭다운 이벤트 리스너 등록됨');
-    } else {
-        console.log('프로젝트 드롭다운 요소를 찾을 수 없음');
+    if (projectDropdown && projectDropdownMenu) {
+        projectDropdown.addEventListener('click', function(e) {
+            e.stopPropagation();
+            projectDropdownMenu.classList.toggle('show');
+            projectDropdown.classList.toggle('active');
+        });
     }
+
+    // === MGP: 햄버거 메뉴 이벤트 리스너 추가 ===
+    const hamburgerBtn = document.getElementById('hamburger-menu-btn');
+    const sidebar = document.querySelector('.sidebar');
+    const sidebarOverlay = document.getElementById('sidebar-overlay');
+    
+    if (hamburgerBtn && sidebar) {
+        // 햄버거 버튼 클릭 시 사이드바 토글
+        hamburgerBtn.addEventListener('click', function() {
+            sidebar.classList.toggle('open');
+            if (sidebarOverlay) {
+                sidebarOverlay.classList.toggle('show');
+            }
+        });
+        
+        // 오버레이 클릭 시 사이드바 닫기
+        if (sidebarOverlay) {
+            sidebarOverlay.addEventListener('click', function() {
+                sidebar.classList.remove('open');
+                sidebarOverlay.classList.remove('show');
+            });
+        }
+        
+        // ESC 키로 사이드바 닫기
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && sidebar.classList.contains('open')) {
+                sidebar.classList.remove('open');
+                if (sidebarOverlay) {
+                    sidebarOverlay.classList.remove('show');
+                }
+            }
+        });
+    }
+    /* === /MGP === */
+
+    // 드롭다운 외부 클릭 시 닫기
     
     // 팀 생성 버튼
     const createTeamBtn = document.getElementById('create-team-btn');

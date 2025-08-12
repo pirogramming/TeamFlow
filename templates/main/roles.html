@@ -43,57 +43,61 @@
                 </button>
             </div>
             {% else %}
-            <!-- AI 추천 폼 -->
-            <div class="ai-form-container">
-                <form id="ai-recommendation-form" class="ai-form">
-                    <div class="form-group">
-                        <label>전공</label>
-                        <input type="text" name="major" value="{{ user_major }}" readonly>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="required">성향 (필수)</label>
-                        <div class="checkbox-grid">
-                            <label class="checkbox-item"><input type="checkbox" name="traits" value="리더십"><span>리더십</span></label>
-                            <label class="checkbox-item"><input type="checkbox" name="traits" value="창의적"><span>창의적</span></label>
-                            <label class="checkbox-item"><input type="checkbox" name="traits" value="논리적"><span>논리적</span></label>
-                            <label class="checkbox-item"><input type="checkbox" name="traits" value="협력적"><span>협력적</span></label>
-                            <label class="checkbox-item"><input type="checkbox" name="traits" value="책임감"><span>책임감</span></label>
-                            <label class="checkbox-item"><input type="checkbox" name="traits" value="적극적"><span>적극적</span></label>
-                            <label class="checkbox-item"><input type="checkbox" name="traits" value="신중함"><span>신중함</span></label>
+                <!-- AI 추천 폼 -->
+                <div class="ai-form-container">
+                    <form id="ai-recommendation-form" class="ai-form">
+                        <div class="form-group">
+                            <label>전공</label>
+                            <input type="text" name="major" value="{{ user_major }}" readonly>
                         </div>
-                    </div>
 
-                    <div class="form-group">
-                        <label>선호 역할 (팀에서 등록된 역할, 선택사항)</label>
-                        <div class="preferred-roles" id="preferred-roles">
-                            {% for role in team_roles %}
-                            <label class="checkbox-item">
-                                <input type="checkbox" name="preferred_roles" value="{{ role.id }}">
-                                <span>{{ role.name }}</span>
-                            </label>
-                            {% empty %}
-                            <p class="no-roles-message">등록된 역할이 없습니다. 먼저 역할을 등록해주세요.</p>
-                            {% endfor %}
+                        <div class="form-group">
+                            <label class="required">성향 (필수)</label>
+                            <div class="checkbox-grid">
+                                <label class="checkbox-item"><input type="checkbox" name="traits" value="리더십"><span>리더십</span></label>
+                                <label class="checkbox-item"><input type="checkbox" name="traits" value="창의적"><span>창의적</span></label>
+                                <label class="checkbox-item"><input type="checkbox" name="traits" value="논리적"><span>논리적</span></label>
+                                <label class="checkbox-item"><input type="checkbox" name="traits" value="협력적"><span>협력적</span></label>
+                                <label class="checkbox-item"><input type="checkbox" name="traits" value="책임감"><span>책임감</span></label>
+                                <label class="checkbox-item"><input type="checkbox" name="traits" value="적극적"><span>적극적</span></label>
+                                <label class="checkbox-item"><input type="checkbox" name="traits" value="신중함"><span>신중함</span></label>
+                            </div>
                         </div>
-                    </div>
 
-                    <button type="submit" class="btn-ai-analyze">
-                        <span>내 정보 제출하기</span>
-                    </button>
-                </form>
+                        <div class="form-group">
+                            <label>선호 역할 (팀에서 등록된 역할, 선택사항)</label>
+                            <div class="preferred-roles" id="preferred-roles">
+                                {% for role in team_roles %}
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="preferred_roles" value="{{ role.id }}">
+                                    <span>{{ role.name }}</span>
+                                </label>
+                                {% empty %}
+                                <p class="no-roles-message">등록된 역할이 없습니다. 먼저 역할을 등록해주세요.</p>
+                                {% endfor %}
+                            </div>
+                        </div>
 
-                <!-- ✨ 실시간 제출 현황 표시 영역 (신규 추가) -->
-                <div id="ai-submission-status-container" class="submission-status-container">
-                    <h3>실시간 제출 현황</h3>
-                    <div id="submission-status">제출 현황: 0 / {{ team_members|length }}</div>
-                    <div id="submitted-list"></div>
-                    <button id="team-ai-assign-btn" class="btn btn-primary" disabled>
-                        AI로 전체 역할 자동 배정
-                    </button>
-                    <small>모든 팀원이 정보를 제출하면 버튼이 활성화됩니다.</small>
+                        <button type="submit" class="btn-ai-analyze">
+                            <span>내 정보 제출하기</span>
+                        </button>
+                    </form>
                 </div>
-            </div>
+
+                <!-- ✨ 실시간 제출 및 AI 팀 역할 배정 컨테이너 (별도 분리) -->
+                <div class="ai-status-container">
+                    <h3>실시간 제출 현황</h3>
+                    <div class="status-content">
+                        <div id="submission-status" class="submission-status">제출 현황: 0 / {{ team_members|length }}</div>
+                        <div id="submitted-list" class="submitted-list"></div>
+                        <div class="ai-assignment-section">
+                            <button id="team-ai-assign-btn" class="btn-ai-assign" disabled>
+                                <span>AI로 전체 역할 자동 배정</span>
+                            </button>
+                            <small class="ai-assign-note">모든 팀원이 정보를 제출하면 버튼이 활성화됩니다.</small>
+                        </div>
+                    </div>
+                </div>
             {% endif %}
             <div id="ai-result" class="ai-result-container hidden">
                 <div class="result-header">
