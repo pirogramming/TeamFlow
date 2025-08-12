@@ -290,7 +290,7 @@ ACCOUNT_REMEMBER_ME_REMEMBER_REMEMBER_EXPIRES = None
 ACCOUNT_REMEMBER_ME_REMEMBER_REMEMBER_REMEMBER = False
 
 # Django 메시지 프레임워크 비활성화 (allauth 메시지 제거)
-MESSAGE_STORAGE = 'django.contrib.messages.storage.NullStorage'
+# MESSAGE_STORAGE = 'django.contrib.messages.storage.fallback.FallbackStorage'
 
 # ========================================
 # MGP: 3rdparty signup 완전 비활성화 설정
