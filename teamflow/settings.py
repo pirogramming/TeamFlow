@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import os
+import socket
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -360,7 +361,24 @@ NCP_SECRET_KEY = env('NCP_SECRET_KEY')
 # 2. ASGI 애플리케이션 설정
 ASGI_APPLICATION = 'teamflow.asgi.application'
 
-REDIS_HOST = os.getenv("REDIS_HOST", "127.0.0.1")
+# 현재 서버 hostname
+HOSTNAME = socket.gethostname()
+
+# WSL일 때 자동으로 127.0.0.1 사용
+def is_wsl():
+    try:
+        with open("/proc/version", "r") as f:
+            return "microsoft" in f.read().lower()
+    except FileNotFoundError:
+        return False
+
+if HOSTNAME == "teamflow":  # 배포 서버
+        REDIS_HOST = os.getenv("REDIS_HOST_PROD", "127.0.0.1")
+elif is_wsl():  # 로컬 WSL 환경
+        REDIS_HOST = "127.0.0.1"
+else:  # 그 외 로컬 환경
+        REDIS_HOST = os.getenv("REDIS_HOST_LOCAL", "127.0.0.1")
+
 REDIS_PORT = int(os.getenv("REDIS_PORT", 6379))
 
 # 3. 채널 레이어 설정 (Redis 사용)
