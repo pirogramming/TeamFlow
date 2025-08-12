@@ -40,8 +40,6 @@ class CustomAccountAdapter(DefaultAccountAdapter):
         else:
             # 새 사용자 또는 프로필 미완성 사용자: 프로필 설정 페이지로
             return reverse('profile-setup')
-        
-        return '/'
 
 class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
     """
