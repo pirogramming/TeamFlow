@@ -204,6 +204,10 @@
 
 .profile-btn-secondary:hover { background: var(--surface-2); border-color: var(--primary-600); transform: translateY(-1px); }
 
+/* 로그아웃 버튼 (위험/강조) */
+.profile-btn-danger { background: #ef4444; color: #fff; }
+.profile-btn-danger:hover { background: #dc2626; transform: translateY(-2px); }
+
 .profile-btn:active {
   transform: translateY(0);
 }

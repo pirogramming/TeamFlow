@@ -7,6 +7,8 @@ from rest_framework.response import Response
 from users.utils import needs_profile_setup, is_existing_user, get_user_profile_status
 from teams.models import TeamMember
 from allauth.socialaccount.models import SocialAccount
+from tasks.models import Task
+from django.db.models import Q
 
 
 # ========================================
@@ -155,11 +157,21 @@ class UserMeUpdateView(APIView):
         로그인한 사용자 정보 반환
         """
         user = request.user
+        # 통계 계산
+        teams_count = TeamMember.objects.filter(user=user).count()
+        tasks_count = Task.objects.filter(status='completed').filter(
+            Q(assignee=user) | Q(assignees=user)
+        ).distinct().count()
+        join_date = user.date_joined
+
         return Response({
             "id": user.id,
             "first_name": user.first_name,
             "major": user.profile.major,
             "specialization": user.profile.specialization,
+            "teams_count": teams_count,
+            "tasks_count": tasks_count,
+            "join_date": join_date,
         })
 
     def patch(self, request):
@@ -190,10 +202,18 @@ class UserMeUpdateView(APIView):
         # 프로필 설정 완료 여부 확인
         profile_status = get_user_profile_status(user)
         
+        # 최신 통계 포함하여 반환
+        teams_count = TeamMember.objects.filter(user=user).count()
+        tasks_count = Task.objects.filter(status='completed').filter(
+            Q(assignee=user) | Q(assignees=user)
+        ).distinct().count()
         response_data = {
-            "success": True, 
+            "success": True,
             "id": user.id,
-            "profile_status": profile_status
+            "profile_status": profile_status,
+            "teams_count": teams_count,
+            "tasks_count": tasks_count,
+            "join_date": user.date_joined,
         }
         
         # 프로필 설정이 완료되면 팀 설정 페이지로 리다이렉트 정보 추가

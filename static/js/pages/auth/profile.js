@@ -8,6 +8,7 @@ class ProfileManager {
         this.form = document.getElementById('profile-form');
         this.submitBtn = document.getElementById('save-btn');
         this.cancelBtn = document.getElementById('cancel-btn');
+        this.logoutBtn = document.getElementById('logout-btn');
         this.loadingElement = document.getElementById('profile-loading');
         this.messageElement = document.getElementById('profile-message');
         
@@ -28,6 +29,11 @@ class ProfileManager {
         
         // 취소 버튼 이벤트
         this.cancelBtn.addEventListener('click', () => this.resetForm());
+
+        // 로그아웃 버튼 이벤트
+        if (this.logoutBtn) {
+            this.logoutBtn.addEventListener('click', () => this.handleLogout());
+        }
         
         // 입력 필드 변경 감지
         this.form.addEventListener('input', () => this.checkFormChanges());
@@ -38,6 +44,26 @@ class ProfileManager {
                 this.resetForm();
             }
         });
+    }
+
+    /**
+     * 로그아웃 처리
+     */
+    handleLogout() {
+        try {
+            // 클라이언트 토큰 제거 (프론트 인증 토큰 사용 시)
+            if (typeof window.logout === 'function') {
+                // window.logout 은 토큰을 제거하고 '/'로 이동
+                window.localStorage.removeItem('access_token');
+                window.localStorage.removeItem('refresh_token');
+            }
+
+            // 서버 세션 로그아웃 후 랜딩으로 이동
+            window.location.href = '/auth/logout/';
+        } catch (e) {
+            console.error('로그아웃 실패:', e);
+            window.location.href = '/auth/logout/';
+        }
     }
 
     /**
@@ -99,20 +125,28 @@ class ProfileManager {
      * 추가 정보 업데이트 (통계 등)
      */
     updateAdditionalInfo(data) {
-        // 가입일 표시
+        // 가입일 표시 (백엔드에서 ISO로 전달됨)
         const joinDateElement = document.getElementById('join-date');
         if (joinDateElement) {
-            const joinDate = new Date().toLocaleDateString('ko-KR', {
-                year: 'numeric',
-                month: 'short'
-            });
-            joinDateElement.textContent = joinDate;
+            const raw = data.join_date;
+            if (raw) {
+                const d = new Date(raw);
+                // 유효성 체크 후 포맷팅
+                joinDateElement.textContent = isNaN(d.getTime())
+                    ? '-'
+                    : d.toLocaleDateString('ko-KR', { year: 'numeric', month: 'short' });
+            } else {
+                joinDateElement.textContent = '-';
+            }
         }
 
-        // TODO: 실제 API가 있다면 팀 수, 작업 수 등을 로드
-        // 현재는 플레이스홀더 값 설정
-        this.updateStat('teams-count', '1');
-        this.updateStat('tasks-count', '5');
+        // 실제 값 반영
+        if (typeof data.teams_count !== 'undefined') {
+            this.updateStat('teams-count', String(data.teams_count));
+        }
+        if (typeof data.tasks_count !== 'undefined') {
+            this.updateStat('tasks-count', String(data.tasks_count));
+        }
     }
 
     updateStat(id, value) {
