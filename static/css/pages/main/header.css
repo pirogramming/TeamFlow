@@ -8,7 +8,7 @@
     height: 64px;
     background: var(--surface);
     border-bottom: 1px solid var(--border);
-    z-index: 100;
+    z-index: 500;
     backdrop-filter: saturate(120%) blur(8px);
 }
 
