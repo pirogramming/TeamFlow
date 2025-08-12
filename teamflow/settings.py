@@ -360,12 +360,15 @@ NCP_SECRET_KEY = env('NCP_SECRET_KEY')
 # 2. ASGI 애플리케이션 설정
 ASGI_APPLICATION = 'teamflow.asgi.application'
 
+REDIS_HOST = os.getenv("REDIS_HOST", "127.0.0.1")
+REDIS_PORT = int(os.getenv("REDIS_PORT", 6379))
+
 # 3. 채널 레이어 설정 (Redis 사용)
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [("127.0.0.1", 6379)],
+            "hosts": [(REDIS_HOST, REDIS_PORT)],
         },
     },
 }
