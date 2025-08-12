@@ -49,7 +49,14 @@ SECRET_KEY = 'django-insecure-#jczp$^#q)@^(4v(921(w5*(gk$mo8nkpzy-rp@8e+dogjur_3
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["223-130-129-249.nip.io", "223.130.129.249", "localhost", "127.0.0.1"]
+ALLOWED_HOSTS = [
+    "223-130-129-249.nip.io",
+    "223.130.129.249",
+    "localhost",
+    "127.0.0.1",
+    "team-flow.shop",
+    "www.team-flow.shop"
+    ]
 
 CSRF_TRUSTED_ORIGINS = [
     "http://223-130-129-249.nip.io",
@@ -61,7 +68,6 @@ CSRF_TRUSTED_ORIGINS = [
 # Application definition
 
 INSTALLED_APPS = [
-    'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -87,7 +93,6 @@ INSTALLED_APPS = [
     'schedule',
     'team_log',
     'roles',
-    'channels',
 ]
 
 # ========================================
@@ -146,7 +151,6 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
-        'TIMEOUT': 20, 
     }
 }
 
