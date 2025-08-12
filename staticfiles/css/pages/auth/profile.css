@@ -1,0 +1,406 @@
+/* 프로필 페이지 스타일 (메인 레이아웃 호환) */
+
+/* 페이지 컨테이너 - 메인 레이아웃과 호환 */
+.page-container .profile-page-container {
+  padding: 1.5rem;
+  min-height: calc(100vh - 120px); /* 헤더와 사이드바 고려 */
+}
+
+/* 메인 컨테이너 */
+.profile-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* 헤더 섹션 */
+.profile-header {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.profile-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 0.5rem;
+  letter-spacing: -0.025em;
+}
+
+.profile-subtitle {
+  font-size: 1.125rem;
+  color: #64748b;
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* 프로필 카드 - 메인 페이지 카드 스타일과 통일 */
+.profile-card { background: var(--surface); border-radius: var(--radius-12); padding: 2rem; box-shadow: var(--shadow-1); border: 1px solid var(--border); position: relative; overflow: hidden; }
+
+.profile-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+}
+
+/* 프로필 정보 섹션 */
+.profile-info-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 3rem;
+}
+
+/* 프로필 페이지 전용 아바타 - 사이드바와 구분 */
+.profile-info-section .profile-avatar {
+  width: 120px;
+  height: 120px;
+  margin-bottom: 1.5rem;
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  box-shadow: 0 8px 32px rgba(59, 130, 246, 0.3);
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.profile-info-section .profile-avatar:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(59, 130, 246, 0.4);
+}
+
+.profile-info-section .profile-avatar svg {
+  width: 60px;
+  height: 60px;
+}
+
+/* 사용자 이름 */
+.user-display-name {
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0 0 0.5rem;
+}
+
+.user-email {
+  font-size: 1rem;
+  color: #64748b;
+  margin: 0;
+}
+
+/* 프로필 폼 섹션 */
+.profile-form-section {
+  width: 100%;
+}
+
+.profile-form-header {
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.form-section-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0 0 0.5rem;
+}
+
+.form-section-description {
+  font-size: 0.875rem;
+  color: #64748b;
+  margin: 0;
+}
+
+/* 폼 그룹 */
+.profile-form-group {
+  margin-bottom: 1.5rem;
+}
+
+/* 폼 라벨 */
+.profile-form-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 0.5rem;
+}
+
+.profile-form-label.required::after {
+  content: ' *';
+  color: #ef4444;
+}
+
+/* 폼 입력 */
+.profile-form-input {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  font-size: 0.875rem;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  background: white;
+  color: #1f2937;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.profile-form-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  transform: translateY(-1px);
+}
+
+.profile-form-input::placeholder {
+  color: #9ca3af;
+}
+
+/* 읽기 전용 입력 */
+.profile-form-input:read-only {
+  background: #f9fafb;
+  color: #6b7280;
+  cursor: not-allowed;
+}
+
+/* 액션 버튼 그룹 */
+.profile-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2.5rem;
+  justify-content: center;
+}
+
+/* 버튼 스타일 */
+.profile-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.875rem 1.75rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  white-space: nowrap;
+  min-width: 140px;
+}
+
+.profile-btn-primary { background: var(--primary-600); color: #fff; }
+
+.profile-btn-primary:hover { background: var(--primary-700); transform: translateY(-2px); }
+
+.profile-btn-secondary { background: var(--surface); border: 1px solid var(--border); color: var(--text-1); }
+
+.profile-btn-secondary:hover { background: var(--surface-2); border-color: var(--primary-600); transform: translateY(-1px); }
+
+.profile-btn:active {
+  transform: translateY(0);
+}
+
+.profile-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.profile-btn-icon {
+  width: 20px;
+  height: 20px;
+}
+
+/* 상태 메시지 */
+.profile-message {
+  padding: 1rem 1.25rem;
+  border-radius: 10px;
+  margin-bottom: 1.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  display: none;
+}
+
+.profile-message.success {
+  background: #dcfce7;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+}
+
+.profile-message.error {
+  background: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+}
+
+.profile-message.show {
+  display: block;
+  animation: fadeInMessage 0.3s ease-out;
+}
+
+/* 로딩 상태 */
+.profile-loading {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  color: #64748b;
+  font-size: 0.875rem;
+  margin: 2rem 0;
+}
+
+.profile-loading.show {
+  display: flex;
+}
+
+.loading-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #e2e8f0;
+  border-top: 2px solid #3b82f6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+/* 통계 섹션 (추가 정보) */
+.profile-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+.profile-stat {
+  text-align: center;
+  padding: 1rem;
+  background: #f8fafc;
+  border-radius: 10px;
+}
+
+.stat-number {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #3b82f6;
+  margin: 0;
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  color: #64748b;
+  margin: 0.25rem 0 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* 반응형 디자인 - 메인 레이아웃 고려 */
+@media (max-width: 1024px) {
+  .page-container .profile-page-container {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .page-container .profile-page-container {
+    padding: 0.75rem;
+  }
+  
+  .profile-card {
+    padding: 1.5rem;
+  }
+  
+  .profile-title {
+    font-size: 2rem;
+  }
+  
+  .profile-avatar {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .profile-avatar svg {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .user-display-name {
+    font-size: 1.5rem;
+  }
+  
+  .profile-actions {
+    flex-direction: column;
+  }
+  
+  .profile-btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .profile-container {
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .profile-stats {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* 애니메이션 */
+@keyframes fadeInMessage {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* 페이지 진입 애니메이션 */
+.profile-container {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 포커스 접근성 */
+.profile-form-input:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+.profile-btn:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}

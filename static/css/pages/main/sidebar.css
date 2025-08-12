@@ -117,8 +117,34 @@
 
 /* 반응형 디자인 */
 @media (max-width: 1024px) {
-    .sidebar { transform: translateX(-100%); transition: transform var(--transition-2); }
-    .sidebar.open { transform: translateX(0); }
+    .sidebar { 
+        transform: translateX(-100%); 
+        transition: transform var(--transition-2);
+        z-index: 300; /* 헤더보다 높은 z-index */
+        box-shadow: var(--shadow-2);
+    }
+    
+    .sidebar.open { 
+        transform: translateX(0); 
+    }
+    
+    /* === MGP: 사이드바 오버레이 배경 추가 === */
+    .sidebar-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 250;
+        backdrop-filter: blur(2px);
+    }
+    
+    .sidebar-overlay.show {
+        display: block;
+    }
+    /* === /MGP === */
 }
 
 @media (max-width: 768px) {

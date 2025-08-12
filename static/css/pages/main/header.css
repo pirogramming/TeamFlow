@@ -8,7 +8,7 @@
     height: 64px;
     background: var(--surface);
     border-bottom: 1px solid var(--border);
-    z-index: 500;
+    z-index: 100;
     backdrop-filter: saturate(120%) blur(8px);
 }
 
@@ -19,7 +19,36 @@
     flex: 0 0 auto;
     display: flex;
     align-items: center;
+    gap: 1rem;
 }
+
+/* === MGP: 햄버거 메뉴 버튼 스타일 === */
+.hamburger-menu-btn {
+    display: none; /* 기본적으로 숨김 */
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: none;
+    border: none;
+    color: var(--text-2);
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all var(--transition-1);
+    padding: 0;
+}
+
+.hamburger-menu-btn:hover {
+    background: var(--surface-2);
+    color: var(--text-1);
+}
+
+.hamburger-menu-btn svg {
+    width: 24px;
+    height: 24px;
+}
+
+/* === /MGP === */
 
 .logo-section {
     display: flex;
@@ -300,6 +329,12 @@
     }
     
     .team-project-title { font-size: 1.1rem; }
+    
+    /* === MGP: 1024px 이하에서 햄버거 메뉴 버튼 표시 === */
+    .hamburger-menu-btn {
+        display: flex;
+    }
+    /* === /MGP === */
 }
 
 @media (max-width: 768px) {
