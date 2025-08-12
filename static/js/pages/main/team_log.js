@@ -32,6 +32,49 @@ document.addEventListener('DOMContentLoaded', function() {
     // 전역 노출(상세 페이지에서도 쓰게)
     window.TeamLogLocalHide = TeamLogLocalHide;
 
+    // ===== 프로젝트 카드 로컬 삭제 (팀 기록 카드용) =====
+    const DeletedProjects = (() => {
+        const NEW_KEY = 'teamlog_deleted_projects';
+        const OLD_KEY = 'teamlog_hidden_projects'; // 이전 버전 호환
+
+        function getDeletedSet() {
+            // 마이그레이션: 예전에 저장된 숨김 목록이 있으면 합침
+            let fromNew = [];
+            let fromOld = [];
+            try { fromNew = JSON.parse(localStorage.getItem(NEW_KEY) || '[]'); } catch { fromNew = []; }
+            try { fromOld = JSON.parse(localStorage.getItem(OLD_KEY) || '[]'); } catch { fromOld = []; }
+            const merged = new Set([...(fromNew || []), ...(fromOld || [])].map(String));
+            if (fromOld && fromOld.length) {
+                localStorage.removeItem(OLD_KEY);
+                localStorage.setItem(NEW_KEY, JSON.stringify([...merged]));
+            }
+            return merged;
+        }
+        function saveDeletedSet(set) {
+            localStorage.setItem(NEW_KEY, JSON.stringify([...set]));
+        }
+        function isDeleted(teamId) {
+            const s = getDeletedSet();
+            return s.has(String(teamId));
+        }
+        function markDeleted(teamId) {
+            const s = getDeletedSet();
+            s.add(String(teamId));
+            saveDeletedSet(s);
+        }
+        function restore(teamId) {
+            const s = getDeletedSet();
+            s.delete(String(teamId));
+            saveDeletedSet(s);
+        }
+        function filter(projects) {
+            const s = getDeletedSet();
+            return (projects || []).filter(p => !s.has(String(p.team_id)));
+        }
+        return { getDeletedSet, saveDeletedSet, isDeleted, markDeleted, restore, filter };
+    })();
+    window.TeamLogDeletedProjects = DeletedProjects;
+
     // ===== 탭 해시 제거 (탭이 있을 때만 동작; 없으면 조용히 패스) =====
     (function initTabWithoutHash(){
         const tabs = document.querySelectorAll('.tab[data-tab], .tab[href^="#"]');
@@ -73,11 +116,12 @@ document.addEventListener('DOMContentLoaded', function() {
         try {
             showLoadingState();
             const teamProjects = await fetchTeamProjects();
+            const visibleProjects = DeletedProjects.filter(teamProjects);
             
-            if (teamProjects.length === 0) {
+            if (visibleProjects.length === 0) {
                 showEmptyState();
             } else {
-                renderTeamProjects(teamProjects);
+                renderTeamProjects(visibleProjects);
                 showProjectsGrid();
             }
         } catch (error) {
@@ -106,7 +150,7 @@ document.addEventListener('DOMContentLoaded', function() {
      * 팀 프로젝트 카드들 렌더링
      */
     function renderTeamProjects(projects) {
-        const projectsHTML = projects.map(project => createProjectCard(project)).join('');
+        const projectsHTML = (projects || []).map(project => createProjectCard(project)).join('');
         teamProjectsGrid.innerHTML = projectsHTML;
     }
 
@@ -130,7 +174,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const dashboardUrl = project.dashboard_url || `/api/dashboard/${project.team_id}/`;
 
         return `
-            <div class="project-card">
+            <div class="project-card" data-team-id="${project.team_id}">
                 <div class="project-card-header">
                     <div>
                         <h3 class="project-title">${escapeHtml(project.title)}</h3>
@@ -177,6 +221,12 @@ document.addEventListener('DOMContentLoaded', function() {
                         </svg>
                         프로젝트 보기
                     </a>
+                    <button type="button" class="btn-danger project-delete-btn" title="이 팀 삭제/탈퇴">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7V5a2 2 0 012-2h2a2 2 0 012 2v2m-9 0h10"></path>
+                        </svg>
+                        삭제/탈퇴
+                    </button>
                 </div>
             </div>
         `;
@@ -259,5 +309,71 @@ document.addEventListener('DOMContentLoaded', function() {
             showErrorState
         };
         console.log('🔧 TeamLog 디버그 함수들이 window.TeamLogDebug에 노출되었습니다.');
+    }
+
+    // ===== 이벤트 위임: 카드 숨기기 처리 =====
+    document.addEventListener('click', async (e) => {
+        const btn = e.target.closest('.project-delete-btn');
+        if (!btn) return;
+
+        const card = btn.closest('.project-card');
+        const teamId = card?.dataset?.teamId;
+        if (!card || !teamId) return;
+
+        // 백엔드에서 현재 사용자의 팀 소유 여부를 헤더를 통해 가져올 수 있으나,
+        // 카드 데이터에는 없으므로 확인 팝업에서 분기 선택 제공
+        const choice = await promptDeleteOrLeave();
+        if (!choice) return;
+
+        const confirmMsg = choice === 'delete'
+            ? '정말 팀을 삭제하시겠어요?\n삭제 후 복구할 수 없습니다. (팀장만 가능)'
+            : '정말 팀에서 탈퇴하시겠어요?\n탈퇴 후 복구할 수 없습니다.';
+        if (!window.confirm(confirmMsg)) return;
+
+        try {
+            // 로딩 표시(optional)
+            if (window.showLoading) window.showLoading('처리 중입니다...');
+
+            const url = choice === 'delete'
+                ? `/api/dashboard/${teamId}/team/delete/`
+                : `/api/dashboard/${teamId}/team/leave/`;
+
+            const method = choice === 'delete' ? 'DELETE' : 'POST';
+            const res = await fetch(url, {
+                method,
+                credentials: 'same-origin',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': (window.getCsrfToken?.() || document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '')
+                }
+            });
+
+            const data = await res.json().catch(() => ({}));
+            if (!res.ok || data?.success === false) {
+                throw new Error(data?.error || `요청 실패 (HTTP ${res.status})`);
+            }
+
+            // 성공: 로컬 삭제표시 + DOM 제거
+            DeletedProjects.markDeleted(teamId);
+            card.remove();
+            if (window.showSuccess) window.showSuccess('처리되었습니다.');
+
+            const hasCards = !!teamProjectsGrid.querySelector('.project-card');
+            if (!hasCards) {
+                showEmptyState();
+            }
+        } catch (err) {
+            console.error('팀 삭제/탈퇴 실패:', err);
+            if (window.showError) window.showError(err.message || '처리에 실패했습니다.');
+        } finally {
+            if (window.hideLoading) window.hideLoading();
+        }
+    });
+
+    function promptDeleteOrLeave() {
+        // 간단 분기: 확인 창 2단계 대신 기본 confirm을 두 번 사용
+        // 1) 팀 삭제 시도? (팀장만 가능)
+        const wantDelete = window.confirm('팀 전체를 삭제하시려면 확인을 누르세요.\n팀에서 탈퇴만 하시려면 취소를 누르세요.');
+        return wantDelete ? 'delete' : 'leave';
     }
 });

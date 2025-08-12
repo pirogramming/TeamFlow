@@ -23,4 +23,8 @@ urlpatterns = [
 
     # 일정 페이지
     path('<int:team_id>/calendar/', schedule_views.calendar_page_view, name='calendar_page'),
+
+    # 팀 관리 API (삭제/탈퇴)
+    path('<int:team_id>/team/delete/', views.TeamDeleteAPIView.as_view(), name='team_delete_api'),
+    path('<int:team_id>/team/leave/', views.TeamLeaveAPIView.as_view(), name='team_leave_api'),
 ]

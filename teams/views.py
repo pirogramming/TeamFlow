@@ -280,6 +280,48 @@ def team_create_page(request):
 def team_join_page(request):
     """팀 참여 페이지"""
     return render(request, 'team/join.html')
+
+
+# ========================================
+# 팀 삭제 / 팀 탈퇴 API
+# ========================================
+class TeamDeleteAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, team_id):
+        try:
+            team = Team.objects.get(id=team_id)
+            # 권한: 팀장만 삭제 가능
+            if team.owner != request.user:
+                return Response({'error': '팀을 삭제할 권한이 없습니다.'}, status=status.HTTP_403_FORBIDDEN)
+
+            team_name = team.name
+            team.delete()
+            return Response({'success': True, 'message': f'팀 "{team_name}"이 삭제되었습니다.'}, status=status.HTTP_200_OK)
+        except Team.DoesNotExist:
+            return Response({'error': '존재하지 않는 팀입니다.'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class TeamLeaveAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, team_id):
+        try:
+            try:
+                membership = TeamMember.objects.get(team_id=team_id, user=request.user)
+            except TeamMember.DoesNotExist:
+                return Response({'error': '해당 팀의 멤버가 아닙니다.'}, status=status.HTTP_404_NOT_FOUND)
+
+            # 팀장은 바로 탈퇴 불가(먼저 팀장 권한 위임 필요) - 안전장치
+            if membership.team.owner == request.user:
+                return Response({'error': '팀장은 탈퇴할 수 없습니다. 팀장 권한을 위임 후 진행하세요.'}, status=status.HTTP_400_BAD_REQUEST)
+
+            membership.delete()
+            return Response({'success': True, 'message': '팀에서 탈퇴했습니다.'}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 # ========================================
 
 @login_required
