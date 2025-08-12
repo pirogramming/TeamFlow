@@ -127,6 +127,48 @@
     transform: translateY(0);
 }
 
+/* 보조 버튼: 숨기기 */
+.btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .5rem;
+    padding: .75rem 1rem;
+    background: #eef2f7;
+    color: var(--text-1);
+    border: 1px solid #e1e5e9;
+    border-radius: var(--radius);
+    font-size: .875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition-1);
+}
+
+.btn-secondary:hover {
+    background: #e9edf2;
+}
+
+/* 위험 동작 버튼: 삭제 */
+.btn-danger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .5rem;
+    padding: .75rem 1rem;
+    background: #fee2e2;
+    color: #b91c1c;
+    border: 1px solid #fecaca;
+    border-radius: var(--radius);
+    font-size: .875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-1);
+}
+
+.btn-danger:hover {
+    background: #fecaca;
+}
+
 /* 빈 상태 */
 .empty-state {
     text-align: center;

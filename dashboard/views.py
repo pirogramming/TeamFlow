@@ -269,3 +269,42 @@ def set_current_team(request):
     # 세션에 team_id 저장
     request.session['current_team_id'] = team_id
     return Response({'success': True})
+
+
+# ========================================
+# 팀 관리 API (삭제/탈퇴)
+# ========================================
+class TeamDeleteAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, team_id):
+        try:
+            team = get_object_or_404(Team, id=team_id)
+            # 권한: 팀장만 삭제 가능
+            if team.owner != request.user:
+                return Response({'error': '팀을 삭제할 권한이 없습니다.'}, status=403)
+
+            team_name = team.name
+            team.delete()
+            return Response({'success': True, 'message': f'팀 "{team_name}"이 삭제되었습니다.'}, status=200)
+        except Exception as e:
+            return Response({'error': str(e)}, status=500)
+
+
+class TeamLeaveAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, team_id):
+        try:
+            membership = TeamMember.objects.filter(team_id=team_id, user=request.user).first()
+            if not membership:
+                return Response({'error': '해당 팀의 멤버가 아닙니다.'}, status=404)
+
+            # 팀장은 바로 탈퇴 불가(먼저 팀장 권한 위임 필요)
+            if membership.team.owner == request.user:
+                return Response({'error': '팀장은 탈퇴할 수 없습니다. 팀장 권한을 위임 후 진행하세요.'}, status=400)
+
+            membership.delete()
+            return Response({'success': True, 'message': '팀에서 탈퇴했습니다.'}, status=200)
+        except Exception as e:
+            return Response({'error': str(e)}, status=500)
