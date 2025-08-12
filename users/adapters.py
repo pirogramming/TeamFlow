@@ -41,7 +41,6 @@ class CustomAccountAdapter(DefaultAccountAdapter):
             # 새 사용자 또는 프로필 미완성 사용자: 프로필 설정 페이지로
             return reverse('profile-setup')
 
-
 class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
     """
     소셜 계정 로그인 후 리다이렉트 로직 (3rdparty signup 완전 우회)
