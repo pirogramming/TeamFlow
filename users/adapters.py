@@ -15,7 +15,13 @@ class CustomAccountAdapter(DefaultAccountAdapter):
     """
     일반 계정 로그인 후 리다이렉트 로직
     """
+    def get_user_display(self, user):
+        return (getattr(user, "get_full_name", lambda: "")()
+                or getattr(user, "first_name", "")
+                or getattr(user, "email", "")
+                or getattr(user, "username", ""))
     
+
     def get_login_redirect_url(self, request):
         """
         로그인 후 리다이렉트 URL 결정
