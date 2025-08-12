@@ -8,6 +8,7 @@ class ProfileManager {
         this.form = document.getElementById('profile-form');
         this.submitBtn = document.getElementById('save-btn');
         this.cancelBtn = document.getElementById('cancel-btn');
+        this.logoutBtn = document.getElementById('logout-btn');
         this.loadingElement = document.getElementById('profile-loading');
         this.messageElement = document.getElementById('profile-message');
         
@@ -28,6 +29,11 @@ class ProfileManager {
         
         // 취소 버튼 이벤트
         this.cancelBtn.addEventListener('click', () => this.resetForm());
+
+        // 로그아웃 버튼 이벤트
+        if (this.logoutBtn) {
+            this.logoutBtn.addEventListener('click', () => this.handleLogout());
+        }
         
         // 입력 필드 변경 감지
         this.form.addEventListener('input', () => this.checkFormChanges());
@@ -38,6 +44,26 @@ class ProfileManager {
                 this.resetForm();
             }
         });
+    }
+
+    /**
+     * 로그아웃 처리
+     */
+    handleLogout() {
+        try {
+            // 클라이언트 토큰 제거 (프론트 인증 토큰 사용 시)
+            if (typeof window.logout === 'function') {
+                // window.logout 은 토큰을 제거하고 '/'로 이동
+                window.localStorage.removeItem('access_token');
+                window.localStorage.removeItem('refresh_token');
+            }
+
+            // 서버 세션 로그아웃 후 랜딩으로 이동
+            window.location.href = '/auth/logout/';
+        } catch (e) {
+            console.error('로그아웃 실패:', e);
+            window.location.href = '/auth/logout/';
+        }
     }
 
     /**
