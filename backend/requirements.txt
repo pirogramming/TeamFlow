@@ -11,3 +11,6 @@ google-auth
 python-dotenv
 django-environ
 openai
+channels
+daphne
+channels-redis
