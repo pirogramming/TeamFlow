@@ -23,7 +23,7 @@ def roles_page(request, team_id):
     request.session['current_team_id'] = team.id  # 현재 팀 ID를 세션에 저장
     
     # 팀 멤버 정보
-    team_members = team.teammember_set.select_related('user')
+    team_members = team.teammember_set.select_related('user', 'user__profile')
     
     # 등록된 역할 목록
     team_roles = Role.objects.filter(team=team)
@@ -32,15 +32,22 @@ def roles_page(request, team_id):
     user_profile = getattr(request.user, 'profile', None)
     user_major = user_profile.major if user_profile else ''
     
-    # 팀원별 역할 할당 정보
-    role_assignments = MemberRoleAssignment.objects.filter(team=team).select_related('user', 'role')
+    # ✨ 이 부분이 핵심 수정 사항입니다.
+    # 1. MemberRoleAssignment에서 최신 역할 할당 정보를 가져옵니다.
+    assignments = MemberRoleAssignment.objects.filter(team=team).select_related('role')
+    # 2. user_id를 키로, 할당된 역할 객체를 값으로 하는 딕셔너리를 만듭니다.
+    assignment_map = {assignment.user_id: assignment.role for assignment in assignments}
+    
+    # 3. 각 팀원 객체에 할당된 역할을 직접 추가합니다.
+    for member in team_members:
+        member.assigned_role = assignment_map.get(member.user.id)
     
     return render(request, 'main/roles.html', {
         'team': team,
-        'team_members': team_members,
+        'team_members': team_members, # ✨ 최신 역할이 반영된 리스트를 전달
         'team_roles': team_roles,
         'user_major': user_major,
-        'role_assignments': role_assignments,
+        # 'role_assignments'는 이제 'team_members'에 통합되었으므로 별도로 필요 없습니다.
         'current_team_id': team.id,
         'hide_sidebar': False,
         'hide_footer': False,
@@ -96,10 +103,7 @@ def create_role_api(request, team_id):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
 
-# ========================================
-# MGP: 역할 삭제 API 추가
-# 역할 삭제 시 할당된 팀원들의 역할 할당도 함께 해제하는 로직 구현
-# ========================================
+# 역할 삭제 API
 @login_required
 @csrf_exempt
 @require_http_methods(["DELETE"])
@@ -108,52 +112,38 @@ def delete_role_api(request, team_id, role_id):
     role = get_object_or_404(Role, id=role_id, team=team)
     
     try:
-        # 역할이 할당된 팀원들의 할당을 먼저 해제
         assigned_members = MemberRoleAssignment.objects.filter(role=role)
         assigned_count = assigned_members.count()
         
         if assigned_count > 0:
-            # 할당된 팀원들의 역할 할당 해제
             assigned_members.delete()
-            print(f"[역할 삭제] {assigned_count}명의 팀원 역할 할당 해제 완료")
         
-        # 역할 삭제
         role_name = role.name
         role.delete()
         
         return JsonResponse({
             'success': True,
-            'message': f'역할 "{role_name}"이 삭제되었습니다.' + (f' ({assigned_count}명의 할당 해제됨)' if assigned_count > 0 else '')
+            'message': f'역할 "{role_name}"이 삭제되었습니다.'
         })
         
     except Exception as e:
-        print(f"[역할 삭제 오류] {str(e)}")
         return JsonResponse({'error': str(e)}, status=500)
 
-# AI 역할 추천 API (dev 브랜치 로직 유지)
+# AI 역할 추천 API
 @csrf_exempt
 @require_http_methods(["POST"])
 def recommend_role_api(request):
     try:
-        # 1) 요청 바디 파싱 (프론트에서 보낸 사용자 정보)
-        data = {}
-        if request.body:
-            try:
-                data = json.loads(request.body.decode("utf-8"))
-            except Exception:
-                # 바디가 비어있거나 JSON 아님 → 빈 값으로 진행
-                data = {}
-
+        data = json.loads(request.body.decode("utf-8")) if request.body else {}
         major = (data.get("major") or getattr(getattr(request.user, "profile", None), "major", "") or "").strip()
-        traits = data.get("traits") or []           # ["분석적", "꼼꼼함"] 등
-        preferences = data.get("preferences") or [] # ["기획", "개발"] 등
+        traits = data.get("traits") or []
+        preferences = data.get("preferences") or []
 
-        # 2) 추천 가능한 역할 목록 (팀 기준으로 우선 조회)
         team_id = request.session.get("current_team_id")
         if team_id:
             roles_qs = Role.objects.filter(team_id=team_id).only("name")
         else:
-            roles_qs = Role.objects.all().only("name")
+            roles_qs = Role.objects.none()
 
         available_role_names = [r.name for r in roles_qs]
         if not available_role_names:
@@ -165,6 +155,7 @@ def recommend_role_api(request):
 
         # 4) LLM 호출
         result = call_clova_recommendation(prompt, available_role_names)
+        
         if not result:
             return JsonResponse({"ok": False, "error": "LLM 응답 파싱 실패"}, status=502)
 
@@ -176,10 +167,7 @@ def recommend_role_api(request):
         # 500 대신 502로 내려서 프론트가 메시지를 그대로 보여줄 수 있게 함
         return JsonResponse({"ok": False, "error": str(e)}, status=502)
 
-# ========================================
-# MGP: 역할 할당 API 추가
-# 팀원에게 역할을 할당하거나 업데이트하는 기능 구현
-# ========================================
+# 역할 할당 API
 @login_required
 @csrf_exempt
 @require_http_methods(["POST", "PATCH"])
@@ -214,6 +202,7 @@ def assign_role_api(request, team_id):
             'assignment': {
                 'user': user.username,
                 'role': role.name,
+                'role_id': role.id, # ✨ 프론트엔드에서 사용하기 위해 role_id 추가
                 'is_ai_assigned': assignment.assigned_by_ai
             }
         })
@@ -223,7 +212,16 @@ def assign_role_api(request, team_id):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
 
+# ✨ 누락되었던 register_roles 함수를 다시 추가했습니다.
+def register_roles(request, team_id):
+    team = get_object_or_404(Team, id=team_id)
+    if request.method == 'POST':
+        roles = request.POST.getlist('roles[]')
+        for r in roles:
+            Role.objects.create(name=r, team=team, created_by=request.user)
+    return JsonResponse({"status": "ok"})
 # ========================================
+
 # MGP: 개선된 프롬프트 생성 함수 추가
 # 선호 역할을 포함한 더 상세한 AI 추천을 위한 프롬프트 생성
 # ========================================
@@ -240,13 +238,3 @@ def make_enhanced_prompt(major, traits, preferences, preferred_roles):
 이 정보를 바탕으로 가장 적절한 팀 역할을 하나 추천해주세요. 
 추천하는 역할명과 그 이유를 간단히 설명해주세요.
 응답 형식: "추천 역할: [역할명] - [이유]" """
-
-# 기존 함수들 (호환성 유지)
-def register_roles(request, team_id):
-    team = get_object_or_404(Team, id=team_id)
-    if request.method == 'POST':
-        roles = request.POST.getlist('roles[]')  # ["기획자", "디자이너"]
-        for r in roles:
-            Role.objects.create(name=r, team=team, created_by=request.user)
-    return JsonResponse({"status": "ok"})
-# ========================================

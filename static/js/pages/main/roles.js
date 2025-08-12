@@ -3,6 +3,7 @@
 // 전역 변수
 let currentTeamId = null;
 let currentAIResult = null; // AI 추천 결과를 저장할 변수 (수정된 형식에 맞게 사용)
+let socket = null; // 웹소켓 객체를 저장할 변수
 
 // 페이지 로드 시 초기화
 document.addEventListener('DOMContentLoaded', function() {
@@ -15,7 +16,7 @@ document.addEventListener('DOMContentLoaded', function() {
     currentTeamId = pathParts[1];
 
     setupEventListeners();
-
+    connectWebSocket(); // ✨ 웹소켓 연결 시작
     // 기본적으로 AI 추천 탭 활성화
     switchTab('ai-recommend');
 
@@ -57,11 +58,24 @@ function setupEventListeners() {
             switchTab(tabName);
         });
     });
-
+    
+    const aiAssignBtn = document.getElementById('team-ai-assign-btn');
+    if (aiAssignBtn) {
+        aiAssignBtn.addEventListener('click', function() {
+            if (socket && socket.readyState === WebSocket.OPEN) {
+                // AI 배정 시작을 알리는 메시지를 보냅니다.
+                socket.send(JSON.stringify({ type: 'start_ai_assignment' }));
+                showNotification('AI 역할 배정을 시작합니다. 잠시만 기다려주세요.', 'info');
+                this.disabled = true; // 버튼 비활성화
+            } else {
+                showNotification('서버와 연결이 끊겼습니다. 새로고침 해주세요.', 'error');
+            }
+        });
+    }
     // AI 추천 폼
     const aiForm = document.getElementById('ai-recommendation-form');
     if (aiForm) {
-        aiForm.addEventListener('submit', handleAIRecommendation);
+        aiForm.addEventListener('submit', handleAISubmission);
     }
 
     // 모달 관련
@@ -97,6 +111,41 @@ function setupEventListeners() {
             acceptAIRole();
         }
     });
+}
+
+// ✨ 웹소켓 연결 함수
+function connectWebSocket() {
+    const wsProtocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+    const wsUrl = `${wsProtocol}://${window.location.host}/ws/roles/${currentTeamId}/assignment/`;
+    
+    socket = new WebSocket(wsUrl);
+
+    socket.onopen = function(e) {
+        console.log("✅ 웹소켓 연결 성공");
+    };
+
+    // 서버로부터 메시지를 받았을 때
+    socket.onmessage = function(e) {
+        const data = JSON.parse(e.data);
+        console.log("WebSocket 메시지 수신:", data);
+
+        if (data.type === 'submission_update') {
+            updateSubmissionStatusUI(data.total_members, data.submitted_members);
+        } else if (data.type === 'assignment_complete') {
+            updateAllMemberRolesUI(data.assignments);
+            showTeamAssignmentResults(data.assignments);
+            showNotification('AI가 팀 전체 역할을 배정했습니다!', 'success');
+        }
+    };
+
+    socket.onclose = function(e) {
+        console.error("웹소켓 연결이 종료되었습니다. 페이지를 새로고침해주세요.");
+        showNotification('실시간 연결이 끊겼습니다. 새로고침이 필요합니다.', 'error');
+    };
+
+    socket.onerror = function(err) {
+        console.error('웹소켓 오류:', err);
+    };
 }
 
 // 탭 전환
@@ -138,6 +187,110 @@ function updateAITabState() {
         // 역할이 없으면 빈 알림 표시
         showEmptyRolesInAITab();
     }
+}
+
+async function handleAISubmission(e) {
+    e.preventDefault();
+
+    hideAIResult();
+    const existingBoxes = document.querySelectorAll('.ai-individual-result-box');
+    existingBoxes.forEach(box => box.remove());
+    
+    const aiAssignBtn = document.getElementById('team-ai-assign-btn');
+    if (aiAssignBtn) {
+        aiAssignBtn.disabled = true; // AI 배정 버튼 비활성화
+    }
+
+    if (socket && socket.readyState === WebSocket.OPEN) {
+        socket.send(JSON.stringify({ type: 'resubmitting' }));
+    } else {
+        showNotification('서버와 연결이 끊겼습니다. 새로고침 해주세요.', 'error');
+        return;
+    }
+
+    const formData = new FormData(e.target);
+    const traits = formData.getAll('traits');
+    const preferredRoles = formData.getAll('preferred_roles');
+    const major = formData.get('major');
+
+    if (traits.length === 0) {
+        showNotification('성향을 하나 이상 선택해주세요.', 'error');
+        return;
+    }
+
+    const submissionData = {
+        major: major,
+        traits: traits,
+        preferences: preferredRoles
+    };
+
+    if (socket && socket.readyState === WebSocket.OPEN) {
+        socket.send(JSON.stringify(submissionData));
+        showNotification('내 정보를 제출했습니다. 다른 팀원들을 기다려주세요.', 'info');
+        // 제출 후 폼 비활성화
+        e.target.querySelectorAll('input, button').forEach(el => el.disabled = true);
+    } else {
+        showNotification('서버와 연결이 끊겼습니다. 새로고침 해주세요.', 'error');
+    }
+}
+const assignButton = document.getElementById('team-ai-assign-btn');
+// ✨ 실시간 제출 현황 UI 업데이트
+
+function updateSubmissionStatusUI(total, submitted) {
+    const statusEl = document.getElementById('submission-status'); // HTML에 <div id="submission-status"></div> 필요
+    if (statusEl) {
+        statusEl.textContent = `제출 현황: ${submitted.length} / ${total}`;
+    }
+
+    if(submitted.length === total && total > 0) {
+        assignButton.disabled = false;
+    }
+
+    const submittedListEl = document.getElementById('submitted-list'); // HTML에 <ul id="submitted-list"></ul> 필요
+    if (submittedListEl) {
+        const submittedNames = submitted.map(member => member.name).join(', ');
+        submittedListEl.innerHTML = `<strong>제출한 팀원:</strong> ${submittedNames}`;
+    }
+}
+
+// ✨ AI가 배정한 전체 역할을 UI에 반영하는 함수
+function updateAllMemberRolesUI(assignments) {
+    assignments.forEach(assignment => {
+        const memberItem = Array.from(document.querySelectorAll('.member-assignment-item'))
+                                .find(el => el.querySelector('.member-details h4').textContent.trim() === assignment.username);
+        
+        if (memberItem) {
+            const roleSelect = memberItem.querySelector('.role-select');
+            const roleOption = Array.from(roleSelect.options).find(opt => opt.textContent === assignment.assigned_role);
+            
+            if (roleOption) {
+                roleSelect.value = roleOption.value;
+                const assignedRoleEl = memberItem.querySelector('.assigned-role-display');
+                if(assignedRoleEl) {
+                    assignedRoleEl.textContent = assignment.assigned_role;
+                    assignedRoleEl.classList.add('ai-assigned');
+                }
+            }
+        }
+    });
+    // 모든 역할 할당 후, 팀원 현황 카드도 업데이트
+    updateAllMemberStatusCards(assignments);
+}
+
+// ✨ 팀원 현황 카드 전체 업데이트
+function updateAllMemberStatusCards(assignments) {
+    assignments.forEach(assignment => {
+        const memberCard = document.querySelector(`.member-status-card[data-user-name="${assignment.username}"]`);
+        if (memberCard) {
+            let roleEl = memberCard.querySelector('.assigned-role, .no-role');
+            if (!roleEl) {
+                roleEl = document.createElement('div');
+                memberCard.appendChild(roleEl);
+            }
+            roleEl.className = 'assigned-role ai-assigned';
+            roleEl.textContent = assignment.assigned_role;
+        }
+    });
 }
 
 // 탭 표시
@@ -435,7 +588,31 @@ function getCurrentUserId() {
 
     return null;
 }
+function showTeamAssignmentResults(assignments) {
+    // 현재 로그인한 사용자 ID를 가져옵니다.
+    const currentUserId = window.currentUserId || getCurrentUserId();
+    
+    // assignments 배열에서 현재 사용자의 배정 결과를 찾습니다.
+    // user_id의 데이터 타입이 다를 수 있으므로 String()으로 변환하여 비교합니다.
+    const currentUserAssignment = assignments.find(
+        (a) => String(a.user_id) === String(currentUserId)
+    );
 
+    const resultContainer = document.getElementById('ai-result');
+    const recommendedRoleNameElement = document.getElementById('recommended-role-name');
+    const resultContent = document.getElementById('ai-result-content');
+
+    if (currentUserAssignment) {
+        // AI 배정 결과가 있는 경우, HTML 요소를 업데이트합니다.
+        recommendedRoleNameElement.textContent = `${currentUserAssignment.username}님에게 추천하는 역할: ${currentUserAssignment.assigned_role}`;
+        resultContent.innerHTML = `<p><strong>추천 이유:</strong> ${currentUserAssignment.reason || '추천 이유를 불러올 수 없습니다.'}</p>`;
+        
+        // 결과 컨테이너를 보이게 합니다.
+        resultContainer.classList.remove('hidden');
+        resultContainer.style.display = 'block';
+        resultContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    } 
+}
 // 역할 등록 모달 열기
 function openRoleModal() {
     const modal = document.getElementById('role-modal');
@@ -721,9 +898,6 @@ function showAIFormAfterRoleCreation() {
                         <div class="recommended-role-name" id="recommended-role-name"></div>
                     </div>
                     <div id="ai-result-content" class="result-content"></div>
-                    <div class="result-actions">
-                        <button class="btn-accept-role">추천 역할 수락</button>
-                    </div>
                 </div>
             `;
 
@@ -872,7 +1046,7 @@ function updateMemberStatus(userId, assignment) {
                 // 팀장 + 할당된 역할 표시
                 if (assignment.role && assignment.role !== '역할 없음') {
                     assignedRoleElement.innerHTML = `
-                        <span class="leader-role">팀장</span>
+
                         <span class="assigned-role-name">${assignment.role}</span>
                         ${assignment.is_ai_assigned ? '<small>(AI 추천)</small>' : ''}
                     `;

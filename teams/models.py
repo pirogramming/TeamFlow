@@ -12,7 +12,7 @@ class Team(models.Model):
     members = models.ManyToManyField(settings.AUTH_USER_MODEL, through='TeamMember', related_name="joined_teams")
     invite_code = models.CharField(max_length=6, unique=True, default=generate_invite_code)
     created_at = models.DateTimeField(auto_now_add=True)
-
+    ai_roles_assigned = models.BooleanField(default=False)
     def __str__(self):
         return self.name
 

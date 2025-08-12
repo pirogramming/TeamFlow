@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from teams.models import Team, TeamMember
 from django.db.models import F
 from tasks.models import Task
+from datetime import date, timedelta
 
 def landing_page_view(request):
     return render(request, 'landing/index.html')
@@ -73,14 +74,18 @@ class DashboardAPIView(APIView):
             personal_progress = int((personal_completed_count / personal_tasks_count) * 100) if personal_tasks_count > 0 else 0
 
             # 7. 마감 임박 작업 수 계산 (팀 작업 + 개인 작업)
-            deadline_imminent_tasks = []
-            for task in team_tasks:
-                if task.is_deadline_imminent:
-                    deadline_imminent_tasks.append(task)
-            for task in personal_tasks:
-                if task.is_deadline_imminent:
-                    deadline_imminent_tasks.append(task)
-            deadline_imminent_count = len(deadline_imminent_tasks)
+            deadline_imminent_count = 0
+            if team:
+                deadline_threshold = date.today() + timedelta(days=3)
+                
+                # 팀 작업 + 개인 작업 중 완료되지 않은 마감 임박 작업 수
+                imminent_tasks = Task.objects.filter(
+                    team=team,
+                    due_date__isnull=False,
+                    due_date__lte=deadline_threshold,
+                    status__in=['pending', 'in_progress']
+                )
+                deadline_imminent_count = imminent_tasks.count()
 
             print(f"[8] 전체 진행률: {total_progress}%, 개인 진행률: {personal_progress}%, 마감 임박: {deadline_imminent_count}개")
 
@@ -101,7 +106,7 @@ class DashboardAPIView(APIView):
                 'team_members': list(team_members),
                 'total_progress': total_progress,
                 'personal_progress': personal_progress,
-        
+                'deadline_imminent_count': deadline_imminent_count,
                 'team_tasks': list(team_tasks.values('id', 'name', 'status', 'due_date', 'type', 'assignee__first_name', 'assignee__username', 'description')),
                 'personal_tasks': list(personal_tasks.values('id', 'name', 'status', 'due_date', 'type', 'description')),
             }

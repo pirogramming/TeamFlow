@@ -61,6 +61,7 @@ CSRF_TRUSTED_ORIGINS = [
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -86,6 +87,7 @@ INSTALLED_APPS = [
     'schedule',
     'team_log',
     'roles',
+    'channels',
 ]
 
 # ========================================
@@ -144,6 +146,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
+        'TIMEOUT': 20, 
     }
 }
 
@@ -276,3 +279,18 @@ NCP_APIGW_API_KEY = env('NCP_APIGW_API_KEY')
 
 NCP_ACCESS_KEY = env('NCP_ACCESS_KEY')
 NCP_SECRET_KEY = env('NCP_SECRET_KEY')
+
+# ========================================
+# AI 웹소켓
+# 2. ASGI 애플리케이션 설정
+ASGI_APPLICATION = 'teamflow.asgi.application'
+
+# 3. 채널 레이어 설정 (Redis 사용)
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
+        },
+    },
+}
