@@ -8,7 +8,7 @@
     height: 64px;
     background: var(--surface);
     border-bottom: 1px solid var(--border);
-    z-index: 100;
+    z-index: 600;
     backdrop-filter: saturate(120%) blur(8px);
 }
 
@@ -95,7 +95,7 @@
     line-height: 1.2;
 }
 
-.project-dropdown { display:flex; align-items:center; gap:.5rem; padding: .5rem .75rem; background: var(--surface); border:1px solid var(--border); border-radius: var(--radius); cursor:pointer; transition: all var(--transition-1); min-width: 200px; }
+.project-dropdown { display:flex; align-items:center; gap:.5rem; padding: .5rem .75rem; background: var(--surface); border:1px solid var(--border); border-radius: var(--radius); cursor:pointer; transition: all var(--transition-1); min-width: 200px; position: relative; z-index: 10; }
 
 .project-dropdown:hover { border-color: var(--primary-600); background: var(--surface-2); }
 
@@ -113,14 +113,14 @@
 }
 
 /* 드롭다운 메뉴 */
-.dropdown-menu { position:absolute; top: 100%; left:0; right:0; background: var(--surface); border:1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-2); z-index: 1000; margin-top:.25rem; min-width: 240px; display:none; }
+.dropdown-menu { position:absolute; top: 100%; left:0; right:0; background: var(--surface); border:1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-2); z-index: 20; margin-top:.25rem; min-width: 240px; display:none; }
 
 /* 드롭다운 메뉴 표시 상태 */
 .dropdown-menu.show {
     display: block !important;
     visibility: visible !important;
     opacity: 1 !important;
-    z-index: 9999 !important;
+    z-index: 20 !important;
 }
 
 .dropdown-header {
