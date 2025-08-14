@@ -34,6 +34,8 @@ document.addEventListener('DOMContentLoaded', function() {
         showEmptyRolesInAITab();
         hideTeamRoleAssignmentSection();
     }
+
+    loadLastAssignment();
 });
 
 // 페이지 초기화 (DOMContentLoaded에서 이미 처리되므로 중복될 수 있음)
@@ -603,6 +605,8 @@ function showTeamAssignmentResults(assignments) {
     const resultContent = document.getElementById('ai-result-content');
 
     if (currentUserAssignment) {
+        localStorage.setItem('lastAssignment', JSON.stringify(currentUserAssignment));
+        
         // AI 배정 결과가 있는 경우, HTML 요소를 업데이트합니다.
         recommendedRoleNameElement.textContent = `${currentUserAssignment.username}님에게 추천하는 역할: ${currentUserAssignment.assigned_role}`;
         resultContent.innerHTML = `<p><strong>추천 이유:</strong> ${currentUserAssignment.reason || '추천 이유를 불러올 수 없습니다.'}</p>`;
@@ -613,6 +617,29 @@ function showTeamAssignmentResults(assignments) {
         resultContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     } 
 }
+
+function loadLastAssignment() {
+    // 'lastAssignment' 키로 저장된 데이터 가져오기
+    const lastAssignmentString = localStorage.getItem('lastAssignment');
+
+    if (lastAssignmentString) {
+        // JSON 문자열을 다시 객체로 변환
+        const lastAssignment = JSON.parse(lastAssignmentString);
+        
+        const resultContainer = document.getElementById('ai-result');
+        const recommendedRoleNameElement = document.getElementById('recommended-role-name');
+        const resultContent = document.getElementById('ai-result-content');
+        
+        // 저장된 데이터로 UI 업데이트
+        recommendedRoleNameElement.textContent = `${lastAssignment.username}님에게 추천하는 역할: ${lastAssignment.assigned_role}`;
+        resultContent.innerHTML = `<p><strong>추천 이유:</strong> ${lastAssignment.reason || '추천 이유를 불러올 수 없습니다.'}</p>`;
+        
+        // 결과 컨테이너를 보이게 함
+        resultContainer.classList.remove('hidden');
+        resultContainer.style.display = 'block';
+    }
+}
+
 // 역할 등록 모달 열기
 function openRoleModal() {
     const modal = document.getElementById('role-modal');
