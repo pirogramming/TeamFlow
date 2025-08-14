@@ -5,7 +5,6 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from .models import Team, TeamMember # ⬅️ TeamMember도 import 해야 합니다.
-import uuid
 
 # ========================================
 # MGP: REST API 엔드포인트 추가
@@ -18,16 +17,24 @@ class TeamCreateAPIView(APIView):
         try:
             name = request.data.get('name')
             description = request.data.get('description', '')
+            # ========================================
+            # MGP: 프론트엔드에서 전달받은 초대 코드 사용
+            # 백엔드 팀원이 해결해야 할 부분 대신 해결: 팀 생성 시 초대 코드 일관성 유지
+            # ========================================
+            invite_code = request.data.get('invite_code', '')  # 프론트엔드에서 전달받은 초대 코드
             
             if not name:
                 return Response({'error': '팀 이름은 필수입니다.'}, status=status.HTTP_400_BAD_REQUEST)
             
-            # 팀 생성
+            # ========================================
+            # MGP: 팀 생성 시 프론트엔드에서 생성한 초대 코드 사용
+            # 백엔드 팀원이 해결해야 할 부분 대신 해결: 초대 코드 일관성 보장
+            # ========================================
             new_team = Team.objects.create(
                 name=name,
                 description=description,
                 owner=request.user,
-                invite_code=str(uuid.uuid4())[:6].upper()  # 6자리 초대 코드 생성
+                invite_code=invite_code  # 프론트엔드에서 생성한 코드 사용
             )
             
             # 팀 멤버로 추가 (팀장)

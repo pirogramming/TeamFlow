@@ -181,14 +181,35 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ko-kr'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Seoul'
 
 USE_I18N = True
 
 USE_TZ = True
 
+# ========================================
+# MGP: Django allauth 메시지 한국어 설정 추가
+# 백엔드 팀원이 해결해야 할 부분 대신 해결: 로그인 성공 메시지 한국어 변환
+# ========================================
+LANGUAGES = [
+    ('ko', '한국어'),
+    ('en', 'English'),
+]
+
+LOCALE_PATHS = [
+    BASE_DIR / 'locale',
+]
+
+# Django 메시지 프레임워크 설정 (allauth 메시지 제어)
+MESSAGE_STORAGE = 'django.contrib.messages.storage.fallback.FallbackStorage'
+
+# allauth 메시지 커스터마이징
+ACCOUNT_EMAIL_VERIFICATION = 'none'
+ACCOUNT_EMAIL_REQUIRED = False
+
+# ========================================
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
@@ -232,7 +253,7 @@ ACCOUNT_EMAIL_VERIFICATION = 'none'
 # MGP: allauth 메시지 비활성화 설정 추가
 # 백엔드 팀원이 해결해야 할 부분 대신 해결: 로그인 성공 메시지 제거
 # ========================================
-# allauth 메시지 비활성화
+# allauth 메시지 완전 비활성화
 ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = None
 ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = None
 ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = False
@@ -244,7 +265,7 @@ ACCOUNT_SESSION_REMEMBER = None
 ACCOUNT_SIGNUP_EMAIL_ENTER_TWICE = False
 ACCOUNT_SIGNUP_FORM_CLASS = None
 ACCOUNT_SIGNUP_PASSWORD_ENTER_TWICE = False
-ACCOUNT_SIGNUP_REDIRECT_URL = None
+ACCOUNT_SIGNUP_REDIRECT_URL = '/profile-setup/'
 ACCOUNT_TEMPLATE_EXTENSION = 'html'
 #ACCOUNT_USER_DISPLAY = 'allauth.account.utils.user_display'
 ACCOUNT_USER_MODEL_USERNAME_FIELD = 'username'

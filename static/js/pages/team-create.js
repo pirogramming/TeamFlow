@@ -3,11 +3,21 @@
  * 팀 생성 기능
  */
 
+console.log('team-create.js 파일 로드됨');
+
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM 로드 완료 - 팀 생성 페이지');
+    
     // DOM 요소들
     const createForm = document.getElementById('team-create-form');
     const createBtn = document.getElementById('team-create-btn');
     const tabBtns = document.querySelectorAll('.tab-btn');
+    const inviteCodeEl = document.getElementById('form-invite-code-text');
+    
+    console.log('DOM 요소들 확인:');
+    console.log('- createForm:', createForm);
+    console.log('- createBtn:', createBtn);
+    console.log('- inviteCodeEl:', inviteCodeEl);
     
     // 폼 상태
     let isSubmitting = false;
@@ -17,8 +27,10 @@ document.addEventListener('DOMContentLoaded', function() {
         createBtn.disabled = true;
     }
 
-    // 페이지 로드 시 초대 코드 자동 생성
+    // 페이지 로드 시 초대 코드 미리 생성
+    console.log('초대 코드 생성 시작...');
     generateInviteCode();
+    console.log('초대 코드 생성 완료');
     
     // 탭 전환 이벤트
     tabBtns.forEach(btn => {
@@ -57,12 +69,38 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // 초대 코드 복사 기능
-    const copyBtn = document.getElementById('copy-code-btn');
+    const copyBtn = document.getElementById('form-copy-code-btn');
     if (copyBtn) {
         copyBtn.addEventListener('click', copyInviteCode);
     }
 
-
+    // 초대 코드 생성 함수
+    function generateInviteCode() {
+        console.log('generateInviteCode 함수 호출됨');
+        
+        const inviteCodeEl = document.getElementById('form-invite-code-text');
+        console.log('초대 코드 요소 찾기:', inviteCodeEl);
+        
+        if (!inviteCodeEl) {
+            console.error('초대 코드 요소를 찾을 수 없음: form-invite-code-text');
+            return;
+        }
+        
+        // 6자리 랜덤 코드 생성 (숫자 + 대문자)
+        const chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        let code = '';
+        for (let i = 0; i < 6; i++) {
+            code += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        
+        console.log('생성된 초대 코드:', code);
+        console.log('기존 텍스트:', inviteCodeEl.textContent);
+        
+        inviteCodeEl.textContent = code;
+        
+        console.log('설정된 후 텍스트:', inviteCodeEl.textContent);
+        console.log('초대 코드 생성 완료');
+    }
     
     // 팀 생성 폼 유효성 검사
     function validateCreateForm() {
@@ -112,7 +150,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const formData = new FormData(createForm);
         const data = {
             name: formData.get('name').trim(),
-            description: formData.get('description')?.trim() || ''
+            description: formData.get('description')?.trim() || '',
+            invite_code: document.getElementById('form-invite-code-text').textContent // 초대 코드 추가
         };
         
         // 유효성 검사
@@ -157,16 +196,32 @@ document.addEventListener('DOMContentLoaded', function() {
             if (response.ok) {
                 const result = await response.json();
                 
+                // API 응답 디버깅
+                console.log('팀 생성 API 응답:', result);
+                console.log('초대 코드:', result.invite_code);
+                console.log('팀 이름:', result.team_name);
+                console.log('성공 여부:', result.success);
+                
                 // 생성한 팀을 현재 팀으로 설정
                 if (result.success && result.team_id) {
                     await setCurrentTeam(result.team_id);
                 }
                 
-                // 성공 메시지와 함께 대시보드로 이동
-                showNotification(`"${result.team_name}" 팀이 생성되었습니다!`, 'success');
-                setTimeout(() => {
-                    window.location.href = '/api/dashboard/';
-                }, 1500);
+                // 성공 화면 표시 (프론트엔드에서 생성한 초대 코드 사용)
+                if (result.success) {
+                    console.log('성공 화면 표시');
+                    const generatedCode = document.getElementById('form-invite-code-text').textContent;
+                    showTeamCreateSuccess({
+                        team: {
+                            name: result.team_name,
+                            description: data.description
+                        },
+                        invite_code: generatedCode // 프론트엔드에서 생성한 코드 사용
+                    });
+                } else {
+                    console.log('팀 생성 실패');
+                    showNotification('팀 생성에 실패했습니다.', 'error');
+                }
             } else {
                 const error = await response.json();
                 throw new Error(error.message || '팀 생성에 실패했습니다.');
@@ -192,39 +247,28 @@ document.addEventListener('DOMContentLoaded', function() {
             // 팀 정보 업데이트
             const teamNameEl = document.getElementById('created-team-name');
             const teamDescEl = document.getElementById('created-team-description');
-            const inviteCodeEl = document.getElementById('invite-code-text');
+            const inviteCodeEl = document.getElementById('success-invite-code-text');
             
             if (teamNameEl) teamNameEl.textContent = result.team?.name || '-';
             if (teamDescEl) teamDescEl.textContent = result.team?.description || '-';
             if (inviteCodeEl) inviteCodeEl.textContent = result.invite_code || '------';
+            
+            console.log('팀 생성 성공 - 초대 코드:', result.invite_code);
+            console.log('팀 이름:', result.team?.name);
+            console.log('팀 설명:', result.team?.description);
         }
         
         showNotification('팀이 성공적으로 생성되었습니다!', 'success');
         
-        // 2초 후 대시보드로 이동
+        // 5초 후 대시보드로 이동 (초대 코드를 충분히 볼 수 있도록)
         setTimeout(() => {
             window.location.href = '/api/dashboard/';
-        }, 2000);
+        }, 5000);
     }
     
-    // 초대 코드 생성
-    function generateInviteCode() {
-        const inviteCodeEl = document.getElementById('invite-code-text');
-        if (!inviteCodeEl) return;
-        
-        // 6자리 랜덤 코드 생성 (숫자 + 대문자)
-        const chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        let code = '';
-        for (let i = 0; i < 6; i++) {
-            code += chars.charAt(Math.floor(Math.random() * chars.length));
-        }
-        
-        inviteCodeEl.textContent = code;
-    }
-
     // 초대 코드 복사
     async function copyInviteCode() {
-        const inviteCodeEl = document.getElementById('invite-code-text');
+        const inviteCodeEl = document.getElementById('form-invite-code-text');
         if (!inviteCodeEl) return;
         
         const code = inviteCodeEl.textContent;
@@ -354,4 +398,4 @@ async function setCurrentTeam(teamId) {
 window.navigateToDashboard = navigateToDashboard;
 window.navigateToTeamJoin = navigateToTeamJoin;
 window.createAnotherTeam = createAnotherTeam;
-window.goBack = goBack; 
+window.goBack = goBack;
