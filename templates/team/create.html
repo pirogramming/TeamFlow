@@ -106,11 +106,11 @@ auth-page team-create-page
             <label class="form-label">초대 코드</label>
             <div class="invite-code-container">
               <div class="invite-code-display">
-                <span class="invite-code" id="invite-code-text">------</span>
+                <span class="invite-code" id="form-invite-code-text">------</span>
                 <button
                   type="button"
                   class="copy-btn"
-                  id="copy-code-btn"
+                  id="form-copy-code-btn"
                   title="코드 복사"
                   aria-label="초대 코드 복사"
                 >
@@ -199,7 +199,7 @@ auth-page team-create-page
             <label class="invite-code-label">초대 코드</label>
             <div class="invite-code-container">
               <div class="invite-code-display">
-                <span class="invite-code" id="invite-code-text">------</span>
+                <span class="invite-code" id="success-invite-code-text">------</span>
                 <button
                   type="button"
                   class="copy-btn"
@@ -279,5 +279,9 @@ auth-page team-create-page
 {% endblock %}
 
 {% block extra_js %}
+<script>
+console.log('HTML 템플릿 JavaScript 로드됨');
+console.log('초대 코드 요소 확인:', document.getElementById('form-invite-code-text'));
+</script>
 <script src="{% static 'js/pages/team-create.js' %}"></script>
 {% endblock %}

@@ -48,12 +48,57 @@
 
     <!-- 전역 알림 시스템 -->
     <div id="global-notifications" class="notifications-container">
+      <!-- ======================================== -->
+      <!-- MGP: Django 메시지 시스템 -->
+      <!-- 백엔드 팀원이 해결해야 할 부분 대신 해결: 로그인 성공 메시지 표시 -->
+      <!-- ======================================== -->
+      
+      <!-- Django 메시지 시스템 -->
       {% if messages %}
+        <!-- 디버깅 정보 -->
+        <!-- 현재 URL: {{ request.path }} -->
+        <!-- URL 이름: {{ request.resolver_match.url_name }} -->
+        <!-- 메시지 개수: {{ messages|length }} -->
+        
         {% for message in messages %}
+        <!-- 메시지 내용: {{ message }} -->
+        <!-- 메시지 태그: {{ message.tags }} -->
         <div class="notification notification-{{ message.tags }}" data-auto-hide="true">
-        <span class="notification-text">{{ message }}</span>
+          <!-- ======================================== -->
+          <!-- MGP: allauth 메시지 한국어 변환 및 디자인 개선 -->
+          <!-- 백엔드 팀원이 해결해야 할 부분 대신 해결: 사용자 경험 개선 -->
+          <!-- ======================================== -->
+          {% if "Successfully signed in as" in message %}
+            <!-- 로그인 성공 메시지는 team-setup 페이지에서만 표시 -->
+            {% if request.resolver_match.url_name == 'team-setup' or 'team-setup' in request.path %}
+            <div class="notification-content">
+              <div class="notification-text">
+                <strong>로그인 성공!</strong>
+                <span class="user-email">{{ message|slice:"25:" }} 계정으로 로그인되었습니다</span>
+              </div>
+            </div>
+            {% endif %}
+          {% elif "Successfully signed out" in message %}
+            <div class="notification-content">
+              <div class="notification-text">
+                <strong>로그아웃 완료</strong>
+                <span class="user-email">안전하게 로그아웃되었습니다</span>
+              </div>
+            </div>
+          {% elif "error" in message.tags or "Error" in message %}
+            <div class="notification-content">
+              <div class="notification-text">
+                <strong>오류 발생</strong>
+                <span class="user-email">{{ message }}</span>
+              </div>
+            </div>
+          {% else %}
+            <div class="notification-content">
+              <span class="notification-text">{{ message }}</span>
+            </div>
+          {% endif %}
           <button class="notification-close" type="button" aria-label="닫기">&times;</button>
-      </div>
+        </div>
         {% endfor %}
       {% endif %}
     </div>
