@@ -267,21 +267,42 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // 초대 코드 복사
-    async function copyInviteCode() {
-        const inviteCodeEl = document.getElementById('form-invite-code-text');
-        if (!inviteCodeEl) return;
-        
-        const code = inviteCodeEl.textContent;
-        if (code === '------') return;
-        
+function copyInviteCode() {
+    const inviteCodeEl = document.getElementById('form-invite-code-text');
+    if (!inviteCodeEl) return;
+
+    const code = inviteCodeEl.textContent;
+    if (code === '------') return;
+
+    // HTTPS + localhost에서만 navigator.clipboard 사용 가능
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(code)
+            .then(() => {
+                showNotification('초대 코드가 복사되었습니다!', 'success');
+            })
+            .catch((error) => {
+                console.error('복사 실패:', error);
+                showNotification('복사에 실패했습니다.', 'error');
+            });
+    } else {
+        // HTTP 환경 fallback
+        const textarea = document.createElement('textarea');
+        textarea.value = code;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = 0;
+        document.body.appendChild(textarea);
+        textarea.focus();
+        textarea.select();
         try {
-            await navigator.clipboard.writeText(code);
+            document.execCommand('copy');
             showNotification('초대 코드가 복사되었습니다!', 'success');
         } catch (error) {
             console.error('복사 실패:', error);
             showNotification('복사에 실패했습니다.', 'error');
         }
+        document.body.removeChild(textarea);
     }
+}
     
     // 버튼 로딩 상태 설정
     function setButtonLoading(button, loading) {
