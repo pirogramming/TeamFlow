@@ -43,6 +43,24 @@ document.addEventListener("DOMContentLoaded", function () {
   console.log("✨ TeamFlow 노션 스타일 랜딩 페이지 초기화 완료");
 });
 
+// 스크롤 시 헤더 스타일 변경
+document.addEventListener('DOMContentLoaded', function() {
+    const header = document.querySelector('.landing-header');
+    
+    function handleScroll() {
+        if (window.scrollY > 10) {
+            header.classList.add('scrolled');
+        } else {
+            header.classList.remove('scrolled');
+        }
+    }
+    
+    window.addEventListener('scroll', handleScroll);
+    
+    // 초기 상태 확인
+    handleScroll();
+});
+
 // ========================================
 // 2. 구글 로그인 기능 (노션 스타일)
 // ========================================
