@@ -135,6 +135,57 @@
 /* FullCalendar 커스텀 스타일 */
 #calendar { background: var(--surface); border-radius: var(--radius-12); padding:1.5rem; box-shadow: var(--shadow-1); border:1px solid var(--border); }
 
+/* 세그먼트 컨트롤 스타일 */
+.view-toggle-container {
+    margin-bottom: 1.5rem;
+}
+
+.segment-control {
+    display: inline-flex;
+    background: #f3f4f6;
+    border-radius: 8px;
+    padding: 4px;
+    border: 1px solid #e5e7eb;
+}
+
+.segment-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border: none;
+    background: transparent;
+    color: #6b7280;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.segment-btn svg {
+    width: 16px;
+    height: 16px;
+    stroke: currentColor;
+}
+
+.segment-btn.active {
+    background: white;
+    color: #374151;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.segment-btn:hover:not(.active) {
+    color: #374151;
+    background: rgba(255, 255, 255, 0.5);
+}
+
+/* 기존 뷰 전환 버튼 스타일 제거 */
+.view-toggle-btn {
+    display: none;
+}
+
 /* FullCalendar 헤더 버튼 스타일 */
 .fc .fc-button-primary { background: var(--primary-600); border-color: var(--primary-600); color:#fff; border-radius:6px; padding:.5rem 1rem; font-weight:500; font-size:.875rem; }
 
@@ -387,6 +438,22 @@
     
     #calendar {
         padding: 1rem;
+    }
+    
+    .view-toggle-btn {
+        margin-bottom: 0.75rem;
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+    }
+    
+    .segment-control {
+        padding: 3px;
+    }
+    
+    .segment-btn {
+        padding: 6px 12px;
+        font-size: 13px;
+        gap: 6px;
     }
     
     .fc .fc-toolbar {
