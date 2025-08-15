@@ -5,10 +5,42 @@
 .roles-header .page-title { font-size: 1.5rem; }
 
 /* 탭 네비게이션 */
-.tab-navigation { /* unified via common components */ }
+.tab-navigation { 
+    margin-top: 0.75rem;
+    display: inline-flex;
+    background: #f3f4f6;
+    border-radius: 8px;
+    padding: 4px;
+    border: 1px solid #e5e7eb;
+}
 
 /* 탭 버튼 스타일 - 팀 생성 버튼과 동일한 컬러 */
-.tab-btn { /* unified via common components */ }
+.tab-btn { 
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border: none;
+    background: transparent;
+    color: #6b7280;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.tab-btn.active {
+    background: white;
+    color: #374151;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.tab-btn:hover:not(.active) {
+    color: #374151;
+    background: rgba(255, 255, 255, 0.5);
+}
 
 /* 탭 콘텐츠 */
 .tab-content {

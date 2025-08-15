@@ -271,28 +271,10 @@
 
 .notification-text { font-size:.8rem; font-weight:600; color: var(--danger-600); white-space:nowrap; line-height:1; }
 
-/* === MGP: 부들거림 현상 제거하고 일반 호버 효과로 변경 === */
-.action-button { 
-    display: flex; 
-    align-items: center; 
-    gap: .5rem; 
-    padding: .5rem .75rem; 
-    background: var(--primary-600); 
-    color: #fff; 
-    border: none; 
-    border-radius: var(--radius); 
-    cursor: pointer; 
-    transition: all var(--transition-1); 
-    font-size: .875rem; 
-    font-weight: 600; 
-    position: relative;
-}
 
-.action-button:hover { 
-    background: var(--primary-700); 
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-}
+.action-button { display:flex; align-items:center; gap:.5rem; padding:.5rem .75rem; background: var(--primary-600); color:#fff; border:none; border-radius: var(--radius); cursor:pointer; transition: all var(--transition-1); font-size:.875rem; font-weight:600; }
+
+.action-button:hover { background: var(--primary-700); }
 
 .action-button:active {
     transform: translateY(0);

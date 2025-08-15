@@ -89,17 +89,49 @@ document.addEventListener('DOMContentLoaded', function() {
     function initializeCalendar() {
         if (!calendarEl) return;
 
+        // 세그먼트 컨트롤 이벤트 리스너 설정
+        const segmentBtns = document.querySelectorAll('.segment-btn');
+        segmentBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const viewType = this.dataset.view;
+                
+                // 활성 상태 업데이트
+                segmentBtns.forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                
+                // 캘린더 뷰 변경
+                if (viewType === 'month') {
+                    calendar.changeView('dayGridMonth');
+                } else if (viewType === 'week') {
+                    calendar.changeView('timeGridWeek');
+                }
+            });
+        });
+
         calendar = new FullCalendar.Calendar(calendarEl, {
             initialView: 'dayGridMonth',
             headerToolbar: { 
                 left: 'prev,next today', 
                 center: 'title', 
-                right: 'dayGridMonth' 
+                right: '' // 기존 버튼 제거
             },
             events: `/api/teams/${teamId}/schedule/detail`,
             editable: true,
             timeZone: 'local',
             height: 'auto',
+            datesSet: function(info) {
+                // 뷰 변경 시 세그먼트 컨트롤 자동 업데이트
+                const currentView = info.view.type;
+                const segmentBtns = document.querySelectorAll('.segment-btn');
+                
+                segmentBtns.forEach(btn => {
+                    btn.classList.remove('active');
+                    if ((currentView === 'dayGridMonth' && btn.dataset.view === 'month') ||
+                        (currentView === 'timeGridWeek' && btn.dataset.view === 'week')) {
+                        btn.classList.add('active');
+                    }
+                });
+            },
             eventClick: function(info) {
                 const event = info.event;
                 currentEventId = event.id;

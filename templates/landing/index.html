@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TeamFlow - AI로 시작하는 가장 스마트한 팀플 관리</title>
+    <title>TeamFlow</title>
     
     <!-- Meta Tags -->
     <meta property="og:title" content="TeamFlow - AI로 시작하는 가장 스마트한 팀플 관리">
@@ -22,6 +22,30 @@
 </head>
 
 <body class="landing-page notion-style">
+    <!-- 헤더 -->
+    <header class="landing-header">
+        <div class="header-container">
+            <div class="header-left">
+                <a href="#" class="logo">
+                    <img src="{% static 'images/logos/TeamFlow-icon.png' %}" alt="TeamFlow" class="logo-icon" />
+                    <span class="logo-text">TeamFlow</span>
+                </a>
+            </div>
+            
+            <nav class="header-nav">
+                <a href="#core-values" class="nav-link">핵심 가치</a>
+                <a href="#features" class="nav-link">주요 기능</a>
+                <a href="#use-cases" class="nav-link">활용 사례</a>
+                <a href="#faq" class="nav-link">자주 묻는 질문</a>
+            </nav>
+            
+            <div class="header-right">
+                <a href="{% provider_login_url 'google' %}" class="btn-login">로그인</a>
+                <a href="{% provider_login_url 'google' %}" class="btn-start">구글로 시작하기</a>
+            </div>
+        </div>
+    </header>
+
     <!-- 
         TeamFlow 노션 스타일 랜딩 페이지
         
@@ -36,16 +60,14 @@
     <section class="hero-section">
         <div class="hero-container">
             <div class="hero-content">
-                <div class="hero-badge">
-                    ✨ Google 계정으로 10초 만에 가입하세요
-                </div>
+
                 <h1 class="hero-title">
-                    AI로 시작하는<br />
-                    <span class="highlight-gradient">가장 스마트한 팀플 관리</span>
+                    <span class="highlight-gradient">가장 쉬운 팀플 관리</span>
+                    <br>
+                    <span class="teamflow-brand">TeamFlow</span>
                 </h1>
                 <p class="hero-description">
-                    AI 역할 분담부터 실시간 진행 상황까지, 대학생 팀 프로젝트의 모든 것을 한 곳에서 관리하세요.<br />
-                    복잡한 툴은 이제 그만. TeamFlow는 오직 팀플에만 집중합니다.
+                    대학생 팀플의 모든 것.
                 </p>
                 <div class="hero-cta">
                     <a href="{% provider_login_url 'google' %}" class="btn-primary-large">
@@ -61,12 +83,14 @@
                     <span class="trust-text">신용카드 정보 없이도 바로 시작할 수 있습니다</span>
                 </div>
             </div>
-
+            <div class="hero-image">
+                <img src="{% static 'images/characters/character4-Photoroom.png' %}" alt="TeamFlow 캐릭터" class="hero-character" />
+            </div>
         </div>
     </section>
 
     <!-- 핵심 가치 소개 섹션 -->
-    <section class="core-values">
+    <section id="core-values" class="core-values">
         <div class="container">
             <div class="section-header">
                 <h2 class="section-title">모두가 만족하는 팀플, 불가능하지 않아요</h2>
@@ -107,7 +131,7 @@
     </section>
 
     <!-- AI 역할분담 기능 상세 -->
-    <section class="feature-detail">
+    <section id="features" class="feature-detail">
         <div class="container">
             <div class="feature-content left-content">
                 <div class="feature-visual">
@@ -267,7 +291,7 @@
     </section>
 
     <!-- 대학생 활용 사례 -->
-    <section class="use-cases">
+    <section id="use-cases" class="use-cases">
         <div class="container">
             <div class="section-header">
                 <h2 class="section-title">이런 팀에게 TeamFlow가 필요해요</h2>
@@ -491,7 +515,7 @@
     </section>
 
     <!-- FAQ 섹션 -->
-    <section class="faq-section">
+    <section id="faq" class="faq-section">
         <div class="container">
             <div class="section-header">
                 <h2 class="section-title">자주 묻는 질문</h2>

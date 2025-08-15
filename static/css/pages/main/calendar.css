@@ -14,13 +14,46 @@
 .calendar-header .page-title { font-size: 1.5rem; }
 
 /* 탭 네비게이션 */
-.tab-navigation { /* unified via common components */ margin-top: .75rem; }
+.tab-navigation { 
+    margin-top: 0.75rem;
+    display: inline-flex;
+    background: #f3f4f6;
+    border-radius: 8px;
+    padding: 4px;
+    border: 1px solid #e5e7eb;
+}
 
-.tab-btn { /* unified via common components */ display:flex; align-items:center; gap:.375rem; }
+.tab-btn { 
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border: none;
+    background: transparent;
+    color: #6b7280;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
 
 .tab-btn svg {
     width: 16px;
     height: 16px;
+    stroke: currentColor;
+}
+
+.tab-btn.active {
+    background: white;
+    color: #374151;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.tab-btn:hover:not(.active) {
+    color: #374151;
+    background: rgba(255, 255, 255, 0.5);
 }
 
 /* 탭 컨텐츠 */
@@ -46,9 +79,33 @@
 
 .btn:hover { background: var(--surface-2); border-color: var(--primary-600); }
 
-.btn-primary { background: var(--primary-600); color:#fff; border-color: var(--primary-600); }
+.btn.btn-primary { background: var(--primary-600); color:#fff; border-color: var(--primary-600); }
 
-.btn-primary:hover { background: var(--primary-700); border-color: var(--primary-700); transform: translateY(-1px); }
+.btn.btn-primary:hover { background: var(--primary-700); border-color: var(--primary-700); transform: translateY(-1px); }
+
+/* btn-primary 독립 클래스 - 전체 시스템과 일치하도록 수정 */
+.btn-primary { 
+  display: inline-flex; 
+  align-items: center; 
+  justify-content: center; 
+  padding: 0.75rem 1.5rem; 
+  background: var(--primary-600); 
+  color: #fff; 
+  font-weight: 600; 
+  font-size: 0.875rem; 
+  border-radius: var(--radius); 
+  border: none; 
+  cursor: pointer; 
+  transition: all 0.2s ease; 
+  white-space: nowrap; 
+  gap: 0.5rem; 
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
+}
+.btn-primary:hover { 
+  background: var(--primary-700); 
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
+}
 
 /* 일정 조율 섹션 */
 #when2meet-grid-container { background: var(--surface); border-radius: var(--radius-12); padding:1.5rem; margin-bottom:2rem; box-shadow: var(--shadow-1); border:1px solid var(--border); }
@@ -135,6 +192,57 @@
 /* FullCalendar 커스텀 스타일 */
 #calendar { background: var(--surface); border-radius: var(--radius-12); padding:1.5rem; box-shadow: var(--shadow-1); border:1px solid var(--border); }
 
+/* 세그먼트 컨트롤 스타일 */
+.view-toggle-container {
+    margin-bottom: 1.5rem;
+}
+
+.segment-control {
+    display: inline-flex;
+    background: #f3f4f6;
+    border-radius: 8px;
+    padding: 4px;
+    border: 1px solid #e5e7eb;
+}
+
+.segment-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border: none;
+    background: transparent;
+    color: #6b7280;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.segment-btn svg {
+    width: 16px;
+    height: 16px;
+    stroke: currentColor;
+}
+
+.segment-btn.active {
+    background: white;
+    color: #374151;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.segment-btn:hover:not(.active) {
+    color: #374151;
+    background: rgba(255, 255, 255, 0.5);
+}
+
+/* 기존 뷰 전환 버튼 스타일 제거 */
+.view-toggle-btn {
+    display: none;
+}
+
 /* FullCalendar 헤더 버튼 스타일 */
 .fc .fc-button-primary { background: var(--primary-600); border-color: var(--primary-600); color:#fff; border-radius:6px; padding:.5rem 1rem; font-weight:500; font-size:.875rem; }
 
@@ -167,20 +275,7 @@
     color: #374151;
 }
 
-/* 일정 저장 버튼 특별 스타일 */
-#save-vote-btn {
-    background: linear-gradient(135deg, #2383e2, #1a6bc9);
-    border: none;
-    color: white;
-    font-weight: 600;
-    padding: 0.75rem 1.5rem; /* .btn과 동일한 패딩으로 조정 */
-    box-shadow: 0 2px 4px rgba(35, 131, 226, 0.2);
-}
-
-#save-vote-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(35, 131, 226, 0.3);
-}
+/* 일정 저장 버튼 특별 스타일 제거 - btn-primary 클래스 사용 */
 
 /* 모달 스타일 */
 .modal-overlay {
@@ -350,18 +445,19 @@
     }
     
     .tab-navigation {
-        padding: 0.2rem;
+        padding: 3px;
     }
     
     .tab-btn {
-        padding: 0.4rem 0.75rem;
-        font-size: 0.75rem;
-        gap: 0.25rem;
+        padding: 6px 12px;
+        font-size: 13px;
+        gap: 6px;
     }
     
     .tab-btn svg {
         width: 14px;
         height: 14px;
+        stroke: currentColor;
     }
     
     .tab-header {
@@ -387,6 +483,22 @@
     
     #calendar {
         padding: 1rem;
+    }
+    
+    .view-toggle-btn {
+        margin-bottom: 0.75rem;
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+    }
+    
+    .segment-control {
+        padding: 3px;
+    }
+    
+    .segment-btn {
+        padding: 6px 12px;
+        font-size: 13px;
+        gap: 6px;
     }
     
     .fc .fc-toolbar {

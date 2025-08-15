@@ -9,7 +9,6 @@
         <!-- 로고 섹션 -->
         <div class="sidebar-logo">
             <h1 class="logo">TeamFlow</h1>
-            <div class="logo-subtitle">미니로그</div>
         </div>
         
         <!-- 상단 네비게이션 -->
@@ -39,7 +38,7 @@
                 <li class="nav-item {% if request.resolver_match.url_name == 'tasks-page' %}active{% endif %}">
                     <a href="{% if team %}{% url 'tasks-page' team.id %}{% else %}#{% endif %}" class="nav-link">
                         <svg class="nav-icon" fill="currentColor" viewBox="0 0 24 24" width="20" height="20">
-                            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7l-2-2 1.41-1.41L10 17.17l7.59-7.59L19 11l-9 9z"/>
+                            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
                         </svg>
                         <span class="nav-text">작업</span>
                     </a>

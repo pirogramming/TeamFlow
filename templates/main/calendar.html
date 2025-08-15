@@ -49,13 +49,32 @@
     <div id="schedule-tab" class="tab-panel active">
       <div class="tab-header">
         <h2>팀 일정</h2>
-        <button id="add-schedule-btn" class="btn btn-primary">
+        <button id="add-schedule-btn" class="btn-primary">
           <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
           </svg>
           새 일정 추가
         </button>
       </div>
+      
+      <!-- 뷰 전환 세그먼트 컨트롤 -->
+      <div class="view-toggle-container">
+        <div class="segment-control">
+          <button class="segment-btn active" data-view="month">
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+            </svg>
+            월간 보기
+          </button>
+          <button class="segment-btn" data-view="week">
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            주간 보기
+          </button>
+        </div>
+      </div>
+      
       <div id="calendar"></div>
     </div>
 
@@ -63,7 +82,7 @@
     <div id="meeting-tab" class="tab-panel">
       <div class="tab-header">
         <h2>팀 미팅 시간 조율</h2>
-        <button id="save-vote-btn" class="btn btn-primary">
+        <button id="save-vote-btn" class="btn-primary">
           <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
           </svg>
@@ -106,7 +125,7 @@
         </div>
         <div class="modal-actions">
           <button type="button" id="cancel-schedule-btn" class="btn btn-secondary">취소</button>
-          <button type="submit" class="btn btn-primary">일정 추가</button>
+          <button type="submit" class="btn-primary">일정 추가</button>
         </div>
       </form>
     </div>

@@ -13,6 +13,146 @@
   overflow-x: hidden;
 }
 
+/* ========================================
+   1-1. 헤더 스타일
+   ======================================== */
+
+.landing-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid transparent;
+  z-index: 1000;
+  transition: all 0.3s ease;
+}
+
+.landing-header.scrolled {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.98);
+}
+
+.header-container {
+  width: 100%;
+  padding: 0 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+  gap: 1rem;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+  color: #1A1A1A;
+  font-weight: 700;
+  font-size: 1.25rem;
+}
+
+.logo-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+}
+
+.logo-text {
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  font-size: 1.5rem;
+}
+
+.header-nav {
+  display: flex;
+  align-items: center;
+  gap: 2.5rem;
+  flex: 1;
+  justify-content: center;
+  margin: 0 1rem;
+}
+
+.nav-link {
+  text-decoration: none;
+  color: #666;
+  font-weight: 500;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+  padding: 0.5rem 0;
+  position: relative;
+}
+
+.nav-link:hover {
+  color: #2383E2;
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: #2383E2;
+  transition: width 0.2s ease;
+}
+
+.nav-link:hover::after {
+  width: 100%;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-shrink: 0;
+}
+
+.btn-login {
+  padding: 0.5rem 1rem;
+  border: 1px solid #E5E7EB;
+  border-radius: 0.5rem;
+  background: #FFFFFF;
+  color: #1A1A1A;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+}
+
+.btn-login:hover {
+  background: #F8F9FA;
+  border-color: #D1D5DB;
+}
+
+.btn-start {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 0.5rem;
+  background: #2383E2;
+  color: #FFFFFF;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(35, 131, 226, 0.2);
+}
+
+.btn-start:hover {
+  background: #1A6BC9;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(35, 131, 226, 0.3);
+}
+
 .container {
   max-width: 1200px;
   margin: 0 auto;
@@ -112,16 +252,12 @@
    ======================================== */
 
 .hero-section {
-  min-height: 100vh;
+  min-height: 80vh;
   display: flex;
   align-items: center;
-  padding: 6rem 0;
-  background: 
-    linear-gradient(135deg, rgba(248, 249, 250, 0.9) 0%, rgba(255, 255, 255, 0.85) 100%),
-    url('/static/images/characters/character4.png');
-  background-size: cover;
-  background-position: center right;
-  background-repeat: no-repeat;
+  padding: 4rem 0;
+  margin-top: 64px;
+  background: linear-gradient(135deg, rgba(248, 249, 250, 0.9) 0%, rgba(255, 255, 255, 0.85) 100%);
   position: relative;
 }
 
@@ -132,17 +268,19 @@
   padding: 0 2rem;
   display: flex;
   align-items: center;
-  justify-content: flex-start;
-  min-height: 80vh;
+  justify-content: space-between;
+  min-height: 60vh;
+  gap: 4rem;
 }
 
 .hero-content {
   display: flex;
   flex-direction: column;
   gap: 2rem;
-  max-width: 600px;
+  max-width: 500px;
   z-index: 2;
   position: relative;
+  flex: 1;
 }
 
 .hero-badge {
@@ -159,7 +297,7 @@
 }
 
 .hero-title {
-  font-size: 4rem;
+  font-size: 3.5rem;
   font-weight: 800;
   line-height: 1.1;
   color: #1A1A1A;
@@ -172,6 +310,14 @@
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  font-size: 2.5rem;
+}
+
+.teamflow-brand {
+  font-size: 5rem;
+  color: #1A1A1A;
+  font-weight: 900;
+  letter-spacing: -0.02em;
 }
 
 .hero-description {
@@ -197,6 +343,25 @@
   font-size: 0.875rem;
   color: #999;
   font-weight: 400;
+}
+
+.hero-image {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  max-width: 500px;
+}
+
+.hero-character {
+  max-width: 150%;
+  height: auto;
+  border-radius: 1rem;
+  transition: transform 0.3s ease;
+}
+
+.hero-character:hover {
+  transform: scale(1.05);
 }
 
 .hero-visual {
@@ -938,6 +1103,30 @@
     padding: 0 1rem;
   }
 
+  /* 헤더 모바일 */
+  .header-container {
+    padding: 0 1rem;
+    height: 56px;
+  }
+
+  .header-nav {
+    display: none;
+  }
+
+  .logo-text {
+    font-size: 1.125rem;
+  }
+
+  .btn-login,
+  .btn-start {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.8125rem;
+  }
+
+  .hero-section {
+    margin-top: 56px;
+  }
+
   /* 공통 섹션 패딩 조정 */
   .core-values,
   .feature-detail,
@@ -970,9 +1159,19 @@
   }
 
   .hero-container {
-    grid-template-columns: 1fr;
+    flex-direction: column-reverse;
     gap: 3rem;
     text-align: center;
+    padding: 0 1rem;
+  }
+
+  .hero-content {
+    max-width: 100%;
+  }
+
+  .hero-image {
+    max-width: 300px;
+    margin: 0 auto;
   }
 
   .hero-title {
@@ -1119,6 +1318,20 @@
 
   .section-title {
     font-size: 2.5rem;
+  }
+
+  .hero-container {
+    flex-direction: column;
+    text-align: center;
+    gap: 3rem;
+  }
+
+  .hero-content {
+    max-width: 100%;
+  }
+
+  .hero-image {
+    max-width: 400px;
   }
 }
 

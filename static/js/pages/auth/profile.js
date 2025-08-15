@@ -7,7 +7,7 @@ class ProfileManager {
     constructor() {
         this.form = document.getElementById('profile-form');
         this.submitBtn = document.getElementById('save-btn');
-        this.cancelBtn = document.getElementById('cancel-btn');
+        this.restoreBtn = document.getElementById('restore-btn');
         this.logoutBtn = document.getElementById('logout-btn');
         this.loadingElement = document.getElementById('profile-loading');
         this.messageElement = document.getElementById('profile-message');
@@ -27,8 +27,8 @@ class ProfileManager {
         // 폼 제출 이벤트
         this.form.addEventListener('submit', (e) => this.handleSubmit(e));
         
-        // 취소 버튼 이벤트
-        this.cancelBtn.addEventListener('click', () => this.resetForm());
+        // 복구하기 버튼 이벤트
+        this.restoreBtn.addEventListener('click', () => this.restoreForm());
 
         // 로그아웃 버튼 이벤트
         if (this.logoutBtn) {
@@ -38,10 +38,10 @@ class ProfileManager {
         // 입력 필드 변경 감지
         this.form.addEventListener('input', () => this.checkFormChanges());
         
-        // 키보드 이벤트 (Escape로 취소)
+        // 키보드 이벤트 (Escape로 복구)
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
-                this.resetForm();
+                this.restoreForm();
             }
         });
     }
@@ -209,7 +209,7 @@ class ProfileManager {
                     displayName.textContent = data.name;
                 }
                 
-                // 버튼 상태 리셋
+                // 버튼 상태 업데이트
                 this.checkFormChanges();
                 
                 // 리다이렉트 제거 - 현재 페이지에서 그대로 유지
@@ -292,13 +292,13 @@ class ProfileManager {
             currentData.specialization !== (this.originalData.specialization || '');
         
         this.submitBtn.disabled = !hasChanges;
-        this.cancelBtn.disabled = !hasChanges;
+        this.restoreBtn.disabled = !hasChanges;
     }
 
     /**
-     * 폼 리셋
+     * 폼 복구 (원래 데이터로 되돌리기)
      */
-    resetForm() {
+    restoreForm() {
         this.populateForm(this.originalData);
         this.checkFormChanges();
         this.hideMessage();
@@ -320,7 +320,7 @@ class ProfileManager {
             `;
         } else {
             this.submitBtn.innerHTML = `
-                <svg class="profile-btn-icon" fill="currentColor" viewBox="0 0 24 24">
+                <svg class="btn-icon" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
                 </svg>
                 저장하기
