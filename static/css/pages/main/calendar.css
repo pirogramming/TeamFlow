@@ -14,13 +14,46 @@
 .calendar-header .page-title { font-size: 1.5rem; }
 
 /* 탭 네비게이션 */
-.tab-navigation { /* unified via common components */ margin-top: .75rem; }
+.tab-navigation { 
+    margin-top: 0.75rem;
+    display: inline-flex;
+    background: #f3f4f6;
+    border-radius: 8px;
+    padding: 4px;
+    border: 1px solid #e5e7eb;
+}
 
-.tab-btn { /* unified via common components */ display:flex; align-items:center; gap:.375rem; }
+.tab-btn { 
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border: none;
+    background: transparent;
+    color: #6b7280;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
 
 .tab-btn svg {
     width: 16px;
     height: 16px;
+    stroke: currentColor;
+}
+
+.tab-btn.active {
+    background: white;
+    color: #374151;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.tab-btn:hover:not(.active) {
+    color: #374151;
+    background: rgba(255, 255, 255, 0.5);
 }
 
 /* 탭 컨텐츠 */
@@ -412,18 +445,19 @@
     }
     
     .tab-navigation {
-        padding: 0.2rem;
+        padding: 3px;
     }
     
     .tab-btn {
-        padding: 0.4rem 0.75rem;
-        font-size: 0.75rem;
-        gap: 0.25rem;
+        padding: 6px 12px;
+        font-size: 13px;
+        gap: 6px;
     }
     
     .tab-btn svg {
         width: 14px;
         height: 14px;
+        stroke: currentColor;
     }
     
     .tab-header {
