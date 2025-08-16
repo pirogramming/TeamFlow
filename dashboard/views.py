@@ -74,12 +74,17 @@ class DashboardAPIView(APIView):
             personal_progress = int((personal_completed_count / personal_tasks_count) * 100) if personal_tasks_count > 0 else 0
 
             # 7. 마감 임박 작업 수 계산 (팀 작업 + 개인 작업)
+            from django.db.models import Q
+            my_tasks = Task.objects.filter(
+                Q(team_id=team_id) & (Q(assignee=request.user) | Q(assignees=request.user))
+            ).distinct().order_by('-created_at')
+
             deadline_imminent_count = 0
             if team:
-                deadline_threshold = date.today() + timedelta(days=3)
+                deadline_threshold = date.today() + timedelta(days=1)
                 
                 # 팀 작업 + 개인 작업 중 완료되지 않은 마감 임박 작업 수
-                imminent_tasks = Task.objects.filter(
+                imminent_tasks = my_tasks.filter(
                     team=team,
                     due_date__isnull=False,
                     due_date__lte=deadline_threshold,
