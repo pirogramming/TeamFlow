@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // AOS (Animate On Scroll) 초기화
   if (typeof AOS !== "undefined") {
     AOS.init({
-      duration: 400,
+      duration: 300,
       easing: "ease-out-cubic",
       once: true,
       offset: 80,
@@ -30,6 +30,9 @@ document.addEventListener("DOMContentLoaded", function () {
   if (typeof gsap !== "undefined" && typeof ScrollTrigger !== "undefined") {
     gsap.registerPlugin(ScrollTrigger);
   }
+
+  // 스크롤 애니메이션 관리자 초기화
+  initScrollAnimations();
 
   // 초기 애니메이션 실행
   initNotionStyleAnimations();
@@ -624,6 +627,204 @@ window.startGoogleAuth = startGoogleAuth;
 window.scrollToSection = scrollToSection;
 window.showNotification = showNotification;
 
+// ========================================
+// 8. 스크롤 애니메이션 함수들
+// ========================================
+
+/**
+ * 스크롤 애니메이션 시스템 초기화
+ */
+function initScrollAnimations() {
+  // 스크롤 진행률 표시기 추가
+  addScrollProgressBar();
+  
+  // Intersection Observer 설정
+  setupIntersectionObserver();
+  
+  // 패럴랙스 효과 설정
+  setupParallaxEffects();
+  
+  // 호버 애니메이션 설정
+  setupHoverAnimations();
+  
+  // 스크롤 이벤트 최적화
+  setupScrollOptimization();
+}
+
+/**
+ * 스크롤 진행률 표시기 추가
+ */
+function addScrollProgressBar() {
+  const progressBar = document.createElement('div');
+  progressBar.className = 'scroll-progress';
+  document.body.appendChild(progressBar);
+  
+  // 스크롤 진행률 업데이트
+  window.addEventListener('scroll', () => {
+    const scrollTop = window.pageYOffset;
+    const docHeight = document.body.scrollHeight - window.innerHeight;
+    const scrollPercent = (scrollTop / docHeight) * 100;
+    progressBar.style.width = scrollPercent + '%';
+  });
+}
+
+/**
+ * Intersection Observer 설정
+ */
+function setupIntersectionObserver() {
+  const observerOptions = {
+    threshold: 0.1,
+    rootMargin: '0px 0px -50px 0px'
+  };
+  
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const element = entry.target;
+        
+        // 애니메이션 클래스 추가
+        if (element.classList.contains('animate-on-scroll')) {
+          element.classList.add('animate-active');
+        }
+        
+        // 패럴랙스 요소 활성화
+        if (element.classList.contains('parallax-slow') || 
+            element.classList.contains('parallax-fast')) {
+          element.classList.add('parallax-active');
+        }
+        
+        // 한 번만 실행되도록 관찰 해제
+        observer.unobserve(element);
+      }
+    });
+  }, observerOptions);
+  
+  // 애니메이션 대상 요소들 관찰 시작
+  const animateElements = document.querySelectorAll('.animate-on-scroll, .parallax-slow, .parallax-fast');
+  animateElements.forEach(element => {
+    observer.observe(element);
+  });
+}
+
+/**
+ * 패럴랙스 효과 설정
+ */
+function setupParallaxEffects() {
+  let ticking = false;
+  
+  function updateParallax() {
+    const scrolled = window.pageYOffset;
+    const parallaxElements = document.querySelectorAll('.parallax-slow, .parallax-fast');
+    
+    parallaxElements.forEach(element => {
+      const speed = element.classList.contains('parallax-slow') ? 0.3 : 0.8;
+      const yPos = -(scrolled * speed);
+      element.style.transform = `translateY(${yPos}px)`;
+    });
+    
+    ticking = false;
+  }
+  
+  function requestTick() {
+    if (!ticking) {
+      requestAnimationFrame(updateParallax);
+      requestAnimationFrame(updateParallax);
+      ticking = true;
+    }
+  }
+  
+  window.addEventListener('scroll', requestTick, { passive: true });
+}
+
+/**
+ * 호버 애니메이션 설정
+ */
+function setupHoverAnimations() {
+  // 버튼 호버 효과
+  const buttons = document.querySelectorAll('.btn-primary-large, .btn-secondary-large, .btn-login, .btn-start');
+  buttons.forEach(button => {
+    button.addEventListener('mouseenter', function() {
+      if (typeof gsap !== "undefined") {
+        gsap.to(this, {
+          scale: 1.05,
+          duration: 0.15,
+          ease: "power2.out"
+        });
+      }
+    });
+    
+    button.addEventListener('mouseleave', function() {
+      if (typeof gsap !== "undefined") {
+        gsap.to(this, {
+          scale: 1,
+          duration: 0.15,
+          ease: "power2.out"
+        });
+      }
+    });
+  });
+  
+  // 이미지 호버 효과
+  const images = document.querySelectorAll('.hover-scale');
+  images.forEach(image => {
+    image.addEventListener('mouseenter', function() {
+      if (typeof gsap !== "undefined") {
+        gsap.to(this, {
+          scale: 1.05,
+          duration: 0.2,
+          ease: "power2.out"
+        });
+      }
+    });
+    
+    image.addEventListener('mouseleave', function() {
+      if (typeof gsap !== "undefined") {
+        gsap.to(this, {
+          scale: 1,
+          duration: 0.2,
+          ease: "power2.out"
+        });
+      }
+    });
+  });
+}
+
+/**
+ * 스크롤 이벤트 최적화
+ */
+function setupScrollOptimization() {
+  let scrollTimeout;
+  
+  function handleScroll() {
+    // 스크롤 중일 때 헤더 스타일 변경
+    const header = document.querySelector('.landing-header');
+    if (header) {
+      header.classList.add('scrolling');
+      
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        header.classList.remove('scrolling');
+      }, 150);
+    }
+  }
+  
+  // 스로틀링된 스크롤 이벤트
+  let ticking = false;
+  function updateScroll() {
+    handleScroll();
+    ticking = false;
+  }
+  
+  function requestTick() {
+    if (!ticking) {
+      requestAnimationFrame(updateScroll);
+      ticking = true;
+    }
+  }
+  
+  window.addEventListener('scroll', requestTick, { passive: true });
+}
+
 // 디버깅용 함수들 (개발 환경에서만)
 if (window.APP_CONFIG && window.APP_CONFIG.DEBUG) {
   window.teamflowDebug = {
@@ -631,6 +832,7 @@ if (window.APP_CONFIG && window.APP_CONFIG.DEBUG) {
     refreshScrollTrigger: () => ScrollTrigger.refresh(),
     refreshAOS: () => AOS.refresh(),
     statsCounter: initStatsCounter,
+    scrollAnimations: initScrollAnimations,
   };
 }
 

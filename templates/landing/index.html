@@ -63,28 +63,27 @@
     <section id="hero" class="hero-section">
         <div class="hero-container">
             <div class="hero-content">
-
-                <h1 class="hero-title">
+                <h1 class="hero-title animate-on-scroll">
                     <span class="highlight-gradient">가장 쉬운 팀플 관리</span>
                     <br>
                     <span class="teamflow-brand">TeamFlow</span>
                 </h1>
-                <p class="hero-description">
+                <p class="hero-description animate-on-scroll animate-delay-200">
                     흐름을 잇다, 팀플을 잇다.
                 </p>
-                <div class="hero-cta">
-                    <a href="{% provider_login_url 'google' %}" class="btn-primary-large">
+                <div class="hero-cta animate-on-scroll animate-delay-400">
+                    <a href="{% provider_login_url 'google' %}" class="btn-primary-large hover-lift">
                         <img src="{% static 'images/icons/google-icon.svg' %}" alt="Google" />
                         <span>구글로 시작하기</span>
                         <span class="btn-arrow">→</span>
                     </a>
-                    <a href="{% provider_login_url 'google' %}" class="btn-secondary-large">
+                    <a href="{% provider_login_url 'google' %}" class="btn-secondary-large hover-lift">
                         무료로 시작하기
                     </a>
                 </div>
             </div>
             <div class="hero-image">
-                <img src="{% static 'images/characters/character4-Photoroom.png' %}" alt="TeamFlow 캐릭터" class="hero-character" />
+                <img src="{% static 'images/characters/character4-Photoroom.png' %}" alt="TeamFlow 캐릭터" class="hero-character parallax-slow" />
             </div>
         </div>
     </section>
@@ -93,18 +92,18 @@
     <section class="features-section notion-style">
         <div class="container">
             <div class="section-header">
-                <h2 class="section-title">대학생 팀플에 최적화된 기능들</h2>
-                <p class="section-description">
+                <h2 class="section-title animate-on-scroll">대학생 팀플에 최적화된 기능들</h2>
+                <p class="section-description animate-on-scroll animate-delay-200">
                     복잡한 도구들은 이제 그만. 팀플에만 집중한 깔끔한 기능들을 만나보세요.
                 </p>
             </div>
 
             <!-- 1. 팀 생성/참여 -->
-            <div id="feature-01" class="feature-item">
+            <div id="feature-01" class="feature-item animate-on-scroll">
                 <div class="feature-content">
                     <div class="feature-image-container">
                         <div class="image-placeholder team-creation">
-                            <img src="{% static 'images/screenshots/team-creation.png' %}" alt="팀 생성 화면" class="feature-screenshot" />
+                            <img src="{% static 'images/screenshots/team-creation.png' %}" alt="팀 생성 화면" class="feature-screenshot hover-scale" />
                         </div>
                     </div>
                     <div class="feature-text">
@@ -124,7 +123,7 @@
             </div>
 
             <!-- 2. 대시보드 -->
-            <div id="feature-02" class="feature-item reverse">
+            <div id="feature-02" class="feature-item reverse animate-on-scroll animate-delay-200">
                 <div class="feature-content">
                     <div class="feature-text">
                         <div class="feature-number">02</div>
@@ -141,18 +140,18 @@
                     </div>
                     <div class="feature-image-container">
                         <div class="image-placeholder dashboard">
-                            <img src="{% static 'images/screenshots/dashboard.png' %}" alt="대시보드 화면" class="feature-screenshot" />
+                            <img src="{% static 'images/screenshots/dashboard.png' %}" alt="대시보드 화면" class="feature-screenshot hover-scale" />
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- 3. 일정 관리 -->
-            <div id="feature-03" class="feature-item">
+            <div id="feature-03" class="feature-item animate-on-scroll animate-delay-400">
                 <div class="feature-content">
                     <div class="feature-image-container">
                         <div class="image-placeholder calendar">
-                            <img src="{% static 'images/screenshots/calendar.png' %}" alt="일정 관리 화면" class="feature-screenshot" />
+                            <img src="{% static 'images/screenshots/calendar.png' %}" alt="일정 관리 화면" class="feature-screenshot hover-scale" />
                         </div>
                     </div>
                     <div class="feature-text">
@@ -172,7 +171,7 @@
             </div>
 
             <!-- 4. 작업 관리 -->
-            <div id="feature-04" class="feature-item reverse">
+            <div id="feature-04" class="feature-item reverse animate-on-scroll animate-delay-600">
                 <div class="feature-content">
                     <div class="feature-text">
                         <div class="feature-number">04</div>
@@ -189,18 +188,18 @@
                     </div>
                     <div class="feature-image-container">
                         <div class="image-placeholder tasks">
-                            <img src="{% static 'images/screenshots/tasks.png' %}" alt="작업 관리 화면" class="feature-screenshot" />
+                            <img src="{% static 'images/screenshots/tasks.png' %}" alt="작업 관리 화면" class="feature-screenshot hover-scale" />
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- 5. 역할 관리 -->
-            <div id="feature-05" class="feature-item">
+            <div id="feature-05" class="feature-item animate-on-scroll animate-delay-800">
                 <div class="feature-content">
                     <div class="feature-image-container">
                         <div class="image-placeholder roles">
-                            <img src="{% static 'images/screenshots/roles.png' %}" alt="AI 역할 배정 화면" class="feature-screenshot" />
+                            <img src="{% static 'images/screenshots/roles.png' %}" alt="AI 역할 배정 화면" class="feature-screenshot hover-scale" />
                         </div>
                     </div>
                     <div class="feature-text">
@@ -214,13 +213,14 @@
                             <span class="tag">AI 추천</span>
                             <span class="tag">수동 배정</span>
                             <span class="tag">갈등 해결</span>
+                            <span class="tag">갈등 해결</span>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- 6. 자료 공유 -->
-            <div id="feature-06" class="feature-item reverse">
+            <div id="feature-06" class="feature-item reverse animate-on-scroll animate-delay-1000">
                 <div class="feature-content">
                     <div class="feature-text">
                         <div class="feature-number">06</div>
@@ -237,7 +237,7 @@
                     </div>
                     <div class="feature-image-container">
                         <div class="image-placeholder files">
-                            <img src="{% static 'images/screenshots/files.png' %}" alt="자료 공유 화면" class="feature-screenshot" />
+                            <img src="{% static 'images/screenshots/files.png' %}" alt="자료 공유 화면" class="feature-screenshot hover-scale" />
                         </div>
                     </div>
                 </div>
@@ -249,18 +249,18 @@
     <section id="how-it-works" class="how-it-works-section notion-style">
         <div class="container">
             <div class="section-header">
-                <h2 class="section-title">3단계로 시작하는 팀플</h2>
-                <p class="section-description">
+                <h2 class="section-title animate-on-scroll">3단계로 시작하는 팀플</h2>
+                <p class="section-description animate-on-scroll animate-delay-200">
                     복잡한 설정 없이 바로 팀 프로젝트를 시작할 수 있습니다
                 </p>
             </div>
 
             <div class="steps-container">
-                <div class="step-item">
+                <div class="step-item animate-on-scroll">
                     <div class="step-visual">
                         <div class="step-number">1</div>
                         <div class="step-image">
-                            <img src="{% static 'images/screenshots/profile-setup.png' %}" alt="구글 로그인" class="step-screenshot" />
+                            <img src="{% static 'images/screenshots/profile-setup.png' %}" alt="구글 로그인" class="step-screenshot hover-scale" />
                         </div>
                     </div>
                     <div class="step-content">
@@ -269,13 +269,13 @@
                     </div>
                 </div>
 
-                <div class="step-arrow">→</div>
+                <div class="step-arrow animate-on-scroll animate-delay-300">→</div>
 
-                <div class="step-item">
+                <div class="step-item animate-on-scroll animate-delay-400">
                     <div class="step-visual">
                         <div class="step-number">2</div>
                         <div class="step-image">
-                            <img src="{% static 'images/screenshots/team-join.png' %}" alt="팀 생성/참여" class="step-screenshot" />
+                            <img src="{% static 'images/screenshots/team-join.png' %}" alt="팀 생성/참여" class="step-screenshot hover-scale" />
                         </div>
                     </div>
                     <div class="step-content">
@@ -284,13 +284,13 @@
                     </div>
                 </div>
 
-                <div class="step-arrow">→</div>
+                <div class="step-arrow animate-on-scroll animate-delay-700">→</div>
 
-                <div class="step-item">
+                <div class="step-item animate-on-scroll animate-delay-800">
                     <div class="step-visual">
                         <div class="step-number">3</div>
                         <div class="step-image">
-                            <img src="{% static 'images/screenshots/ai-roles.png' %}" alt="AI 역할분담" class="step-screenshot" />
+                            <img src="{% static 'images/screenshots/ai-roles.png' %}" alt="AI 역할분담" class="step-screenshot hover-scale" />
                         </div>
                     </div>
                     <div class="step-content">
@@ -310,21 +310,21 @@
     <section class="final-cta">
         <div class="container">
             <div class="cta-content">
-                <div class="cta-visual">
+                <div class="cta-visual animate-on-scroll">
                     <div class="cta-emoji">🚀</div>
                 </div>
-                <h2 class="cta-title">지금 바로 당신의 팀을 바꿔보세요</h2>
-                <p class="cta-description">
+                <h2 class="cta-title animate-on-scroll animate-delay-200">지금 바로 당신의 팀을 바꿔보세요</h2>
+                <p class="cta-description animate-on-scroll animate-delay-400">
                     가장 성공적인 팀 프로젝트 경험, TeamFlow와 함께 시작하세요.<br>
                     회원가입부터 첫 팀 생성까지 단 1분이면 충분합니다.
                 </p>
-                <div class="cta-buttons">
-                    <a href="{% provider_login_url 'google' %}" class="btn-primary-large">
+                <div class="cta-buttons animate-on-scroll animate-delay-600">
+                    <a href="{% provider_login_url 'google' %}" class="btn-primary-large hover-lift">
                         <img src="{% static 'images/icons/google-icon.svg' %}" alt="Google" />
                         <span>구글로 시작하기</span>
                         <span class="btn-arrow">→</span>
                     </a>
-                    <a href="{% provider_login_url 'google' %}" class="btn-secondary-large">
+                    <a href="{% provider_login_url 'google' %}" class="btn-secondary-large hover-lift">
                         무료로 시작하기
                     </a>
                 </div>

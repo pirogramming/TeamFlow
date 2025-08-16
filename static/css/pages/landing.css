@@ -2293,3 +2293,159 @@ html {
 }
 
 /* 노션 스타일 랜딩페이지 CSS 완료 ✨ */
+
+/* ========================================
+   스크롤 애니메이션 시스템
+   ======================================== */
+
+/* 기본 애니메이션 상태 */
+.animate-on-scroll {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 애니메이션 활성화 */
+.animate-on-scroll.animate-active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* 방향별 애니메이션 */
+.animate-slide-left {
+  transform: translateX(-60px);
+}
+
+.animate-slide-left.animate-active {
+  transform: translateX(0);
+}
+
+.animate-slide-right {
+  transform: translateX(60px);
+}
+
+.animate-slide-right.animate-active {
+  transform: translateX(0);
+}
+
+.animate-scale-in {
+  transform: translateY(40px) scale(0.9);
+}
+
+.animate-scale-in.animate-active {
+  transform: translateY(0) scale(1);
+}
+
+/* 애니메이션 지연 */
+.animate-delay-100 { transition-delay: 0.05s; }
+.animate-delay-200 { transition-delay: 0.1s; }
+.animate-delay-300 { transition-delay: 0.15s; }
+.animate-delay-400 { transition-delay: 0.2s; }
+.animate-delay-500 { transition-delay: 0.25s; }
+.animate-delay-600 { transition-delay: 0.3s; }
+.animate-delay-700 { transition-delay: 0.35s; }
+.animate-delay-800 { transition-delay: 0.4s; }
+.animate-delay-1000 { transition-delay: 0.5s; }
+
+/* 패럴랙스 효과 */
+.parallax-bg {
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+.parallax-slow {
+  transform: translateZ(-2px) scale(1.05);
+  will-change: transform;
+  transition: transform 0.1s ease-out;
+}
+
+.parallax-fast {
+  transform: translateZ(1px) scale(0.98);
+  will-change: transform;
+  transition: transform 0.1s ease-out;
+}
+
+.parallax-active {
+  transform: translateY(0) scale(1);
+}
+
+/* 호버 애니메이션 */
+.hover-lift {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hover-lift:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+.hover-scale {
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hover-scale:hover {
+  transform: scale(1.05);
+}
+
+/* 숫자 카운터 애니메이션 */
+.counter-animate {
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 스크롤 진행률 표시기 */
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 0%;
+  height: 3px;
+  background: linear-gradient(90deg, #2383E2, #4CAF50);
+  z-index: 9999;
+  transition: width 0.1s ease;
+}
+
+/* 애니메이션 성능 최적화 */
+.animate-on-scroll,
+.parallax-bg,
+.parallax-slow,
+.parallax-fast {
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* How-it-works 화살표 위치 조정 */
+.step-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  color: #2383E2;
+  font-weight: bold;
+  margin: 0 1rem;
+  transform: translateY(-20px); /* 화살표를 위로 올림 */
+}
+
+/* 모바일 최적화 */
+@media (max-width: 768px) {
+  .animate-on-scroll {
+    transform: translateY(20px);
+  }
+  
+  .animate-slide-left,
+  .animate-slide-right {
+    transform: translateX(0);
+  }
+  
+  .parallax-slow,
+  .parallax-fast {
+    transform: none;
+  }
+  
+  /* 모바일에서 화살표 위치 조정 */
+  .step-arrow {
+    transform: translateY(-15px); /* 모바일에서는 조금 덜 올림 */
+    font-size: 1.5rem;
+    margin: 0 0.5rem;
+  }
+}
