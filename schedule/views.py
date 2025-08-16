@@ -61,7 +61,7 @@ def schedule_list_view(request, team_id):
     # 2. Task(할 일) 데이터를 가져와 events 리스트에 추가
     from django.db.models import Q
     tasks = Task.objects.filter(
-    Q(team_id=team_id) & Q(assignee=request.user) | Q(assignees=request.user)
+        Q(team_id=team_id) & (Q(assignee=request.user) | Q(assignees=request.user))
     ).distinct().prefetch_related('assignees')
     for task in tasks:
         if not task.due_date:
