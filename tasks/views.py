@@ -24,12 +24,13 @@ def tasks_page(request, team_id):
     
     # 팀 멤버 정보
     team_members = team.teammember_set.select_related('user')
-
+    current_user_id = request.user.id
     return render(request, 'main/tasks.html', {
         'team': team,
         'team_tasks': team_tasks,
         'personal_tasks': personal_tasks,
         'team_members': team_members,
+        'current_user_id': current_user_id,
         'hide_sidebar': False,  # 사이드바 표시
         'hide_footer': False,   # 푸터 표시
     })

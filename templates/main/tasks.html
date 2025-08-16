@@ -6,6 +6,14 @@
 {% endblock %}
 
 {% block content %}
+<head>
+  <script>
+    // Django 템플릿 문법을 사용하여 백엔드에서 받은 ID를 전역 변수에 할당합니다.
+    window.currentUserId = "{{ current_user_id }}";
+    window.currentTeamId = "{{ team.id }}"; // teamId도 함께 관리
+  </script>
+</head>
+
 <div class="page-container">
         <!-- 헤더 -->
         <div class="tasks-header">

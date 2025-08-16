@@ -133,6 +133,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             },
             eventClick: function(info) {
+                
                 const event = info.event;
                 currentEventId = event.id;
                 currentEventType = event.extendedProps.type;
@@ -141,9 +142,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 let contentHTML = '';
                 if (currentEventType === 'task') {
+                    const assigneeName = event.extendedProps.assignee_first_name || event.extendedProps.assignee || '미정';
                     contentHTML = `
                         <p><strong>상태:</strong> ${event.extendedProps.status}</p>
-                        <p><strong>담당자:</strong> ${event.extendedProps.assignee}</p>
+                        <p><strong>담당자:</strong> ${assigneeName}</p>
                         <p><strong>마감일:</strong> ${new Date(event.start).toLocaleDateString()}</p>
                         <p><strong>설명:</strong> ${event.extendedProps.description || '없음'}</p>
                     `;
