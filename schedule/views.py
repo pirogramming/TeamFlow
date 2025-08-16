@@ -82,6 +82,7 @@ def schedule_list_view(request, team_id):
 
         assignee_usernames = [assignee.username for assignee in task.assignees.all()]
         assignee_ids = [assignee.id for assignee in task.assignees.all()]
+        assignee_first_names = [user.first_name for user in task.assignees.all()]
 
         events.append({
             'id': f"task_{task.id}",
@@ -95,6 +96,8 @@ def schedule_list_view(request, team_id):
                 'assignee': ', '.join(assignee_usernames) if assignee_usernames else '미지정',
                 'status': task.get_status_display(),
                 'assigneeIds': assignee_ids,
+                'assignee_first_name': ', '.join(assignee_first_names) if assignee_first_names else '미지정',
+                
             }
         })
 

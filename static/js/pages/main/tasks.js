@@ -266,8 +266,9 @@ document.addEventListener('DOMContentLoaded', async function() {
             // 호환성: 단일 assignee 필드도 첫 번째 값만 동반 전송
             taskData.assignee = selectedIds[0] || null;
         } else {
-            delete taskData.assignee;
-            delete taskData.assignees;
+            const currentUserId = window.currentUserId; // 전역 변수에서 ID 가져오기
+            taskData.assignee = parseInt(currentUserId);
+            taskData.assignees = [parseInt(currentUserId)];
         }
 
         try {
