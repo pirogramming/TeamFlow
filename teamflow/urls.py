@@ -1,9 +1,11 @@
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include, re_path
 from django.conf import settings
 from django.conf.urls.static import static
 from team_log import views as team_log_views
 from dashboard import views as dashboard
+from django.views.generic import RedirectView
+from django.contrib.staticfiles.storage import staticfiles_storage
 # ========================================
 # MGP: 프론트엔드 페이지 URL 패턴 추가 (프리뷰 제거 후 실제 페이지 연결)
 from users import views as users
@@ -64,6 +66,11 @@ urlpatterns = [
     path('api/', include('schedule.urls')),
 
     path('team-log/', team_log_views.team_log_page, name='team_log_page'),  # HTML 페이지
+
+    re_path(r'^favicon\.ico$', RedirectView.as_view(
+        url=staticfiles_storage.url('images/logos/teamflow-icon.png'),
+        permanent=False
+    )),
 
 
 ]
