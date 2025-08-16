@@ -22,18 +22,33 @@
   top: 0;
   left: 0;
   right: 0;
-  background: #ffffff;
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid transparent;
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(0px);
+  -webkit-backdrop-filter: blur(0px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   z-index: 1000;
-  transition: all 0.3s ease;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  height: 65px; /* 헤더 높이 명시 */
 }
 
 .landing-header.scrolled {
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-  background: #ffffff;
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+  box-shadow: 
+    0 4px 20px rgba(0, 0, 0, 0.04),
+    0 1px 3px rgba(0, 0, 0, 0.06);
 }
 
+/* 스크롤 중일 때의 헤더 스타일 */
+.landing-header.scrolling {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+/* 헤더 내부 요소들의 z-index 조정 */
 .header-container {
   width: 100%;
   padding: 0 2rem;
@@ -42,8 +57,34 @@
   justify-content: space-between;
   height: 64px;
   gap: 1rem;
+  position: relative;
+  z-index: 1001;
 }
 
+/* 헤더 배경 그라데이션 효과 */
+.landing-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.05) 0%,
+    rgba(255, 255, 255, 0.02) 100%
+  );
+  pointer-events: none;
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.landing-header.scrolled::before {
+  opacity: 1;
+}
+
+/* 헤더 내부 요소들의 가독성 향상 */
 .header-left {
   display: flex;
   align-items: center;
@@ -58,12 +99,24 @@
   color: #1A1A1A;
   font-weight: 700;
   font-size: 1.25rem;
+  transition: all 0.2s ease;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+}
+
+.logo:hover {
+  transform: translateY(-1px);
 }
 
 .logo-icon {
   width: 48px;
   height: 48px;
   border-radius: 8px;
+  transition: transform 0.2s ease;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+}
+
+.logo:hover .logo-icon {
+  transform: scale(1.05);
 }
 
 .logo-text {
@@ -76,35 +129,42 @@
 .header-nav {
   display: flex;
   align-items: center;
-  gap: 2.5rem;
+  gap: 1.5rem;
   flex: 1;
   justify-content: center;
   margin: 0 1rem;
 }
 
+/* 네비게이션 링크 가독성 향상 */
 .nav-link {
   text-decoration: none;
-  color: #666;
-  font-weight: 500;
+  color: #333;
+  font-weight: 600;
   font-size: 0.875rem;
   transition: all 0.2s ease;
   padding: 0.5rem 0;
   position: relative;
+  border-radius: 4px;
+  padding: 0.5rem 0.75rem;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.6);
 }
 
 .nav-link:hover {
   color: #2383E2;
+  background: rgba(35, 131, 226, 0.1);
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
 }
 
 .nav-link::after {
   content: '';
   position: absolute;
   bottom: 0;
-  left: 0;
+  left: 50%;
   width: 0;
   height: 2px;
   background: #2383E2;
-  transition: width 0.2s ease;
+  transition: all 0.3s ease;
+  transform: translateX(-50%);
 }
 
 .nav-link:hover::after {
@@ -120,19 +180,24 @@
 
 .btn-login {
   padding: 0.5rem 1rem;
-  border: 1px solid #E5E7EB;
+  border: 1px solid rgba(229, 231, 235, 0.8);
   border-radius: 0.5rem;
-  background: #FFFFFF;
+  background: rgba(255, 255, 255, 0.8);
   color: #1A1A1A;
   text-decoration: none;
-  font-weight: 500;
+  font-weight: 600;
   font-size: 0.875rem;
   transition: all 0.2s ease;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .btn-login:hover {
-  background: #ffffff;
-  border-color: #D1D5DB;
+  background: rgba(255, 255, 255, 0.95);
+  border-color: rgba(209, 213, 219, 0.9);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .btn-start {
@@ -145,13 +210,15 @@
   font-weight: 600;
   font-size: 0.875rem;
   transition: all 0.2s ease;
-  box-shadow: 0 2px 4px rgba(35, 131, 226, 0.2);
+  box-shadow: 0 2px 8px rgba(35, 131, 226, 0.3);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
 }
 
 .btn-start:hover {
   background: #1A6BC9;
   transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(35, 131, 226, 0.3);
+  box-shadow: 0 4px 16px rgba(35, 131, 226, 0.4);
 }
 
 .container {
@@ -252,14 +319,18 @@
    2. 노션 스타일 히어로 섹션
    ======================================== */
 
+/* ========================================
+   2-1. Hero Section
+   ======================================== */
+
 .hero-section {
-  min-height: 80vh;
+  padding-top: 120px; /* 헤더 높이 + 여백 */
+  padding-bottom: 6rem;
+  min-height: 100vh;
   display: flex;
   align-items: center;
-  padding: 4rem 0;
-  margin-top: 64px;
-  background: #ffffff;
   position: relative;
+  overflow: hidden;
 }
 
 .hero-container {
@@ -277,7 +348,7 @@
 .hero-content {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 1rem;
   max-width: 500px;
   z-index: 2;
   position: relative;
@@ -1446,6 +1517,48 @@ a:focus {
 /* ========================================
    새로운 기능 섹션 - 노션 스타일
    ======================================== */
+
+/* ========================================
+   3-1. Features Section
+   ======================================== */
+
+.features-section {
+  padding: 6rem 0;
+  background: #FAFBFC;
+}
+
+/* 각 기능 섹션에 스크롤 마진 추가 */
+#feature-01,
+#feature-02,
+#feature-03,
+#feature-04,
+#feature-05,
+#feature-06 {
+  scroll-margin-top: 100px; /* 헤더 높이 + 여백 */
+}
+
+/* 부드러운 스크롤 동작 */
+html {
+  scroll-behavior: smooth;
+}
+
+/* 스크롤바 스타일링 (웹킷 기반 브라우저) */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
 
 /* 기능 소개 섹션 */
 .features-section.notion-style {

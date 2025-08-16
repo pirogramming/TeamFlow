@@ -33,8 +33,13 @@
             </div>
             
             <nav class="header-nav">
-                <a href="#features" class="nav-link">주요 기능</a>
-                <a href="#how-it-works" class="nav-link">작동 방식</a>
+                <a href="#hero" class="nav-link">TeamFlow</a>
+                <a href="#feature-01" class="nav-link">팀 생성/참여</a>
+                <a href="#feature-02" class="nav-link">대시보드</a>
+                <a href="#feature-03" class="nav-link">일정 관리</a>
+                <a href="#feature-04" class="nav-link">작업</a>
+                <a href="#feature-05" class="nav-link">역할</a>
+                <a href="#feature-06" class="nav-link">자료함</a>
             </nav>
             
             <div class="header-right">
@@ -55,7 +60,7 @@
     -->
 
     <!-- Hero Section - 노션 스타일 -->
-    <section class="hero-section">
+    <section id="hero" class="hero-section">
         <div class="hero-container">
             <div class="hero-content">
 
@@ -85,7 +90,7 @@
     </section>
 
     <!-- 주요 기능 소개 섹션 - 노션 스타일 -->
-    <section id="features" class="features-section notion-style">
+    <section class="features-section notion-style">
         <div class="container">
             <div class="section-header">
                 <h2 class="section-title">대학생 팀플에 최적화된 기능들</h2>
@@ -95,7 +100,7 @@
             </div>
 
             <!-- 1. 팀 생성/참여 -->
-            <div class="feature-item">
+            <div id="feature-01" class="feature-item">
                 <div class="feature-content">
                     <div class="feature-image-container">
                         <div class="image-placeholder team-creation">
@@ -119,7 +124,7 @@
             </div>
 
             <!-- 2. 대시보드 -->
-            <div class="feature-item reverse">
+            <div id="feature-02" class="feature-item reverse">
                 <div class="feature-content">
                     <div class="feature-text">
                         <div class="feature-number">02</div>
@@ -143,7 +148,7 @@
             </div>
 
             <!-- 3. 일정 관리 -->
-            <div class="feature-item">
+            <div id="feature-03" class="feature-item">
                 <div class="feature-content">
                     <div class="feature-image-container">
                         <div class="image-placeholder calendar">
@@ -167,7 +172,7 @@
             </div>
 
             <!-- 4. 작업 관리 -->
-            <div class="feature-item reverse">
+            <div id="feature-04" class="feature-item reverse">
                 <div class="feature-content">
                     <div class="feature-text">
                         <div class="feature-number">04</div>
@@ -191,7 +196,7 @@
             </div>
 
             <!-- 5. 역할 관리 -->
-            <div class="feature-item">
+            <div id="feature-05" class="feature-item">
                 <div class="feature-content">
                     <div class="feature-image-container">
                         <div class="image-placeholder roles">
@@ -215,7 +220,7 @@
             </div>
 
             <!-- 6. 자료 공유 -->
-            <div class="feature-item reverse">
+            <div id="feature-06" class="feature-item reverse">
                 <div class="feature-content">
                     <div class="feature-text">
                         <div class="feature-number">06</div>
@@ -463,6 +468,83 @@
     
     <!-- JavaScript -->
     <script src="{% static 'js/pages/landing.js' %}"></script>
+    
+    <!-- 부드러운 스크롤 기능 -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 모든 앵커 링크에 부드러운 스크롤 적용
+            document.querySelectorAll('a[href^="#"]').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href').substring(1);
+                    const targetElement = document.getElementById(targetId);
+                    
+                    if (targetElement) {
+                        // 헤더 높이 고려 (65px)
+                        const headerHeight = 65;
+                        const targetPosition = targetElement.offsetTop - headerHeight;
+                        
+                        // 부드러운 스크롤
+                        window.scrollTo({
+                            top: targetPosition,
+                            behavior: 'smooth'
+                        });
+                        
+                        // URL 해시 업데이트 (선택사항)
+                        history.pushState(null, null, '#' + targetId);
+                    }
+                });
+            });
+            
+            // 스크롤 시 헤더 스타일 변경 (블러 효과 포함)
+            const header = document.querySelector('.landing-header');
+            let scrollTimeout;
+            let isScrolling = false;
+            
+            function handleScroll() {
+                const scrollY = window.scrollY;
+                
+                // 스크롤 중 상태 설정
+                if (!isScrolling) {
+                    isScrolling = true;
+                    header.classList.add('scrolling');
+                }
+                
+                // 스크롤 방향에 따른 헤더 스타일 변경
+                if (scrollY > 20) {
+                    header.classList.add('scrolled');
+                } else {
+                    header.classList.remove('scrolled');
+                }
+                
+                // 스크롤이 멈춘 후 일정 시간이 지나면 스크롤 중 상태 해제
+                clearTimeout(scrollTimeout);
+                scrollTimeout = setTimeout(() => {
+                    isScrolling = false;
+                    header.classList.remove('scrolling');
+                }, 150);
+            }
+            
+            // 스크롤 이벤트 리스너 등록 (성능 최적화)
+            let ticking = false;
+            function updateHeader() {
+                handleScroll();
+                ticking = false;
+            }
+            
+            function requestTick() {
+                if (!ticking) {
+                    requestAnimationFrame(updateHeader);
+                    ticking = true;
+                }
+            }
+            
+            window.addEventListener('scroll', requestTick, { passive: true });
+            
+            // 초기 상태 확인
+            handleScroll();
+        });
+    </script>
 </body>
 </html>
 

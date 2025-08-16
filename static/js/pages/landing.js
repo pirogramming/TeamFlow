@@ -98,16 +98,28 @@ function startGoogleAuth() {
  * 섹션으로 부드러운 스크롤 (노션 스타일)
  */
 function scrollToSection(sectionId) {
-  const section = document.getElementById(sectionId) || document.querySelector(`.${sectionId}`);
+  const section = document.getElementById(sectionId);
   if (section) {
-    gsap.to(window, {
-      duration: 1.2,
-      scrollTo: {
-        y: section,
-        offsetY: 60, // 노션 스타일 오프셋
-      },
-      ease: "power2.inOut",
-    });
+    // GSAP이 있으면 사용, 없으면 기본 스크롤 사용
+    if (typeof gsap !== "undefined" && typeof ScrollTrigger !== "undefined") {
+      gsap.to(window, {
+        duration: 1.2,
+        scrollTo: {
+          y: section,
+          offsetY: 80, // 헤더 높이 고려
+        },
+        ease: "power2.inOut",
+      });
+    } else {
+      // 기본 부드러운 스크롤
+      const headerHeight = 80; // 헤더 높이
+      const targetPosition = section.offsetTop - headerHeight;
+      
+      window.scrollTo({
+        top: targetPosition,
+        behavior: 'smooth'
+      });
+    }
   }
 }
 
@@ -426,34 +438,46 @@ function initEventListeners() {
         if (otherItem !== item) {
           otherItem.classList.remove("active");
           const otherAnswer = otherItem.querySelector(".faq-answer");
-          gsap.to(otherAnswer, {
-            maxHeight: 0,
-            duration: 0.3,
-            ease: "power2.out"
-          });
+          if (typeof gsap !== "undefined") {
+            gsap.to(otherAnswer, {
+              maxHeight: 0,
+              duration: 0.3,
+              ease: "power2.out"
+            });
+          } else {
+            otherAnswer.style.maxHeight = "0";
+          }
         }
       });
 
       // 현재 아이템 토글
       if (isActive) {
         item.classList.remove("active");
-        gsap.to(answer, {
-          maxHeight: 0,
-          duration: 0.3,
-          ease: "power2.out"
-        });
-      } else {
-        item.classList.add("active");
-        gsap.set(answer, { maxHeight: "auto" });
-        const height = answer.scrollHeight;
-        gsap.fromTo(answer, 
-          { maxHeight: 0 }, 
-          { 
-            maxHeight: height,
+        if (typeof gsap !== "undefined") {
+          gsap.to(answer, {
+            maxHeight: 0,
             duration: 0.3,
             ease: "power2.out"
-          }
-        );
+          });
+        } else {
+          answer.style.maxHeight = "0";
+        }
+      } else {
+        item.classList.add("active");
+        if (typeof gsap !== "undefined") {
+          gsap.set(answer, { maxHeight: "auto" });
+          const height = answer.scrollHeight;
+          gsap.fromTo(answer, 
+            { maxHeight: 0 }, 
+            { 
+              maxHeight: height,
+              duration: 0.3,
+              ease: "power2.out"
+            }
+          );
+        } else {
+          answer.style.maxHeight = answer.scrollHeight + "px";
+        }
       }
     });
   });
@@ -464,12 +488,14 @@ function initEventListeners() {
   // 리사이즈 이벤트
   window.addEventListener("resize", handleWindowResize);
 
-  // 부드러운 스크롤 링크
+  // 부드러운 스크롤 링크 - 모든 앵커 링크에 적용
   document.querySelectorAll('a[href^="#"]').forEach(link => {
     link.addEventListener("click", (e) => {
       e.preventDefault();
       const targetId = link.getAttribute("href").substring(1);
-      scrollToSection(targetId);
+      if (targetId) {
+        scrollToSection(targetId);
+      }
     });
   });
 
