@@ -246,17 +246,21 @@ function renderTeamTasks(tasks = []) {
         `;
     }).join('');
 
-    // 기본 3개만 보이기, 4번째부터 숨김
+    // 기본 2개만 보이기, 3번째부터 숨김
     const items = teamTasksContainer.querySelectorAll('.task-item');
     items.forEach((el, idx) => {
-        if (idx >= 3) el.classList.add('is-hidden');
+        if (idx >= 2) el.classList.add('is-hidden');
     });
 
     // 토글 버튼 상태 설정
     const toggleBtn = document.getElementById('team-tasks-toggle');
     if (toggleBtn) {
-        toggleBtn.textContent = items.length > 3 ? '더보기' : '더보기 없음';
-        toggleBtn.disabled = items.length <= 3;
+        if (items.length > 2) {
+            toggleBtn.innerHTML = `더보기 <svg fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>`;
+            toggleBtn.style.display = 'inline-flex';
+        } else {
+            toggleBtn.style.display = 'none';
+        }
         toggleBtn.onclick = () => toggleTaskList('team');
     }
 }
@@ -297,17 +301,21 @@ function renderPersonalTasks(tasks = []) {
         `;
     }).join('');
 
-    // 기본 3개만 보이기, 4번째부터 숨김
+    // 기본 2개만 보이기, 3번째부터 숨김
     const items = personalTasksContainer.querySelectorAll('.task-item');
     items.forEach((el, idx) => {
-        if (idx >= 3) el.classList.add('is-hidden');
+        if (idx >= 2) el.classList.add('is-hidden');
     });
 
     // 토글 버튼 상태 설정
     const toggleBtn = document.getElementById('personal-tasks-toggle');
     if (toggleBtn) {
-        toggleBtn.textContent = items.length > 3 ? '더보기' : '더보기 없음';
-        toggleBtn.disabled = items.length <= 3;
+        if (items.length > 2) {
+            toggleBtn.innerHTML = `더보기 <svg fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>`;
+            toggleBtn.style.display = 'inline-flex';
+        } else {
+            toggleBtn.style.display = 'none';
+        }
         toggleBtn.onclick = () => toggleTaskList('personal');
     }
 }
@@ -320,20 +328,26 @@ function toggleTaskList(type) {
     const toggleBtn = document.getElementById(toggleId);
     if (!container || !toggleBtn) return;
 
-    const hiddenItems = container.querySelectorAll('.task-item.is-hidden');
-    const isCollapsed = hiddenItems.length > 0;
+    // 현재 펼쳐져 있는지 여부를 버튼의 data-expanded 속성으로 확인
+    const isExpanded = toggleBtn.dataset.expanded === 'true';
 
-    if (isCollapsed) {
-        // 펼치기: 모두 보이기
-        container.querySelectorAll('.task-item').forEach(el => el.classList.remove('is-hidden'));
-        toggleBtn.textContent = '접기';
-    } else {
-        // 접기: 4번째부터 숨기기 (0,1,2만 표시)
+    if (isExpanded) {
+        // 접기
         const items = Array.from(container.querySelectorAll('.task-item'));
         items.forEach((el, idx) => {
-            if (idx >= 3) el.classList.add('is-hidden');
+            if (idx >= 2) {
+                el.classList.add('is-hidden');
+            }
         });
-        toggleBtn.textContent = '더보기';
+        toggleBtn.innerHTML = `더보기 <svg fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>`;
+        toggleBtn.dataset.expanded = 'false';
+    } else {
+        // 펼치기
+        container.querySelectorAll('.task-item').forEach(el => {
+            el.classList.remove('is-hidden');
+        });
+        toggleBtn.innerHTML = `접기 <svg fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd"></path></svg>`;
+        toggleBtn.dataset.expanded = 'true';
     }
 }
 

@@ -120,14 +120,14 @@
 .project-dropdown { 
     display: flex; 
     align-items: center; 
-    gap: .5rem; 
+    justify-content: center; 
     padding: .5rem .75rem; 
     background: var(--surface); 
     border: 1px solid var(--border); 
     border-radius: var(--radius); 
     cursor: pointer; 
     transition: all var(--transition-1); 
-    min-width: 160px; 
+    min-width: 320px; 
     
     position: relative; 
     z-index: 10; 
@@ -136,6 +136,12 @@
 .project-dropdown:hover { 
     border-color: var(--primary-600); 
     background: var(--surface-2); 
+}
+
+.project-info {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
 }
 
 .project-name { 
@@ -157,23 +163,44 @@
 .dropdown-icon {
     color: #6b7280;
     transition: transform 0.2s ease;
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
 }
 
 .project-dropdown.active .dropdown-icon {
-    transform: rotate(180deg);
+    transform: translateY(-50%) rotate(180deg);
 }
 
 /* === /MGP === */
 
 /* 드롭다운 메뉴 */
-.dropdown-menu { position:absolute; top: 100%; left:0; right:0; background: var(--surface); border:1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-2); z-index: 20; margin-top:.25rem; min-width: 240px; display:none; }
+.dropdown-menu { 
+    position: absolute; 
+    top: 100%; 
+    left: 0; 
+    right: 0; 
+    background: var(--surface); 
+    border: 1px solid var(--border); 
+    border-radius: var(--radius); 
+    box-shadow: var(--shadow-2); 
+    z-index: 20; 
+    margin-top: .25rem; 
+    min-width: 240px; 
+    
+    /* 애니메이션을 위한 초기 상태 */
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+}
 
 /* 드롭다운 메뉴 표시 상태 */
-.dropdown-menu.show {
-    display: block !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-    z-index: 20 !important;
+.dropdown-menu.is-active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
 }
 
 .dropdown-header {
@@ -254,9 +281,8 @@
 
 .project-info {
     display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.25rem;
+    align-items: center;
+    gap: .5rem;
 }
 
 .project-title {
@@ -283,6 +309,11 @@
     color: #1d4ed8;
     border-radius: 8px;
     font-weight: 500;
+}
+
+.project-status-text {
+    font-size: 0.75rem;
+    color: #6b7280;
 }
 
 .no-projects {

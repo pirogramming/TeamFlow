@@ -201,16 +201,23 @@ function updateCurrentProject(teamData) {
     console.log('프로젝트 정보 업데이트 시작:', teamData);
     
     const currentProjectName = document.getElementById('current-project-name');
+    const currentProjectStatus = document.getElementById('current-project-status');
     console.log('프로젝트 이름 요소:', currentProjectName);
     
     if (currentProjectName && teamData?.name) { // PATCH: 안전 가드
         console.log('프로젝트 이름 업데이트:', teamData.name);
         currentProjectName.textContent = teamData.name;
+        if (currentProjectStatus && teamData?.status) {
+            currentProjectStatus.textContent = teamData.status;
+        }
         console.log('업데이트 후 텍스트:', currentProjectName.textContent);
     } else {
         console.log('프로젝트 이름 업데이트 실패 - 요소 또는 이름 없음');
         if (currentProjectName) {
             currentProjectName.textContent = '프로젝트를 선택하세요';
+        }
+        if (currentProjectStatus) {
+            currentProjectStatus.textContent = '상태 없음';
         }
     }
 }
@@ -256,6 +263,7 @@ function updateProjectList(teams) {
             </div>
             <div class="project-status">
                 ${team.is_owner ? '<span class="owner-badge">팀장</span>' : ''}
+                <span class="project-status-text">${team.status || '진행중'}</span>
             </div>
         `;
         
@@ -410,7 +418,7 @@ function setupHeaderEventListeners() {
     if (projectDropdown && projectDropdownMenu) {
         projectDropdown.addEventListener('click', function(e) {
             e.stopPropagation();
-            projectDropdownMenu.classList.toggle('show');
+            projectDropdownMenu.classList.toggle('is-active');
             projectDropdown.classList.toggle('active');
         });
     }
@@ -450,6 +458,14 @@ function setupHeaderEventListeners() {
     /* === /MGP === */
 
     // 드롭다운 외부 클릭 시 닫기
+    document.addEventListener('click', function(e) {
+        if (projectDropdownMenu && projectDropdownMenu.classList.contains('is-active')) {
+            if (!projectDropdown.contains(e.target)) {
+                projectDropdownMenu.classList.remove('is-active');
+                projectDropdown.classList.remove('active');
+            }
+        }
+    });
     
     // 팀 생성 버튼
     const createTeamBtn = document.getElementById('create-team-btn');
@@ -484,7 +500,7 @@ function handleProjectDropdown() {
     console.log('드롭다운 메뉴 요소:', dropdownMenu);
     
     if (dropdownMenu) {
-        const isVisible = dropdownMenu.classList.contains('show');
+        const isVisible = dropdownMenu.classList.contains('is-active');
         console.log('드롭다운 현재 표시 상태 (CSS 클래스):', isVisible);
         console.log('드롭다운 현재 CSS 클래스:', dropdownMenu.className);
         
@@ -511,7 +527,7 @@ function showProjectDropdown() {
         console.log('드롭다운 CSS 클래스 변경 전:', dropdownMenu.className);
         
         // CSS 클래스를 사용해서 표시
-        dropdownMenu.classList.add('show');
+        dropdownMenu.classList.add('is-active');
         
         console.log('드롭다운 CSS 클래스 변경 후:', dropdownMenu.className);
         console.log('드롭다운 표시 완료 (CSS 클래스 사용)');
@@ -535,7 +551,7 @@ function hideProjectDropdown() {
         console.log('드롭다운 숨기기 전 CSS 클래스:', dropdownMenu.className);
         
         // CSS 클래스를 사용해서 숨기기
-        dropdownMenu.classList.remove('show');
+        dropdownMenu.classList.remove('is-active');
         
         console.log('드롭다운 숨기기 후 CSS 클래스:', dropdownMenu.className);
         console.log('드롭다운 숨기기 완료');
