@@ -289,13 +289,10 @@ document.addEventListener('DOMContentLoaded', async function() {
 
             if (response.status === 204) {
                 closeModal();
-                showNotification(isEdit ? '작업이 수정되었습니다.' : '새 작업이 추가되었습니다.', 'success');
                 await loadTasks();
             } else if (response.ok) {
                 try { await response.json(); } catch {}
                 closeModal();
-                const message = isEdit ? '작업이 수정되었습니다.' : '새 작업이 추가되었습니다.';
-                showNotification(message, 'success');
                 await loadTasks();
             } else {
                 let errorData = null;
@@ -344,10 +341,18 @@ function getCsrfToken() {
            document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 }
 
-// 알림 표시
+// 알림 표시 - 개선된 버전
 function showNotification(message, type = 'info') {
+    // 기존 알림이 있으면 제거
+    const existingNotifications = document.querySelectorAll('.js-notification');
+    existingNotifications.forEach(notification => {
+        if (notification.parentNode) {
+            notification.remove();
+        }
+    });
+
     const notification = document.createElement('div');
-    notification.className = `notification ${type}`;
+    notification.className = `js-notification js-notification-${type}`;
     notification.textContent = message;
 
     // 스타일 적용
@@ -359,33 +364,38 @@ function showNotification(message, type = 'info') {
         borderRadius: '8px',
         backgroundColor: type === 'error' ? '#ef4444' : type === 'success' ? '#10b981' : '#3b82f6',
         color: 'white',
-        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-        zIndex: '1000',
-        animation: 'slideIn 0.3s ease-out'
+        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+        zIndex: '10000',
+        transform: 'translateX(100%)',
+        opacity: '0',
+        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+        maxWidth: '300px',
+        wordWrap: 'break-word',
+        fontSize: '14px',
+        fontWeight: '500'
     });
 
     document.body.appendChild(notification);
 
-    // 3초 후 제거
+    // 부드럽게 나타나기
+    requestAnimationFrame(() => {
+        notification.style.transform = 'translateX(0)';
+        notification.style.opacity = '1';
+    });
+
+    // 3초 후 부드럽게 사라지기
     setTimeout(() => {
-        notification.style.animation = 'slideOut 0.3s ease-out';
-        setTimeout(() => notification.remove(), 300);
+        notification.style.transform = 'translateX(100%)';
+        notification.style.opacity = '0';
+        
+        // 애니메이션 완료 후 DOM에서 제거
+        setTimeout(() => {
+            if (notification && notification.parentNode) {
+                notification.remove();
+            }
+        }, 300);
     }, 3000);
 }
-
-// 알림 애니메이션
-const style = document.createElement('style');
-style.textContent = `
-@keyframes slideIn {
-    from { transform: translateX(100%); opacity: 0; }
-    to { transform: translateX(0); opacity: 1; }
-}
-@keyframes slideOut {
-    from { transform: translateX(0); opacity: 1; }
-    to { transform: translateX(100%); opacity: 0; }
-}
-`;
-document.head.appendChild(style);
 
 async function loadTasks() {
     try {
