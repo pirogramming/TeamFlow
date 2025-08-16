@@ -247,13 +247,13 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--error-500);
+    color: var(--danger-600);
 }
 
 .deadline-count {
     font-size: 2rem;
     font-weight: 700;
-    color: var(--error-500);
+    color: var(--danger-600);
 }
 
 .deadline-text {
@@ -323,12 +323,24 @@
     gap: 1.25rem; 
     padding: 1.5rem; 
     border-radius: 12px; 
-    transition: all var(--transition-1); 
     border: 1px solid var(--border); 
     margin-bottom: 1rem; 
     background: var(--surface-2); 
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    transition: all 0.4s ease-in-out;
 }
+
+.task-item.is-hidden {
+    max-height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    margin-bottom: 0;
+    opacity: 0;
+    border-width: 0;
+    transform: scaleY(0.5);
+}
+
 
 .task-item:hover { 
     background: var(--surface); 
@@ -496,22 +508,33 @@
 .btn-link.small {
     background: none;
     border: none;
-    color: var(--primary-600);
+    color: var(--text-2); /* 파란색에서 기본 텍스트 색상으로 변경 */
     font-size: 0.875rem;
     font-weight: 500;
     cursor: pointer;
-    padding: 0;
-    text-decoration: underline;
-    transition: color 0.2s ease;
+    padding: 0.25rem 0.5rem; /* 아이콘을 위해 약간의 패딩 추가 */
+    text-decoration: none; /* 밑줄 제거 */
+    transition: all 0.2s ease;
+    display: inline-flex; /* 아이콘과 텍스트 정렬 */
+    align-items: center;
+    gap: 0.25rem;
+    border-radius: 6px;
 }
 
 .btn-link.small:hover {
-    color: var(--primary-700);
+    color: var(--text-1);
+    background-color: var(--surface-2);
 }
 
-/* 숨김 처리 */
+.btn-link.small svg {
+    width: 14px;
+    height: 14px;
+    transition: transform 0.2s ease;
+}
+
+/* 숨김 처리 - display: none 대신 애니메이션을 위해 속성 변경 */
 .is-hidden {
-    display: none !important;
+    /* display: none !important; */
 }
 
 /* 반응형 디자인 */

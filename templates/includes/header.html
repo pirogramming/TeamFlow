@@ -28,15 +28,17 @@
             <div class="header-project-section">
                 <div class="project-selector">
                     <button class="project-dropdown" id="project-dropdown">
-                        <span class="project-name" id="current-project-name">{{ team.name|default:"프로젝트" }}</span>
-                        <span class="project-status">{{ team.status|default:"진행중" }}</span>
+                        <div class="project-info">
+                            <span class="project-name" id="current-project-name">{{ team.name|default:"프로젝트" }}</span>
+                            <span class="project-status" id="current-project-status">{{ team.status|default:"진행중" }}</span>
+                        </div>
                         <svg class="dropdown-icon" fill="currentColor" viewBox="0 0 24 24" width="16" height="16">
                             <path d="M7 10l5 5 5-5z"/>
                         </svg>
                     </button>
                     
                     <!-- 드롭다운 메뉴 -->
-                    <div class="dropdown-menu" id="project-dropdown-menu" style="display: none;">
+                    <div class="dropdown-menu" id="project-dropdown-menu">
                         <div class="dropdown-header">
                             <span>프로젝트 선택</span>
                         </div>
