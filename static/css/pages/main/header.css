@@ -14,7 +14,7 @@
 
 .header-container { display:flex; align-items:center; justify-content:space-between; height:100%; padding: 0 1rem; max-width: 1400px; margin: 0 auto; }
 
-/* 좌측: 프로젝트 선택 */
+/* 좌측: 햄버거 메뉴 */
 .header-left {
     flex: 0 0 auto;
     display: flex;
@@ -24,7 +24,7 @@
 
 /* === MGP: 햄버거 메뉴 버튼 스타일 === */
 .hamburger-menu-btn {
-    display: none; /* 기본적으로 숨김 */
+    display: none; /* 기본적으로 숨김 - 반응형에서만 표시 */
     align-items: center;
     justify-content: center;
     width: 40px;
@@ -64,44 +64,95 @@
     line-height: 1;
 }
 
-/* 중앙: 팀 프로젝트 정보 */
+/* 중앙: 로고와 프로젝트 선택 */
 .header-center {
     flex: 1;
     display: flex;
     justify-content: center;
     align-items: center;
+    padding: 0 1rem;
 }
 
-.team-info {
-    text-align: center;
+/* === MGP: 헤더 로고 스타일 (중앙 왼쪽) - 랜딩페이지와 동일 === */
+.header-logo {
+    position: absolute;
+    left: 1rem;
+}
+
+.header-logo .logo {
     display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
+    align-items: center;
+    gap: 0.75rem;
+    text-decoration: none;
+    color: #1A1A1A;
+    font-weight: 700;
+    font-size: 1.25rem;
 }
 
-.team-project-title { font-size: 1.25rem; font-weight: 700; color: var(--text-1); margin:0; letter-spacing: -0.02em; line-height:1.2; }
+.header-logo .logo-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+}
 
-/* 프로젝트 드롭다운 */
+.header-logo .logo-text {
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    font-size: 1.5rem;
+    color: #1A1A1A;
+}
+/* === /MGP === */
+
+/* === MGP: 헤더 프로젝트 섹션 (중앙) === */
+.header-project-section {
+    display: flex;
+    justify-content: center;
+    margin-left: 15rem;
+}
+/* === /MGP === */
+
+/* === MGP: 중앙 프로젝트 드롭다운 스타일 조정 === */
 .project-selector {
     position: relative;
     display: inline-block;
 }
 
-.project-subtitle {
-    font-size: 0.875rem;
-    color: #6b7280;
-    margin: 0;
-    text-align: center;
-    line-height: 1.2;
+.project-dropdown { 
+    display: flex; 
+    align-items: center; 
+    gap: .5rem; 
+    padding: .5rem .75rem; 
+    background: var(--surface); 
+    border: 1px solid var(--border); 
+    border-radius: var(--radius); 
+    cursor: pointer; 
+    transition: all var(--transition-1); 
+    min-width: 160px; 
+    
+    position: relative; 
+    z-index: 10; 
 }
 
-.project-dropdown { display:flex; align-items:center; gap:.5rem; padding: .5rem .75rem; background: var(--surface); border:1px solid var(--border); border-radius: var(--radius); cursor:pointer; transition: all var(--transition-1); min-width: 200px; position: relative; z-index: 10; }
+.project-dropdown:hover { 
+    border-color: var(--primary-600); 
+    background: var(--surface-2); 
+}
 
-.project-dropdown:hover { border-color: var(--primary-600); background: var(--surface-2); }
+.project-name { 
+    font-size: .95rem; 
+    font-weight: 700; 
+    color: var(--text-1); 
+    letter-spacing: -0.01em; 
+}
 
-.project-name { font-size: .95rem; font-weight: 700; color: var(--text-1); letter-spacing: -0.01em; }
-
-.project-status { font-size: .7rem; padding:.25rem .5rem; background: rgba(59,130,246,.08); color: var(--info-600); border-radius: 999px; font-weight: 600; }
+.project-status { 
+    font-size: .7rem; 
+    padding: .25rem .5rem; 
+    background: rgba(59,130,246,.08); 
+    color: var(--info-600); 
+    border-radius: 999px; 
+    font-weight: 600; 
+}
 
 .dropdown-icon {
     color: #6b7280;
@@ -111,6 +162,8 @@
 .project-dropdown.active .dropdown-icon {
     transform: rotate(180deg);
 }
+
+/* === /MGP === */
 
 /* 드롭다운 메뉴 */
 .dropdown-menu { position:absolute; top: 100%; left:0; right:0; background: var(--surface); border:1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-2); z-index: 20; margin-top:.25rem; min-width: 240px; display:none; }
