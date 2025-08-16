@@ -1,1 +1,67 @@
 /* 반응형 디자인 (@media queries) */
+
+/* === MGP: 헤더 반응형 스타일 추가 === */
+
+/* 태블릿 및 모바일 (사이드바 숨김 시점) */
+@media (max-width: 1024px) {
+    .header-container {
+        padding: 0 0.75rem;
+    }
+    
+    /* 햄버거 메뉴 표시 */
+    .hamburger-menu-btn {
+        display: flex !important;
+    }
+    
+    /* 로고를 header-left로 이동 */
+    .header-logo {
+        position: static !important;
+        left: auto !important;
+    }
+    
+    /* 중앙 프로젝트 드롭다운 크기 조정 */
+    .project-dropdown {
+        min-width: 140px;
+        padding: 0.5rem 0.75rem;
+    }
+    
+    /* 프로젝트 이름 폰트 크기 조정 */
+    .project-name {
+        font-size: 0.9rem;
+    }
+    
+    /* 우측 액션 버튼 텍스트 숨기기 */
+    .action-button span {
+        display: none;
+    }
+    
+    .action-button {
+        padding: 0.5rem;
+        min-width: 40px;
+    }
+}
+
+/* 작은 모바일 */
+@media (max-width: 480px) {
+    .header-container {
+        padding: 0 0.5rem;
+    }
+    
+    /* 프로젝트 드롭다운 더 작게 */
+    .project-dropdown {
+        min-width: 120px;
+        padding: 0.5rem;
+    }
+    
+    /* 프로젝트 상태 배지 숨기기 */
+    .project-status {
+        display: none;
+    }
+    
+    /* 알림 텍스트 숨기기 */
+    .notification-text {
+        display: none;
+    }
+}
+
+/* === /MGP === */

@@ -1,43 +1,52 @@
+{% load static %}
 <!-- 상단 헤더 (로고, 알림, 프로필) -->
 <header class="header">
     <div class="header-container">
-        <!-- 좌측: 프로젝트 선택 -->
+        <!-- 좌측: 햄버거 메뉴 -->
         <div class="header-left">
-            <!-- === MGP: 햄버거 메뉴 버튼 추가 === -->
+            <!-- === MGP: 햄버거 메뉴 버튼 === -->
             <button class="hamburger-menu-btn" id="hamburger-menu-btn" aria-label="사이드바 메뉴 열기">
                 <svg fill="currentColor" viewBox="0 0 24 24" width="24" height="24">
                     <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
                 </svg>
             </button>
             <!-- === /MGP === -->
+        </div>
+
+        <!-- 중앙: 로고와 프로젝트 선택 -->
+        <div class="header-center">
+            <!-- === MGP: 왼쪽 - TeamFlow 로고 === -->
+            <div class="header-logo">
+                <a href="/" class="logo">
+                    <img src="{% static 'images/logos/TeamFlow-icon.png' %}" alt="TeamFlow" class="logo-icon" />
+                    <span class="logo-text">TeamFlow</span>
+                </a>
+            </div>
+            <!-- === /MGP === -->
             
-            <div class="project-selector">
-                <button class="project-dropdown" id="project-dropdown">
-                    <span class="project-name" id="current-project-name">{{ team.name|default:"프로젝트" }}</span>
-                    <span class="project-status">{{ team.status|default:"진행중" }}</span>
-                    <svg class="dropdown-icon" fill="currentColor" viewBox="0 0 24 24" width="16" height="16">
-                        <path d="M7 10l5 5 5-5z"/>
-                    </svg>
-                </button>
-                
-                <!-- 드롭다운 메뉴 -->
-                <div class="dropdown-menu" id="project-dropdown-menu" style="display: none;">
-                    <div class="dropdown-header">
-                        <span>프로젝트 선택</span>
-                    </div>
-                    <div class="dropdown-items" id="project-list">
-                        <!-- 프로젝트 목록이 동적으로 로드됩니다 -->
+            <!-- === MGP: 오른쪽 - 프로젝트 선택 === -->
+            <div class="header-project-section">
+                <div class="project-selector">
+                    <button class="project-dropdown" id="project-dropdown">
+                        <span class="project-name" id="current-project-name">{{ team.name|default:"프로젝트" }}</span>
+                        <span class="project-status">{{ team.status|default:"진행중" }}</span>
+                        <svg class="dropdown-icon" fill="currentColor" viewBox="0 0 24 24" width="16" height="16">
+                            <path d="M7 10l5 5 5-5z"/>
+                        </svg>
+                    </button>
+                    
+                    <!-- 드롭다운 메뉴 -->
+                    <div class="dropdown-menu" id="project-dropdown-menu" style="display: none;">
+                        <div class="dropdown-header">
+                            <span>프로젝트 선택</span>
+                        </div>
+                        <div class="dropdown-items" id="project-list">
+                            <!-- 프로젝트 목록이 동적으로 로드됩니다 -->
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-
-        <!-- 중앙: 팀 프로젝트 정보 -->
-        <div class="header-center">
-            <div class="team-info">
-                <h1 class="team-project-title">{{ team.name|default:"웹 개발 프로젝트" }}</h1>
-                <div class="project-subtitle">{{ team.description|default:"2024년 1학기 캡스톤 디자인" }}</div>
-            </div>
+            <!-- === /MGP === -->
         </div>
 
         <!-- 우측: 알림 및 액션 버튼 -->
