@@ -62,10 +62,13 @@ def global_context(request):
         deadline_imminent_count = 0
         if current_team:
             # 오늘로부터 3일 이내의 마감 작업들
-            deadline_threshold = date.today() + timedelta(days=3)
-            
+            deadline_threshold = date.today() + timedelta(days=1)
+            from django.db.models import Q
+            my_tasks = Task.objects.filter(
+                (Q(assignee=request.user) | Q(assignees=request.user))
+            ).distinct().order_by('-created_at')
             # 팀 작업 중 마감 임박
-            team_tasks = Task.objects.filter(
+            team_tasks = my_tasks.filter(
                 team=current_team,
                 type='team',
                 due_date__isnull=False,

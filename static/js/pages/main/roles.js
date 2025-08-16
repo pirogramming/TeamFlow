@@ -595,7 +595,6 @@ function showTeamAssignmentResults(assignments) {
     const currentUserId = window.currentUserId || getCurrentUserId();
     
     // assignments 배열에서 현재 사용자의 배정 결과를 찾습니다.
-    // user_id의 데이터 타입이 다를 수 있으므로 String()으로 변환하여 비교합니다.
     const currentUserAssignment = assignments.find(
         (a) => String(a.user_id) === String(currentUserId)
     );
@@ -605,7 +604,11 @@ function showTeamAssignmentResults(assignments) {
     const resultContent = document.getElementById('ai-result-content');
 
     if (currentUserAssignment) {
-        localStorage.setItem('lastAssignment', JSON.stringify(currentUserAssignment));
+        // ⭐ 개선된 부분: 사용자 ID를 포함한 고유한 키를 생성
+        const storageKey = `lastAssignment_${currentUserId}`;
+        
+        // 고유한 키에 사용자 데이터 저장
+        localStorage.setItem(storageKey, JSON.stringify(currentUserAssignment));
         
         // AI 배정 결과가 있는 경우, HTML 요소를 업데이트합니다.
         recommendedRoleNameElement.textContent = `${currentUserAssignment.username}님에게 추천하는 역할: ${currentUserAssignment.assigned_role}`;
@@ -619,8 +622,18 @@ function showTeamAssignmentResults(assignments) {
 }
 
 function loadLastAssignment() {
-    // 'lastAssignment' 키로 저장된 데이터 가져오기
-    const lastAssignmentString = localStorage.getItem('lastAssignment');
+    // 현재 로그인된 사용자 ID를 가져옵니다.
+    const currentUserId = window.currentUserId || getCurrentUserId();
+    if (!currentUserId) {
+        console.warn("현재 사용자 ID를 가져올 수 없습니다. 기록을 로드하지 않습니다.");
+        return;
+    }
+
+    // ⭐ 개선된 부분: 사용자 ID를 포함한 고유한 키를 사용합니다.
+    const storageKey = `lastAssignment_${currentUserId}`;
+
+    // 고유한 키로 저장된 데이터 가져오기
+    const lastAssignmentString = localStorage.getItem(storageKey);
 
     if (lastAssignmentString) {
         // JSON 문자열을 다시 객체로 변환

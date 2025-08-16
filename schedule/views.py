@@ -59,7 +59,10 @@ def schedule_list_view(request, team_id):
         })
     
     # 2. Task(할 일) 데이터를 가져와 events 리스트에 추가
-    tasks = Task.objects.filter(team_id=team_id)
+    from django.db.models import Q
+    tasks = Task.objects.filter(
+        Q(team_id=team_id) & (Q(assignee=request.user) | Q(assignees=request.user))
+    ).distinct().prefetch_related('assignees')
     for task in tasks:
         if not task.due_date:
             continue
@@ -77,6 +80,9 @@ def schedule_list_view(request, team_id):
         elif task.type == 'team':
             color = '#f1c40f' # 팀 할 일은 노란색
 
+        assignee_usernames = [assignee.username for assignee in task.assignees.all()]
+        assignee_ids = [assignee.id for assignee in task.assignees.all()]
+
         events.append({
             'id': f"task_{task.id}",
             'title': f"[작업] {task.name}",
@@ -86,8 +92,9 @@ def schedule_list_view(request, team_id):
             'extendedProps': {
                 'type': 'task',
                 'description': task.description,
-                'assignee': task.assignee.username if task.assignee else '미지정',
+                'assignee': ', '.join(assignee_usernames) if assignee_usernames else '미지정',
                 'status': task.get_status_display(),
+                'assigneeIds': assignee_ids,
             }
         })
 
