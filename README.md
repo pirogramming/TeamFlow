@@ -1,7 +1,7 @@
 # 🌊 TeamFlow
 > 가장 쉬운 팀플 관리, **흐름을 잇다. 팀플을 잇다.**
 
-![TeamFlow Banner](./assets/banner.png)
+<img width="150" height="59" alt="image" src="https://github.com/user-attachments/assets/bb85aba9-ca09-4161-af1b-e92216c7d4d5" />
 
 ---
 
