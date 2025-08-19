@@ -60,11 +60,21 @@ ALLOWED_HOSTS = [
     ]
 
 CSRF_TRUSTED_ORIGINS = [
+    "https://team-flow.shop",
+    "https://www.team-flow.shop",
+
+    "http://team-flow.shop",
+    "http://www.team-flow.shop",
+
     "http://223-130-129-249.nip.io",
     "http://223-130-129-249.nip.io:8000",
     "http://223.130.129.249",
     "http://223.130.129.249:8000",
 ]
+
+# Nginx(프록시) 뒤에서 https 인식시키기
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+USE_X_FORWARDED_HOST = True
 
 # Application definition
 
