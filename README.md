@@ -5,6 +5,17 @@
 
 ---
 
+## 👥 팀원 소개
+
+| 이름  | 역할           | 담당                            |
+| --- | ------------ | ----------------------------- |
+| 박수빈 | PM & Backend | 작업, 팀플 기록, 구글 로그인, 배포         |
+| 박민경 | Frontend     | 온보딩, 팀 생성/참여, 대시보드, 작업        |
+| 이상윤 | Backend      | 대시보드, 일정, 자료, 팀 생성/참여, AI/웹소켓 |
+| 전도현 | Frontend     | 랜딩, 일정, 프로필, 팀플 기록, UI 디자인 개선 |
+
+---
+
 ## 📌 프로젝트 소개
 **TeamFlow**는 팀플 관리를 어려워하는 대학생을 위한 올인원 협업 플랫폼입니다.  
 복잡한 도구 없이, **팀 생성 → 일정 관리 → 역할 배정 → 작업 관리**를 한 곳에서 해결할 수 있습니다.
@@ -44,18 +55,7 @@
 **Collaboration**: GitHub, Notion, Figma  
 
 ## 📚 아키텍쳐
-<img width="730" height="362" alt="image" src="https://github.com/user-attachments/assets/fec33f3c-b138-4838-aff9-007aaecfd367" />
-
----
-
-## 👥 팀원 소개
-
-| 이름  | 역할           | 담당                            |
-| --- | ------------ | ----------------------------- |
-| 박수빈 | PM & Backend | 작업, 팀플 기록, 구글 로그인, 배포         |
-| 박민경 | Frontend     | 온보딩, 팀 생성/참여, 대시보드, 작업        |
-| 이상윤 | Backend      | 대시보드, 일정, 자료, 팀 생성/참여, AI/웹소켓 |
-| 전도현 | Frontend     | 랜딩, 일정, 프로필, 팀플 기록, UI 디자인 개선 |
+<img width="1765" height="752" alt="image" src="https://github.com/user-attachments/assets/adda6c34-dea2-4705-adca-a245a5cb28ea" />
 
 ---
 
