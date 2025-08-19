@@ -9,7 +9,7 @@
 
 | 박수빈      | 박민경     | 이상윤    | 전도현      |
 | --------- | --------- | --------- | --------- |
-|<img width="200" height="200" alt="image" src="https://github.com/user-attachments/assets/62226544-9e83-470a-9625-6fce252951b7" /> |<img width="200" height="200" alt="image" src="https://github.com/user-attachments/assets/7cd3b777-42bd-4bfd-bcb0-c7ced7a6425d" /> |<img width="200" height="200" alt="image" src="https://github.com/user-attachments/assets/ce056287-ee03-4982-a149-2e23cc7f433c" /> |<img width="200" height="200" alt="image" src="https://github.com/user-attachments/assets/7c8cb9a5-a5e1-46a0-9b4a-56431ffabdbe" /> |
+|<img width="240" height="240" alt="image" src="https://github.com/user-attachments/assets/62226544-9e83-470a-9625-6fce252951b7" /> |<img width="220" height="220" alt="image" src="https://github.com/user-attachments/assets/7cd3b777-42bd-4bfd-bcb0-c7ced7a6425d" /> |<img width="200" height="200" alt="image" src="https://github.com/user-attachments/assets/ce056287-ee03-4982-a149-2e23cc7f433c" /> |<img width="200" height="200" alt="image" src="https://github.com/user-attachments/assets/7c8cb9a5-a5e1-46a0-9b4a-56431ffabdbe" /> |
 | PM & Backend   | Frontend  | Backend  | Frontend  |
 | 작업, 팀플 기록, 구글 로그인, 배포  | 온보딩, 팀 생성/참여, 대시보드, 작업 | 대시보드, 일정, 자료, 팀 생성/참여, AI/웹소켓  | 랜딩, 일정, 프로필, 팀플 기록, UI 디자인 개선 |   
 
