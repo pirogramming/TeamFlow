@@ -22,6 +22,7 @@
 복잡한 도구 없이, **팀 생성 → 일정 관리 → 역할 배정 → 작업 관리**를 한 곳에서 해결할 수 있습니다.
 
 ### 프로젝트 링크 : https://team-flow.shop/   
+[시연영상 바로가기](https://drive.google.com/file/d/1lmnXNVlCrZ_P_5kY4aeYbrIhATJ_AF_8/view?usp=sharing)
 
 <br/>
 
